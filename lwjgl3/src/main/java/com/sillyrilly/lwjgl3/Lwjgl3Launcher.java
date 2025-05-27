@@ -17,7 +17,7 @@ public class Lwjgl3Launcher {
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
-        configuration.setTitle("ЕрThe Game");
+        configuration.setTitle("Eterna");
         //// Vsync limits the frames per second to what your hardware can display, and helps eliminate
         //// screen tearing. This setting doesn't always work on Linux, so the line after is a safeguard.
         configuration.useVsync(true);
@@ -29,9 +29,19 @@ public class Lwjgl3Launcher {
         //// You may also need to configure GPU drivers to fully disable Vsync; this can cause screen tearing.
 
         configuration.setWindowedMode(640, 480);
+        configuration.setResizable(false);
+
         //// You can change these files; they are in lwjgl3/src/main/resources/ .
         //// They can also be loaded from the root of assets/ .
-        configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
+        configuration.setWindowIcon("icon.png");
+        /// | Розмір    | Де може використовуватись                 |
+        /// | --------- | ----------------------------------------- |
+        /// | `128x128` | macOS Dock, великі іконки в Windows/Linux |
+        /// | `64x64`   | ярлики на робочому столі                  |
+        /// | `32x32`   | заголовок вікна гри (Windows, Linux)      |
+        /// | `16x16`   | маленькі панелі, таскбар                  |
+
+
         return configuration;
     }
 }
