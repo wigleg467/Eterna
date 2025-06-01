@@ -9,10 +9,11 @@ import com.sillyrilly.screens.MenuScreen;
 import java.util.EnumMap;
 
 import com.sillyrilly.screens.SettingsScreen;
+import com.sillyrilly.screens.TestASCIIGameScreen;
 
 public class ScreenManager implements Disposable {
     public enum ScreenType {
-        MENU, GAME, SETTINGS
+        MENU, GAME, SETTINGS, TestASCIIGameScreen
     }
 
     private static ScreenManager instance;
@@ -30,7 +31,7 @@ public class ScreenManager implements Disposable {
 
     public void initialize(Game game) {
         this.game = game;
-        setScreen(ScreenManager.ScreenType.MENU);
+        setScreen(ScreenType.TestASCIIGameScreen);
     }
 
     public void setScreen(ScreenType type) {
@@ -50,6 +51,7 @@ public class ScreenManager implements Disposable {
             case MENU -> new MenuScreen();
             case GAME -> new GameScreen();
             case SETTINGS -> new SettingsScreen();
+            case TestASCIIGameScreen -> new TestASCIIGameScreen();
         };
     }
 

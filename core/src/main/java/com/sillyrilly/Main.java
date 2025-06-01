@@ -4,7 +4,9 @@ import com.badlogic.gdx.Game;
 import com.sillyrilly.managers.*;
 import com.sillyrilly.util.GameConfig;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
+/**
+ * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
+ */
 public class Main extends Game {
 
     @Override
@@ -19,8 +21,8 @@ public class Main extends Game {
 
     @Override
     public void dispose() {
-        AssetManagerWrapper.getInstance().dispose();
-        AudioManager.getInstance().dispose();
+       // AssetManagerWrapper.getInstance().dispose();
+      //  AudioManager.getInstance().dispose();
         ScreenManager.getInstance().dispose();
     }
 
@@ -28,10 +30,10 @@ public class Main extends Game {
         CameraManager.getInstance().initialize(GameConfig.VIRTUAL_WIDTH, GameConfig.VIRTUAL_HEIGHT);
 
         // Завантаження ресурсів
-        AssetManagerWrapper.getInstance().loadAssets();
+        // AssetManagerWrapper.getInstance().loadAssets();
 
-        AudioManager.getInstance().load();
-        GameStateManager.getInstance().setState(GameStateManager.GameState.RUNNING);
+        // AudioManager.getInstance().load();
+        // GameStateManager.getInstance().setState(GameStateManager.GameState.RUNNING);
 
         ScreenManager.getInstance().initialize(this);
     }
