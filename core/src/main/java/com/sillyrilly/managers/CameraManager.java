@@ -5,13 +5,13 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class CameraManager {
-
     private static CameraManager instance;
 
     private OrthographicCamera camera;
     private Viewport viewport;
 
-    private CameraManager() {}
+    private CameraManager() {
+    }
 
     public static CameraManager getInstance() {
         if (instance == null) instance = new CameraManager();

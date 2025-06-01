@@ -2,9 +2,9 @@ package com.sillyrilly.managers;
 
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.utils.Disposable;
 
-public class AudioManager {
-
+public class AudioManager implements Disposable {
     private static AudioManager instance;
 
     private Music music;

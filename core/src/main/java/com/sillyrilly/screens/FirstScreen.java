@@ -11,8 +11,10 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-/** First screen of the application. Displayed after the application is created. */
-public class  FirstScreen implements Screen {
+/**
+ * First screen of the application. Displayed after the application is created.
+ */
+public class FirstScreen implements Screen {
     private OrthographicCamera camera;
     private Viewport viewport;
     private ShapeRenderer shapeRenderer;
@@ -23,6 +25,7 @@ public class  FirstScreen implements Screen {
     }
 
     private final ViewportType viewportType = ViewportType.SCREEN;
+
     @Override
     public void show() {
         camera = new OrthographicCamera();

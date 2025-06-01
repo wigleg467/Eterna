@@ -4,10 +4,13 @@ public class GameStateManager {
     public enum GameState {
         RUNNING, PAUSED, INVENTORY, DIALOG
     }
+
     private static GameStateManager instance;
+
     private GameState currentState = GameState.RUNNING;
 
-    private GameStateManager() {}
+    private GameStateManager() {
+    }
 
     public static GameStateManager getInstance() {
         if (instance == null) instance = new GameStateManager();

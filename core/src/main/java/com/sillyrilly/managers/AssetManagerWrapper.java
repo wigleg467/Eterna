@@ -4,10 +4,11 @@ package com.sillyrilly.managers;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.utils.Disposable;
 
-public class AssetManagerWrapper {
-
+public class AssetManagerWrapper implements Disposable {
     private static AssetManagerWrapper instance;
+
     private final AssetManager assetManager = new AssetManager();
 
     private AssetManagerWrapper() {
