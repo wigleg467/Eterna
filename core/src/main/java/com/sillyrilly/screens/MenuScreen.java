@@ -1,4 +1,4 @@
-package com.sillyrilly;
+package com.sillyrilly.screens;
 
 import com.badlogic.gdx.Screen;
 
