@@ -5,11 +5,10 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.Disposable;
 import com.sillyrilly.screens.GameScreen;
 import com.sillyrilly.screens.MenuScreen;
-
-import java.util.EnumMap;
-
 import com.sillyrilly.screens.SettingsScreen;
 import com.sillyrilly.screens.TestASCIIGameScreen;
+
+import java.util.EnumMap;
 
 public class ScreenManager implements Disposable {
     public enum ScreenType {
@@ -31,7 +30,7 @@ public class ScreenManager implements Disposable {
 
     public void initialize(Game game) {
         this.game = game;
-        setScreen(ScreenType.TestASCIIGameScreen);
+        setScreen(ScreenType.MENU);
     }
 
     public void setScreen(ScreenType type) {
