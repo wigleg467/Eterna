@@ -13,24 +13,23 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kotcrab.vis.ui.VisUI;
-import com.kotcrab.vis.ui.widget.VisLabel;
-import com.kotcrab.vis.ui.widget.VisSlider;
-import com.kotcrab.vis.ui.widget.VisTextButton;
-import com.kotcrab.vis.ui.widget.VisWindow;
+import com.kotcrab.vis.ui.widget.*;
 import com.sillyrilly.managers.CameraManager;
+
+import java.util.ArrayList;
 
 public class MenuScreen implements Screen {
     private Game game;
@@ -48,11 +47,15 @@ public class MenuScreen implements Screen {
     Stage stage;
     Window settingsWindow;
     VisTextButton close;
-    VisSlider volumeSlider;
+    Slider volumeSlider;
+    VisTable settingsTable;
+    BitmapFont customFont;
+
     Music bgm;
     Skin skin;
     float centreX = width / 2;
     float centreY = height / 2;
+    ArrayList<Settings> settingsList;
 
 
     /**
@@ -73,7 +76,10 @@ public class MenuScreen implements Screen {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
+        initializeFonts();
         initializeSettingWindow();
+        functionalSettings();
+
         loadTextures();
         createSprites();
 
@@ -81,23 +87,72 @@ public class MenuScreen implements Screen {
         font.getData().setScale(1.2f);
     }
 
-    private void initializeSettingWindow() {
+    private void initializeFonts() {
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/settings.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 24;
+        parameter.color = Color.BLACK;
+        customFont = generator.generateFont(parameter);
+        generator.dispose();
+    }
 
+    private void initializeSettingWindow() {
         skin = VisUI.getSkin();
         Window.WindowStyle style = new Window.WindowStyle(skin.get("default", Window.WindowStyle.class));
+        style.background = skin.newDrawable("white", new Color(111 / 255f, 54 / 255f, 54 / 255f, 1f));
 
-        style.titleFontColor = Color.GOLD;
-        style.titleFont = skin.getFont("default-font");
-        style.background = new TextureRegionDrawable(new TextureRegion(new Texture("images/bgsettings.jpg")));
+        style.titleFont = customFont;
 
-        settingsWindow = new VisWindow("Налаштування", style);
+        //ТЕСТОВА КАРТИНКА
+
+        settingsWindow = new VisWindow("", style);
+        settingsWindow.top().padTop(0);
+
         settingsWindow.setSize(400, 300);
-        settingsWindow.setPosition(
-                centreX - settingsWindow.getWidth() / 2, centreY - settingsWindow.getHeight() / 2
-        );
-        settingsWindow.add(new VisLabel("Гучність:")).row();
-        volumeSlider=new VisSlider(0, 1, 0.1f, false);
+        settingsWindow.setPosition(centreX - settingsWindow.getWidth() / 2, centreY - settingsWindow.getHeight() / 2);
+
+        VisLabel title = new VisLabel("Settings", new Label.LabelStyle(customFont, Color.WHITE));
+        title.setAlignment(Align.center);
+        title.setFontScale(1.2f);
+
+        VisTable header = new VisTable();
+        settingsTable = new VisTable();
+        close = new VisTextButton("x");
+
+        header.add().expandX();
+        header.add(close).right();
+        header.row();
+        header.add(title).colspan(2).center().padTop(10);
+        header.row();
+
+        settingsWindow.add(header).colspan(2).expandX().fillX().row();
+
+
+        Skin skinknob = new Skin(Gdx.files.internal("uiskin.json"));
+        volumeSlider = new Slider(0, 1, 0.1f, false, skinknob, "default-horizontal");
         volumeSlider.setValue(0.5f);
+
+        System.out.println(volumeSlider.getStyle().background);
+
+
+        settingsList = new ArrayList<>();
+
+        settingsList.add(new Settings("Гучнiсть", volumeSlider));
+        settingsList.add(new Settings("Страшнi звуки", new CheckBox("йоу", skinknob)));
+        settingsList.add(new Settings("Селект бокс", new SelectBox<>(skinknob)));
+
+        for (Settings settings : settingsList) {
+            settings.placeSettings();
+        }
+
+        settingsWindow.add(settingsTable).colspan(2).expandX().fillX().padTop(10).row();
+        settingsWindow.setVisible(false);
+        stage.addActor(settingsWindow);
+
+
+    }
+
+    private void functionalSettings() {
         volumeSlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeListener.ChangeEvent event, Actor actor) {
@@ -105,14 +160,6 @@ public class MenuScreen implements Screen {
                 bgm.setVolume(volume);
             }
         });
-
-        settingsWindow.add(volumeSlider).row();
-
-        close = new VisTextButton("Закрити");
-        settingsWindow.add(close).row();
-
-        settingsWindow.setVisible(false);
-        stage.addActor(settingsWindow);
 
         close.addListener(new ClickListener() {
             @Override
@@ -242,7 +289,7 @@ public class MenuScreen implements Screen {
         if (Gdx.input.justTouched()) {
             if (exitBtn.getBoundingRectangle().contains(mouse.x, mouse.y))
                 Gdx.app.exit();
-             else if (settingsBtn.getBoundingRectangle().contains(mouse.x, mouse.y)){
+            else if (settingsBtn.getBoundingRectangle().contains(mouse.x, mouse.y)) {
                 settingsWindow.setVisible(true);
             }
         }
@@ -251,7 +298,6 @@ public class MenuScreen implements Screen {
 
     /**
      * @param width
-     * @param height
      * @see ApplicationListener#resize(int, int)
      */
     @Override
@@ -310,6 +356,40 @@ public class MenuScreen implements Screen {
         font.draw(batch, hoveredHint, buttonCentreX - length * 4, button.getY() - 10);
     }
 
+    private class Settings {
+        VisLabel settingsLabel;
+        Actor actor;
+        private static final float rowSpacing = 10f;
+        private static final float labelColumnWidth = 120f;
+
+        public Settings(String label, Slider slider) {
+            this.settingsLabel = new VisLabel(label);
+            this.actor = slider;
+        }
+
+        public Settings(String label, CheckBox checkbox) {
+            this.settingsLabel = new VisLabel(label);
+            this.actor = checkbox;
+        }
+
+        public Settings(String label, SelectBox<?> selectBox) {
+            this.settingsLabel = new VisLabel(label);
+            this.actor = selectBox;
+        }
+
+        public void placeSettings() {
+            settingsTable.row().padTop(rowSpacing);
+            settingsTable.add(settingsLabel).width(labelColumnWidth).padLeft(30).left();
+            settingsTable.add(actor).expandX().fillX().padRight(30).left();
+        }
+
+        public Actor getActor() {
+            return actor;
+        }
+
+    }
+}
+
 //    private class PixelPerfectSprite {
 //        private final Sprite sprite;
 //        private final Pixmap pixmap;
@@ -363,4 +443,4 @@ public class MenuScreen implements Screen {
 //            pixmap.dispose();
 //        }
 //    }
-}
+

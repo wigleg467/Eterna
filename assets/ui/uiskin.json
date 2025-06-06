@@ -192,10 +192,10 @@ com.badlogic.gdx.scenes.scene2d.ui.SelectBox$SelectBoxStyle: {
 }
 com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle: {
     default-horizontal: {
-        knobOver: slider-knob-over
-        knobDown: slider-knob-over
+        knobOver: wing-slider-knob
+        knobDown: wing-slider-knob
         background: progress-bar-square
-        knob: slider-knob
+        knob: wing-slider-knob
     }
     default-vertical: {
         knobOver: slider-knob-over

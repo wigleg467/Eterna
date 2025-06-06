@@ -243,6 +243,13 @@ slider-knob
   orig: 9, 9
   offset: 0, 0
   index: -1
+  wing-slider-knob
+    rotate: false
+    xy: 65, 20         # ← заміни на свої координати у `uiskin.png`
+    size: 20, 20        # ← розмір твоєї картинки
+    orig: 20, 20
+    offset: 0, 0
+    index: -1
 slider-knob-over
   rotate: false
   xy: 46, 46
