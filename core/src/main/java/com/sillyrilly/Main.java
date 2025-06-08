@@ -21,19 +21,21 @@ public class Main extends Game {
 
     @Override
     public void dispose() {
-       // AssetManagerWrapper.getInstance().dispose();
-      //  AudioManager.getInstance().dispose();
+        super.dispose();
         ScreenManager.getInstance().dispose();
+
+        // AssetManagerWrapper.getInstance().dispose();
+        // AudioManager.getInstance().dispose();
     }
 
     private void initialize() {
+        CameraManager.getInstance().initialize(GameConfig.VIRTUAL_WIDTH, GameConfig.VIRTUAL_HEIGHT);
+        ScreenManager.getInstance().initialize(this);
+
         // Завантаження ресурсів
         // AssetManagerWrapper.getInstance().loadAssets();
 
         // AudioManager.getInstance().load();
         // GameStateManager.getInstance().setState(GameStateManager.GameState.RUNNING);
-
-        CameraManager.getInstance().initialize(GameConfig.VIRTUAL_WIDTH, GameConfig.VIRTUAL_HEIGHT);
-        ScreenManager.getInstance().initialize(this);
     }
 }

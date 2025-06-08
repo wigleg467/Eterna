@@ -7,7 +7,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.entities.EntityFactory;
 import com.sillyrilly.gamelogic.ecs.systems.InputSystem;
 import com.sillyrilly.gamelogic.ecs.systems.MovementSystem;
@@ -18,8 +17,6 @@ public class GameScreen implements Screen {
     private Engine engine;
     private SpriteBatch batch;
     private EntityFactory factory;
-
-    Vector2 dir;
 
     /**
      * Called when this screen becomes the current screen for a {@link Game}.
