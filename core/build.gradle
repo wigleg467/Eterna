@@ -19,8 +19,6 @@ dependencies {
   api "com.squidpony:squidlib-extra:$squidlibExtraVersion"
   api "com.squidpony:squidlib-util:$squidlibUtilVersion"
   api "com.squidpony:squidlib:$squidlibVersion"
-  annotationProcessor "org.projectlombok:lombok:$lombokVersion"
-  compileOnly "org.projectlombok:lombok:$lombokVersion"
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"

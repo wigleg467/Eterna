@@ -33,29 +33,29 @@ import java.util.ArrayList;
 
 public class MenuScreen implements Screen {
     private Game game;
-    OrthographicCamera camera;
-    Viewport viewport;
+    private OrthographicCamera camera;
+    private Viewport viewport;
     private SpriteBatch batch;
     private Texture texHead, texEye, texNewGame, texSettings, texExit, texWings, texBook, keyOutlineTexture, settingOutlineTexture, bestiaryOutlineTexture;
     private Sprite head, eye, newGameBtn, settingsBtn, exitBtn, leftWing, rightWing, bestiary, keyOutline, settingOutline, bestiaryOutline;
-    ShapeRenderer shapeRenderer;
-    TextureRegion textureRegion;
+    private ShapeRenderer shapeRenderer;
+    private TextureRegion textureRegion;
     private static final float width = 1280, height = 720;
     private static final int padding = 30;
-    BitmapFont font;
-    String hoveredHint = null;
-    Stage stage;
-    Window settingsWindow;
-    VisTextButton close;
-    Slider volumeSlider;
-    VisTable settingsTable;
-    BitmapFont customFont;
+    private BitmapFont font;
+    private String hoveredHint = null;
+    private Stage stage;
+    private Window settingsWindow;
+    private VisTextButton close;
+    private Slider volumeSlider;
+    private VisTable settingsTable;
+    private BitmapFont customFont;
 
-    Music bgm;
-    Skin skin;
-    float centreX = width / 2;
-    float centreY = height / 2;
-    ArrayList<Settings> settingsList;
+    private Music bgm;
+    private Skin skin;
+    private float centreX = width / 2;
+    private float centreY = height / 2;
+    private ArrayList<Settings> settingsList;
 
 
     /**
@@ -70,6 +70,7 @@ public class MenuScreen implements Screen {
         camera.update();
 
         bgm = Gdx.audio.newMusic(Gdx.files.internal("audio/music/policy-of-truth.mp3"));
+        bgm.setLooping(true);
         bgm.play();
 
         VisUI.load();
@@ -130,7 +131,7 @@ public class MenuScreen implements Screen {
 
         Skin skinknob = new Skin(Gdx.files.internal("uiskin.json"));
         volumeSlider = new Slider(0, 1, 0.1f, false, skinknob, "default-horizontal");
-        volumeSlider.setValue(0.5f);
+        volumeSlider.setValue(0.005f);
 
         System.out.println(volumeSlider.getStyle().background);
 
@@ -297,7 +298,8 @@ public class MenuScreen implements Screen {
 
 
     /**
-     * @param width
+     * @param width  ширина
+     * @param height висота
      * @see ApplicationListener#resize(int, int)
      */
     @Override

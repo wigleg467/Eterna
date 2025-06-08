@@ -27,14 +27,13 @@ public class Main extends Game {
     }
 
     private void initialize() {
-        CameraManager.getInstance().initialize(GameConfig.VIRTUAL_WIDTH, GameConfig.VIRTUAL_HEIGHT);
-
         // Завантаження ресурсів
         // AssetManagerWrapper.getInstance().loadAssets();
 
         // AudioManager.getInstance().load();
         // GameStateManager.getInstance().setState(GameStateManager.GameState.RUNNING);
 
+        CameraManager.getInstance().initialize(GameConfig.VIRTUAL_WIDTH, GameConfig.VIRTUAL_HEIGHT);
         ScreenManager.getInstance().initialize(this);
     }
 }
