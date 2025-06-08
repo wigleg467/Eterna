@@ -34,6 +34,6 @@ public class Main extends Game {
         // GameStateManager.getInstance().setState(GameStateManager.GameState.RUNNING);
 
         CameraManager.getInstance().initialize(GameConfig.VIRTUAL_WIDTH, GameConfig.VIRTUAL_HEIGHT);
-        ScreenManager.getInstance().initialize(this);
+        ScreenManager.getInstance() .initialize(this);
     }
 }

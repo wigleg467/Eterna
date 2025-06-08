@@ -30,7 +30,7 @@ public class ScreenManager implements Disposable {
 
     public void initialize(Game game) {
         this.game = game;
-        setScreen(ScreenType.GAME);
+        setScreen(ScreenType.MENU);
     }
 
     public void setScreen(ScreenType type) {
