@@ -20,7 +20,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kotcrab.vis.ui.VisUI;
@@ -261,8 +260,8 @@ public class MenuScreen implements Screen {
         settingsWindow.add(header).colspan(2).expandX().fillX().row();
 
 
-        volumeSlider = new VisSlider(0, 1, 0.1f, false, skin.get("default-horizontal", VisSlider.SliderStyle.class));
-        volumeSlider.setValue(0.5f);
+        volumeSlider = new VisSlider(0, 1, 0.05f, false, skin.get("default-horizontal", VisSlider.SliderStyle.class));
+        volumeSlider.setValue(0.05f);
 
         ArrayList<Settings> settingsList = new ArrayList<>();
 
