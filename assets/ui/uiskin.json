@@ -198,16 +198,16 @@ com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle: {
         knob: wing-slider-knob
     }
     default-vertical: {
-        knobOver: slider-knob-over
-        knobDown: slider-knob-over
+        knobOver: wing-slider-knob
+        knobDown: wing-slider-knob
         background: progress-bar-square
-        knob: slider-knob
+        knob: wing-slider-knob
     }
     curved: {
-        knobOver: slider-knob-over
-        knobDown: slider-knob-over
+        knobOver: wing-slider-knob
+        knobDown: wing-slider-knob
         background: slider
-        knob: slider-knob
+        knob: wing-slider-knob
     }
 }
 com.badlogic.gdx.scenes.scene2d.ui.SplitPane$SplitPaneStyle: {

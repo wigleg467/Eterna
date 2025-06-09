@@ -5,14 +5,29 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.Disposable;
 import com.sillyrilly.screens.GameScreen;
 import com.sillyrilly.screens.MenuScreen;
-import com.sillyrilly.screens.SettingsScreen;
-import com.sillyrilly.screens.TestASCIIGameScreen;
 
 import java.util.EnumMap;
 
 public class ScreenManager implements Disposable {
     public enum ScreenType {
-        MENU, GAME, SETTINGS, TestASCIIGameScreen
+        MENU, GAME;
+
+        private static ScreenType current;
+
+        public static Screen createScreen(ScreenType type) {
+            return switch (type) {
+                case MENU -> new MenuScreen();
+                case GAME -> new GameScreen();
+            };
+        }
+
+        public static void setScreenType(ScreenType type) {
+            current = type;
+        }
+
+        public static ScreenType getCurrentScreenType() {
+            return current;
+        }
     }
 
     private static ScreenManager instance;
@@ -30,28 +45,19 @@ public class ScreenManager implements Disposable {
 
     public void initialize(Game game) {
         this.game = game;
-        setScreen(ScreenType.GAME);
+        setScreen(ScreenType.MENU);
     }
 
     public void setScreen(ScreenType type) {
         if (!screenMap.containsKey(type)) {
-            screenMap.put(type, createScreen(type));
+            screenMap.put(type, ScreenType.createScreen(type));
         }
         game.setScreen(screenMap.get(type));
+        ScreenType.setScreenType(type);
     }
 
     public void dispose() {
         for (Screen screen : screenMap.values()) screen.dispose();
         screenMap.clear();
     }
-
-    private Screen createScreen(ScreenType type) {
-        return switch (type) {
-            case MENU -> new MenuScreen();
-            case GAME -> new GameScreen();
-            case SETTINGS -> new SettingsScreen();
-            case TestASCIIGameScreen -> new TestASCIIGameScreen();
-        };
-    }
-
 }

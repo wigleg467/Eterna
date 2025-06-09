@@ -9,7 +9,6 @@ buildscript {
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
   }
   dependencies {
-    classpath "io.freefair.gradle:lombok-plugin:8.3"
 
   }
 }
@@ -29,7 +28,6 @@ allprojects {
 
 configure(subprojects) {
   apply plugin: 'java-library'
-  apply plugin: 'io.freefair.lombok'
   sourceCompatibility = 17
 
   // From https://lyze.dev/2021/04/29/libGDX-Internal-Assets-List/

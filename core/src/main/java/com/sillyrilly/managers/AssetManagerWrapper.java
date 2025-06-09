@@ -2,8 +2,6 @@ package com.sillyrilly.managers;
 
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Disposable;
 
 public class AssetManagerWrapper implements Disposable {
