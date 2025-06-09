@@ -24,8 +24,8 @@ public class InputSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
-        InputManager.update();
-        Vector2 movement = InputManager.getMovementDirection();
+        InputManager.getInstance().update();
+        Vector2 movement = InputManager.getInstance().getMovementDirection();
 
         for (Entity entity : controlledEntities) {
             VelocityComponent vel = vm.get(entity);
