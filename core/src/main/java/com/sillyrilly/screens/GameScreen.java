@@ -6,17 +6,19 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.sillyrilly.gamelogic.ecs.entities.EntityFactory;
 import com.sillyrilly.gamelogic.ecs.systems.CameraFollowSystem;
 import com.sillyrilly.gamelogic.ecs.systems.InputSystem;
 import com.sillyrilly.gamelogic.ecs.systems.MovementSystem;
 import com.sillyrilly.gamelogic.ecs.systems.RenderSystem;
 import com.sillyrilly.managers.CameraManager;
+import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
 
 
 public class GameScreen implements Screen {
@@ -25,6 +27,9 @@ public class GameScreen implements Screen {
     private EntityFactory factory;
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
+    private World world;
+    private Box2DMapObjectParser parser;
+    float tileScale = 1f / 32f;
 
     /**
      * Called when this screen becomes the current screen for a {@link Game}.
@@ -41,6 +46,10 @@ public class GameScreen implements Screen {
         float mapHeight = map.getProperties().get("height", Integer.class);
         float tileWidth = map.getProperties().get("tilewidth", Integer.class);
         float tileHeight = map.getProperties().get("tileheight", Integer.class);
+
+        world = new World(new Vector2(0, 0), true);
+         parser = new Box2DMapObjectParser(tileScale);
+        parser.load(world, map);
 
         float centerX = mapWidth * tileWidth / 2f;
         float centerY = mapHeight * tileHeight / 2f;
