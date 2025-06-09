@@ -1,6 +1,7 @@
 package com.sillyrilly.managers;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -43,8 +44,13 @@ public class CameraManager {
         camera.update();
     }
 
+    public void centerOnSmooth(float x, float y) {
+        camera.position.lerp(new Vector3(x, y, 0), 0.1f);
+        camera.update();
+    }
+
     public void setZoom(float zoom) {
-        camera.zoom = zoom;
+        camera.zoom += zoom;
         camera.update();
     }
 }

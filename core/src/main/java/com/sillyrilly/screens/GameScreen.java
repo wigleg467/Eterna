@@ -12,9 +12,11 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.sillyrilly.gamelogic.ecs.entities.EntityFactory;
+import com.sillyrilly.gamelogic.ecs.systems.CameraFollowSystem;
 import com.sillyrilly.gamelogic.ecs.systems.InputSystem;
 import com.sillyrilly.gamelogic.ecs.systems.MovementSystem;
 import com.sillyrilly.gamelogic.ecs.systems.RenderSystem;
+import com.sillyrilly.managers.CameraManager;
 
 
 public class GameScreen implements Screen {
@@ -23,7 +25,6 @@ public class GameScreen implements Screen {
     private EntityFactory factory;
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
-    private OrthographicCamera camera;
 
     /**
      * Called when this screen becomes the current screen for a {@link Game}.
@@ -34,8 +35,15 @@ public class GameScreen implements Screen {
         TmxMapLoader loader = new TmxMapLoader();
         map = loader.load("maps/test-map.tmx");
         renderer = new OrthogonalTiledMapRenderer(map);
-        camera = new OrthographicCamera();
-        renderer.setView(camera);
+        renderer.setView(CameraManager.getInstance().getCamera());
+
+        float mapWidth = map.getProperties().get("width", Integer.class);
+        float mapHeight = map.getProperties().get("height", Integer.class);
+        float tileWidth = map.getProperties().get("tilewidth", Integer.class);
+        float tileHeight = map.getProperties().get("tileheight", Integer.class);
+
+        float centerX = mapWidth * tileWidth / 2f;
+        float centerY = mapHeight * tileHeight / 2f;
 
         batch = new SpriteBatch();
         engine = new Engine();
@@ -43,10 +51,11 @@ public class GameScreen implements Screen {
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderSystem(batch));
         engine.addSystem(new InputSystem());
+        engine.addSystem(new CameraFollowSystem(CameraManager.getInstance()));
 
         factory = new EntityFactory(engine);
 
-        factory.createEntity(EntityFactory.EntityType.PLAYER, 100, 100);
+        factory.createEntity(EntityFactory.EntityType.PLAYER, centerX, centerY);
     }
 
     /**
@@ -58,10 +67,11 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        CameraManager.getInstance().getCamera().update();
+        renderer.setView(CameraManager.getInstance().getCamera());
         renderer.render();
 
         engine.update(delta);
-
     }
 
     /**
@@ -71,9 +81,6 @@ public class GameScreen implements Screen {
      */
     @Override
     public void resize(int width, int height) {
-        camera.viewportWidth = width;
-        camera.viewportHeight = height;
-        camera.update();
 
     }
 

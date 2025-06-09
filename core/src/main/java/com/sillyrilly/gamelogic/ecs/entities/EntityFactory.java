@@ -5,10 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Disposable;
-import com.sillyrilly.gamelogic.ecs.components.PositionComponent;
-import com.sillyrilly.gamelogic.ecs.components.SpeedComponent;
-import com.sillyrilly.gamelogic.ecs.components.VelocityComponent;
-import com.sillyrilly.gamelogic.ecs.components.TextureComponent;
+import com.sillyrilly.gamelogic.ecs.components.*;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -18,14 +15,14 @@ public class EntityFactory implements Disposable {
     private final Map<EntityType, Texture> textureMap = new EnumMap<>(EntityType.class);
 
     public enum EntityType {
-        PLAYER("images/entity/cat.png", 100f),
+        PLAYER("images/entity/cat.png", 300f),
         ENEMY("images/entity/cat.png", 100f),
         NPC("images/entity/cat.png", 100f);
 
         private final String texturePath;
         private final float speed;
 
-        EntityType(String texturePath,  float speed) {
+        EntityType(String texturePath, float speed) {
             this.texturePath = texturePath;
             this.speed = speed;
         }
@@ -50,7 +47,7 @@ public class EntityFactory implements Disposable {
         pos.position.set(x, y);
 
         VelocityComponent vel = new VelocityComponent();
-        vel.velocity.set(0, 0);
+        vel.velocity.set(1f, 1f);
 
         SpeedComponent speed = new SpeedComponent(type.getSpeed());
 
@@ -61,6 +58,15 @@ public class EntityFactory implements Disposable {
         entity.add(vel);
         entity.add(speed);
         entity.add(tex);
+
+        if (EntityType.NPC == type || EntityType.PLAYER == type) {
+            entity.add(new CameraFollowableComponent());
+
+            if (EntityType.PLAYER == type) {
+                entity.add(new CameraTargetComponent());
+                Gdx.app.log("Create", "Player");
+            }
+        }
 
         engine.addEntity(entity);
         return entity;
