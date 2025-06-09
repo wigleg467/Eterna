@@ -1,6 +1,7 @@
 package com.sillyrilly;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.sillyrilly.managers.*;
 import com.sillyrilly.util.GameConfig;
 
@@ -21,19 +22,21 @@ public class Main extends Game {
 
     @Override
     public void dispose() {
-       // AssetManagerWrapper.getInstance().dispose();
-      //  AudioManager.getInstance().dispose();
+        // AssetManagerWrapper.getInstance().dispose();
+        AudioManager.getInstance().dispose();
         ScreenManager.getInstance().dispose();
+        Gdx.app.log("DISPOSE", "Game disposed");
+        Gdx.app.exit();
     }
 
     private void initialize() {
         // Завантаження ресурсів
         // AssetManagerWrapper.getInstance().loadAssets();
 
-        // AudioManager.getInstance().load();
+        AudioManager.getInstance().load();
         // GameStateManager.getInstance().setState(GameStateManager.GameState.RUNNING);
 
         CameraManager.getInstance().initialize(GameConfig.VIRTUAL_WIDTH, GameConfig.VIRTUAL_HEIGHT);
-        ScreenManager.getInstance() .initialize(this);
+        ScreenManager.getInstance().initialize(this);
     }
 }

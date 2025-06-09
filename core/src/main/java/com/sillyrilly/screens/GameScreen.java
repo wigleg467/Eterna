@@ -19,8 +19,6 @@ public class GameScreen implements Screen {
     private SpriteBatch batch;
     private EntityFactory factory;
 
-    Vector2 dir;
-
     /**
      * Called when this screen becomes the current screen for a {@link Game}.
      */
@@ -82,7 +80,6 @@ public class GameScreen implements Screen {
      */
     @Override
     public void hide() {
-
     }
 
     /**
@@ -90,6 +87,7 @@ public class GameScreen implements Screen {
      */
     @Override
     public void dispose() {
-
+        batch.dispose();
+        factory.dispose();
     }
 }

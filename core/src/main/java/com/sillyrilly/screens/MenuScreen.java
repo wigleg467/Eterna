@@ -1,7 +1,6 @@
 package com.sillyrilly.screens;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -21,58 +20,59 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.*;
+import com.sillyrilly.managers.AudioManager;
 import com.sillyrilly.managers.CameraManager;
 import com.sillyrilly.managers.ScreenManager;
 
 import java.util.ArrayList;
 
 public class MenuScreen implements Screen {
-    private Game game;
+    private static final Color DARK_RED = new Color(111 / 255f, 54 / 255f, 54 / 255f, 1f);
+    private static final float WIDTH = 1280, HEIGHT = 720, CENTRE_X = WIDTH / 2, CENTRE_Y = HEIGHT / 2;
+    private static final int PADDING = 30;
+    private static final float MAX_ANGLE = 4f;
+    private static final float SPEED = 2f;
+    private static final float FLOAT = 0.1f;
+
+    private boolean fadingOut = true;
+    private float alpha = 1f;
+    private float time = 0;
+
     private OrthographicCamera camera;
     private Viewport viewport;
     private SpriteBatch batch;
-    private Texture texHead, texSettings, texExit, texWings, texBook, keyOutlineTexture, settingOutlineTexture, bestiaryOutlineTexture, labelTexture, backgroundTexture, continueTexture;
-    private Sprite head, settingsBtn, exitBtn, leftWing, rightWing, bestiary, keyOutline, settingOutline, bestiaryOutline, labelSprite;
+    private Texture texHead, texSettings, texExit, texWings, texBook,
+        keyOutlineTexture, settingOutlineTexture,
+        bestiaryOutlineTexture, labelTexture,
+        backgroundTexture, continueTexture;
+    private Sprite head, leftWing,
+        rightWing, keyOutline, settingOutline,
+        bestiaryOutline, labelSprite,
+        settingsBtn, exitBtn, bestiaryBtn;
     private Stage stage;
-    private VisWindow settingsWindow;
     private VisTextButton close;
     private VisSlider volumeSlider;
     private VisTable settingsTable;
+    private VisWindow settingsWindow;
     private BitmapFont customFont, hoverFont;
-    private Music bgm;
-    private String hoveredHint = null;
-    private final Color darkRed = new Color(111 / 255f, 54 / 255f, 54 / 255f, 1f);
-    private static final float width = 1280, height = 720, centreX = width / 2, centreY = height / 2;
-    private static final int padding = 30;
-
-    //Для анімації
-    float time = 0;
-    float maxAngle = 4f;
-    float speed = 2f;
-    float headAmplitude = 0.1f;
-    boolean fadingOut = true;
-    float alpha = 1f;
-
+    private String hoveredHint;
+    private Skin skin;
 
     /**
      * Called when this screen becomes the current screen for a {@link Game}.
      */
     @Override
     public void show() {
-        initViewportAndCamera();
-        playMusic();
-
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
-
+        initFOV();
         loadTextures();
         createSprites();
-        initializeFonts();
-        initializeSettingWindow();
+        initFonts();
+        initSettingWindow();
     }
 
     /**
@@ -82,11 +82,7 @@ public class MenuScreen implements Screen {
      */
     @Override
     public void render(float delta) {
-        time += delta;
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
+        clearAndUpdate(delta);
         handleInput();
         draw(delta);
     }
@@ -122,7 +118,6 @@ public class MenuScreen implements Screen {
      */
     @Override
     public void hide() {
-
     }
 
     /**
@@ -145,17 +140,22 @@ public class MenuScreen implements Screen {
         hoverFont.dispose();
         customFont.dispose();
         stage.dispose();
-        bgm.dispose();
+        skin.dispose();
         VisUI.dispose();
     }
 
-    //************          Методи для show          ************
-    private void initViewportAndCamera() {
-        camera = CameraManager.getInstance().getCamera();
+    //##################### Методи для show #####################
+
+    private void initFOV() {
         viewport = CameraManager.getInstance().getViewport();
         viewport.apply();
-        camera.position.set(centreX, centreY, 0);
+
+        camera = CameraManager.getInstance().getCamera();
+        camera.position.set(CENTRE_X, CENTRE_Y, 0);
         camera.update();
+
+        stage = new Stage(new ScreenViewport());
+        Gdx.input.setInputProcessor(stage);
     }
 
     private void loadTextures() {
@@ -177,74 +177,72 @@ public class MenuScreen implements Screen {
 
         head = new Sprite(texHead);
         increaseSize(head);
-        head.setPosition(centreX - head.getWidth() / 2, centreY - head.getHeight() / 2);
+        head.setPosition(CENTRE_X - head.getWidth() / 2, CENTRE_Y - head.getHeight() / 2);
 
         leftWing = new Sprite(texWings);
         increaseSize(leftWing);
-        leftWing.setPosition(centreX - leftWing.getWidth(), centreY - leftWing.getHeight() / 2 + 15);
+        leftWing.setPosition(CENTRE_X - leftWing.getWidth(), CENTRE_Y - leftWing.getHeight() / 2 + 15);
 
         rightWing = new Sprite(texWings);
         rightWing.flip(true, false);
         increaseSize(rightWing);
-        rightWing.setPosition(centreX, centreY - rightWing.getHeight() / 2 + 15);
+        rightWing.setPosition(CENTRE_X, CENTRE_Y - rightWing.getHeight() / 2 + 15);
 
         settingsBtn = new Sprite(texSettings);
         settingOutline = new Sprite(settingOutlineTexture);
         decreaseSize(settingsBtn);
         decreaseSize(settingOutline);
 
-        settingsBtn.setPosition(width - settingsBtn.getWidth() - padding, padding);
+        settingsBtn.setPosition(WIDTH - settingsBtn.getWidth() - PADDING, PADDING);
         settingOutline.setPosition(settingsBtn.getX(), settingsBtn.getY());
 
         exitBtn = new Sprite(texExit);
         keyOutline = new Sprite(keyOutlineTexture);
-        exitBtn.setPosition(width - exitBtn.getWidth() - padding, height - exitBtn.getHeight() - padding);
+        exitBtn.setPosition(WIDTH - exitBtn.getWidth() - PADDING, HEIGHT - exitBtn.getHeight() - PADDING);
         keyOutline.setPosition(exitBtn.getX() - 2, exitBtn.getY() - 2);
 
-        bestiary = new Sprite(texBook);
+        bestiaryBtn = new Sprite(texBook);
         bestiaryOutline = new Sprite(bestiaryOutlineTexture);
-        bestiary.setPosition(padding, padding);
-        bestiaryOutline.setPosition(bestiary.getX() - 2, bestiary.getY() - 2);
+        bestiaryBtn.setPosition(PADDING, PADDING);
+        bestiaryOutline.setPosition(bestiaryBtn.getX() - 2, bestiaryBtn.getY() - 2);
 
         labelSprite = new Sprite(labelTexture);
         labelSprite.setSize(labelSprite.getWidth() * 0.4f, labelSprite.getHeight() * 0.4f);
-        labelSprite.setPosition(centreX - labelSprite.getWidth() / 2, height - labelSprite.getHeight() * 2.3f);
+        labelSprite.setPosition(CENTRE_X - labelSprite.getWidth() / 2, HEIGHT - labelSprite.getHeight() * 2.3f);
     }
 
-    private void initializeFonts() {
+    private void initFonts() {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/settings.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 24;
-        customFont = generator.generateFont(parameter);
 
-        generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/settings.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter param = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        param.size = 20;
+        FreeTypeFontGenerator.FreeTypeFontParameter paramCustom = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        paramCustom.size = 24;
+        customFont = generator.generateFont(paramCustom);
 
-        param.characters = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ" +
-                "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя" +
-                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.,:;(){}[]«»–-";
+        FreeTypeFontGenerator.FreeTypeFontParameter paramHover = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        paramHover.size = 20;
+        paramHover.characters = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ" +
+                                "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя" +
+                                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.,:;(){}[]«»–-";
 
-        hoverFont = generator.generateFont(param);
-
+        hoverFont = generator.generateFont(paramHover);
         hoverFont.getData().markupEnabled = true;
 
         generator.dispose();
     }
 
-    private void initializeSettingWindow() {
+    private void initSettingWindow() {
         VisUI.load();
-        //******       Стиль для вікна       ******
-        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+        //##################### Стиль для вікна #####################
+        skin = new Skin(Gdx.files.internal("uiskin.json"));
         Window.WindowStyle style = new Window.WindowStyle(skin.get("default", Window.WindowStyle.class));
-        style.background = skin.newDrawable("white", darkRed);
+        style.background = skin.newDrawable("white", DARK_RED);
         style.titleFont = customFont;
 
         settingsWindow = new VisWindow("", style);
         settingsWindow.top().padTop(0);
 
         settingsWindow.setSize(400, 300);
-        settingsWindow.setPosition(centreX - settingsWindow.getWidth() / 2, centreY - settingsWindow.getHeight() / 2);
+        settingsWindow.setPosition(CENTRE_X - settingsWindow.getWidth() / 2, CENTRE_Y - settingsWindow.getHeight() / 2);
 
         VisLabel title = new VisLabel("Settings", new Label.LabelStyle(customFont, Color.WHITE));
         title.setAlignment(Align.center);
@@ -289,7 +287,7 @@ public class MenuScreen implements Screen {
             @Override
             public void changed(ChangeListener.ChangeEvent event, Actor actor) {
                 float volume = volumeSlider.getValue();
-                bgm.setVolume(volume);
+                AudioManager.getInstance().setVolume(volume);
             }
         });
 
@@ -301,13 +299,6 @@ public class MenuScreen implements Screen {
         });
     }
 
-    private void playMusic() {
-        bgm = Gdx.audio.newMusic(Gdx.files.internal("audio/music/policy-of-truth.mp3"));
-        bgm.setVolume(0.5f);
-        bgm.setLooping(true);
-        bgm.play();
-    }
-
     private void increaseSize(Sprite sprite) {
         sprite.setSize(sprite.getWidth() * 1.8f, sprite.getHeight() * 1.8f);
     }
@@ -316,11 +307,21 @@ public class MenuScreen implements Screen {
         sprite.setSize(sprite.getWidth() * 0.7f, sprite.getHeight() * 0.7f);
     }
 
-    //************          Методи для render          ************
+    //##################### Методи для render #####################
+
+    private void clearAndUpdate(float delta) {
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        time += delta;
+
+        camera.update();
+        batch.setProjectionMatrix(camera.combined);
+    }
+
     private void draw(float delta) {
         animateAngel();
         animateContinueButton(delta);
-
 
         batch.begin();
         batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -328,15 +329,13 @@ public class MenuScreen implements Screen {
         rightWing.draw(batch);
         head.draw(batch);
         settingsBtn.draw(batch);
-        bestiary.draw(batch);
+        bestiaryBtn.draw(batch);
         exitBtn.draw(batch);
         labelSprite.draw(batch);
 
-
         batch.setColor(1, 1, 1, alpha);
-        batch.draw(continueTexture, centreX - (float) continueTexture.getWidth() / 2, centreY - continueTexture.getHeight() * 2.3f);
+        batch.draw(continueTexture, CENTRE_X - (float) continueTexture.getWidth() / 2, CENTRE_Y - continueTexture.getHeight() * 2.3f);
         batch.setColor(1, 1, 1, 1);
-
 
         hoveredHint();
 
@@ -347,18 +346,19 @@ public class MenuScreen implements Screen {
     }
 
     private void animateAngel() {
-        float angle = MathUtils.sin(time * speed) * maxAngle;
+        float angle = MathUtils.sin(time * SPEED) * MAX_ANGLE;
+        float offsetY = MathUtils.sin(time * SPEED) * FLOAT;
+
         leftWing.setOriginCenter();
         rightWing.setOriginCenter();
 
         leftWing.setRotation(angle);
         rightWing.setRotation(-angle);
 
-        float offsetY = MathUtils.sin(time * speed) * headAmplitude;
-
-        head.setPosition(head.getX(), head.getY() + offsetY);
         leftWing.setPosition(leftWing.getX(), leftWing.getY() + offsetY);
         rightWing.setPosition(rightWing.getX(), rightWing.getY() + offsetY);
+
+        head.setPosition(head.getX(), head.getY() + offsetY);
     }
 
     private void animateContinueButton(float delta) {
@@ -380,15 +380,19 @@ public class MenuScreen implements Screen {
     private void hoveredHint() {
         if (hoveredHint != null) {
             hoverFont.setColor(Color.BLACK);
-            if (hoveredHint.length() == 9) {
-                drawButtonHint(bestiary, 9);
-                bestiaryOutline.draw(batch);
-            } else if (hoveredHint.length() ==7) {
-                drawButtonHint(settingsBtn, 7);
-                settingOutline.draw(batch);
-            } else if (hoveredHint.length() == 4) {
-                drawButtonHint(exitBtn, 4);
-                keyOutline.draw(batch);
+            switch (hoveredHint.length()) {
+                case 4:
+                    drawButtonHint(exitBtn, 4);
+                    keyOutline.draw(batch);
+                    break;
+                case 7:
+                    drawButtonHint(settingsBtn, 7);
+                    settingOutline.draw(batch);
+                    break;
+                case 9:
+                    drawButtonHint(bestiaryBtn, 9);
+                    bestiaryOutline.draw(batch);
+                    break;
             }
         }
     }
@@ -398,15 +402,17 @@ public class MenuScreen implements Screen {
         hoverFont.draw(batch, hoveredHint, buttonCentreX - length * 4, button.getY() - 10);
     }
 
-    //************          Ввід користувача          ************
+    //##################### Обробка подій #####################
+
     private void handleInput() {
         Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-        camera.unproject(mouse);
+        CameraManager.getInstance().getCamera().unproject(mouse);
+
         if (exitBtn.getBoundingRectangle().contains(mouse.x, mouse.y))
             hoveredHint = "Exit";
         else if (settingsBtn.getBoundingRectangle().contains(mouse.x, mouse.y))
             hoveredHint = "Setting";
-        else if (bestiary.getBoundingRectangle().contains(mouse.x, mouse.y))
+        else if (bestiaryBtn.getBoundingRectangle().contains(mouse.x, mouse.y))
             hoveredHint = "Бестіарій";
         else hoveredHint = null;
 
@@ -422,11 +428,14 @@ public class MenuScreen implements Screen {
         }
     }
 
+    //##################### Інше #####################
+
     private class Settings {
-        VisLabel settingsLabel;
-        Actor actor;
         private static final float rowSpacing = 10f;
         private static final float labelColumnWidth = 120f;
+
+        private final VisLabel settingsLabel;
+        private final Actor actor;
 
         public Settings(String label, VisSlider slider) {
             this.settingsLabel = new VisLabel(label);
@@ -449,64 +458,10 @@ public class MenuScreen implements Screen {
             settingsTable.add(actor).expandX().fillX().padRight(30).left();
         }
 
-        public Actor getActor() {
-            return actor;
-        }
+//        public Actor getActor() {
+//            return actor;
+//        }
 
     }
 }
-
-//    private class PixelPerfectSprite {
-//        private final Sprite sprite;
-//        private final Pixmap pixmap;
-//
-//        public PixelPerfectSprite(String texturePath) {
-//            Texture texture = new Texture(Gdx.files.internal(texturePath));
-//            this.sprite = new Sprite(texture);
-//
-//            Pixmap source = new Pixmap(Gdx.files.internal(texturePath));
-//            this.pixmap = new Pixmap(source.getWidth(), source.getHeight(), source.getFormat());
-//            this.pixmap.drawPixmap(source, 0, 0);
-//            source.dispose();
-//        }
-//
-//        public Sprite getSprite() {
-//            return sprite;
-//        }
-//
-//        public boolean isClicked(float worldX, float worldY) {
-//            Rectangle bounds = sprite.getBoundingRectangle();
-//            if (!bounds.contains(worldX, worldY)) return false;
-//
-//            float localX = (worldX - sprite.getX()) / sprite.getWidth();
-//            float localY = (worldY - sprite.getY()) / sprite.getHeight();
-//
-//            int pixelX = (int) (localX * pixmap.getWidth());
-//            int pixelY = pixmap.getHeight() - (int) (localY * pixmap.getHeight());
-//
-//            if (pixelX < 0 || pixelX >= pixmap.getWidth() || pixelY < 0 || pixelY >= pixmap.getHeight())
-//                return false;
-//
-//            int tolerance = 2; // радіус у пікселях
-//
-//            for (int dx = -tolerance; dx <= tolerance; dx++) {
-//                for (int dy = -tolerance; dy <= tolerance; dy++) {
-//                    int px = pixelX + dx;
-//                    int py = pixelY + dy;
-//
-//                    if (px < 0 || px >= pixmap.getWidth() || py < 0 || py >= pixmap.getHeight())
-//                        continue;
-//
-//                    int alpha = (pixmap.getPixel(px, py) >> 24) & 0xff;
-//                    if (alpha > 10) return true;
-//                }
-//            }
-//            return false;
-//        }
-//
-//        public void dispose() {
-//            sprite.getTexture().dispose();
-//            pixmap.dispose();
-//        }
-//    }
 
