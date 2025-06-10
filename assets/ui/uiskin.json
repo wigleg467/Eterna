@@ -180,7 +180,7 @@ com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle: {
         vScrollKnob: scrollbar
     }
 }
-com.badlogic.gdx.scenes.scene2d.ui.SelectBox$SelectBoxStyle: {
+SelectBoxStyle: {
     default: {
         font: font
         fontColor: white
@@ -190,7 +190,8 @@ com.badlogic.gdx.scenes.scene2d.ui.SelectBox$SelectBoxStyle: {
         backgroundOpen: select-box-open
     }
 }
-com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle: {
+
+SliderStyle: {
     default-horizontal: {
         knobOver: wing-slider-knob
         knobDown: wing-slider-knob

@@ -260,6 +260,7 @@ public class MenuScreen implements Screen {
         settingsWindow.add(header).colspan(2).expandX().fillX().row();
 
 
+
         volumeSlider = new VisSlider(0, 1, 0.05f, false, skin.get("default-horizontal", VisSlider.SliderStyle.class));
         volumeSlider.setValue(0.05f);
 
