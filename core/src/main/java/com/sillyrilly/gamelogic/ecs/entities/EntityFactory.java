@@ -19,22 +19,17 @@ public class EntityFactory implements Disposable {
     private final Map<EntityType, Texture> textureMap = new EnumMap<>(EntityType.class);
 
     public enum EntityType {
-        PLAYER("images/entity/cat.png", "animations/walkingright.atlas", 300f),
-        ENEMY("images/entity/cat.png", "animations/walkingright.atlas", 100f),
-        NPC("images/entity/cat.png", "animations/walkingright.atlas", 100f);
+        PLAYER("animations/player.atlas", 300f),
+        ENEMY("animations/player.atlas", 100f),
+        NPC("animations/player.atlas", 100f);
 
-        private final String texturePath;
+
         private final String animationPath;
         private final float speed;
 
-        EntityType(String texturePath, String animationPath, float speed) {
-            this.texturePath = texturePath;
+        EntityType(String animationPath, float speed) {
             this.animationPath=animationPath;
             this.speed = speed;
-        }
-
-        public String getTexturePath() {
-            return texturePath;
         }
 
         public String getAnimationPath() {
@@ -62,9 +57,6 @@ public class EntityFactory implements Disposable {
 
         SpeedComponent speed = new SpeedComponent(type.getSpeed());
 
-        TextureComponent tex = new TextureComponent();
-        tex.texture = getOrLoadTexture(type);
-
         AnimationComponent animationComp = new AnimationComponent();
         animationComp.animation = createWalkAnimation(type);
         entity.add(animationComp);
@@ -72,7 +64,7 @@ public class EntityFactory implements Disposable {
         entity.add(pos);
         entity.add(vel);
         entity.add(speed);
-        entity.add(tex);
+        entity.add(animationComp);
 
         if (EntityType.NPC == type || EntityType.PLAYER == type) {
             entity.add(new CameraFollowableComponent());
@@ -87,18 +79,9 @@ public class EntityFactory implements Disposable {
         return entity;
     }
 
-    private Texture getOrLoadTexture(EntityType type) {
-        if (!textureMap.containsKey(type)) {
-            Texture tex = new Texture(Gdx.files.internal(type.getTexturePath()));
-            textureMap.put(type, tex);
-        }
-        return textureMap.get(type);
-    }
-
     private Animation<TextureRegion> createWalkAnimation(EntityType type) {
         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(type.getAnimationPath()));
-        Array<TextureAtlas.AtlasRegion> frames = atlas.findRegions(type.name().toLowerCase() + "_walk");
-
+        Array<TextureAtlas.AtlasRegion> frames = atlas.findRegions("walk_right");
         return new Animation<>(0.2f, frames, Animation.PlayMode.LOOP);
     }
 

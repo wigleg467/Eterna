@@ -26,7 +26,7 @@ public class RenderSystem extends EntitySystem {
 
     @Override
     public void addedToEngine(Engine engine) {
-        entities = engine.getEntitiesFor(Family.all(PositionComponent.class, TextureComponent.class).get());
+        entities = engine.getEntitiesFor(Family.all(PositionComponent.class, AnimationComponent.class).get());
     }
 
     @Override
@@ -36,7 +36,6 @@ public class RenderSystem extends EntitySystem {
 
         for (Entity entity : entities) {
             PositionComponent pos = pm.get(entity);
-            TextureComponent tex = tm.get(entity);
             AnimationComponent anim = am.get(entity);
             anim.stateTime += Gdx.graphics.getDeltaTime();
             TextureRegion frame = anim.animation.getKeyFrame(anim.stateTime);
