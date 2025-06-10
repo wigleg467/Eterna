@@ -2,8 +2,10 @@ package com.sillyrilly.gamelogic.ecs.systems;
 
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.PositionComponent;
 import com.sillyrilly.gamelogic.ecs.components.VelocityComponent;
+import com.sillyrilly.managers.CollisionManager;
 
 public class MovementSystem extends EntitySystem {
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
@@ -22,8 +24,12 @@ public class MovementSystem extends EntitySystem {
             PositionComponent pos = pm.get(entity);
             VelocityComponent vel = vm.get(entity);
 
-            pos.position.x += vel.velocity.x * deltaTime;
-            pos.position.y += vel.velocity.y * deltaTime;
+            Vector2 attemptedPos = new Vector2(pos.position).mulAdd(vel.velocity, deltaTime);
+
+            if (!CollisionManager.getInstance().isBlocked(attemptedPos.x, attemptedPos.y)) {
+                pos.position.set(attemptedPos);
+            }
+
         }
     }
 }
