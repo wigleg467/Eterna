@@ -68,7 +68,7 @@
         <key>jpgQuality</key>
         <uint>80</uint>
         <key>pngOptimizationLevel</key>
-        <uint>0</uint>
+        <uint>1</uint>
         <key>webpQualityLevel</key>
         <uint>101</uint>
         <key>textureSubPath</key>
@@ -94,7 +94,7 @@
         <key>algorithmSettings</key>
         <struct type="AlgorithmSettings">
             <key>algorithm</key>
-            <enum type="AlgorithmSettings::AlgorithmId">Basic</enum>
+            <enum type="AlgorithmSettings::AlgorithmId">MaxRects</enum>
             <key>freeSizeMode</key>
             <enum type="AlgorithmSettings::AlgorithmFreeSizeMode">Best</enum>
             <key>sizeConstraints</key>
@@ -124,11 +124,11 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename></filename>
+                <filename>walkright.atlas</filename>
             </struct>
         </map>
         <key>multiPackMode</key>
-        <enum type="SettingsBase::MultiPackMode">MultiPackOff</enum>
+        <enum type="SettingsBase::MultiPackMode">MultiPackAuto</enum>
         <key>forceIdenticalLayout</key>
         <false/>
         <key>outputFormat</key>
@@ -141,7 +141,7 @@
             <string></string>
         </struct>
         <key>autoAliasEnabled</key>
-        <false/>
+        <true/>
         <key>trimSpriteNames</key>
         <false/>
         <key>prependSmartFolderName</key>
@@ -155,7 +155,7 @@
             <key>scaleMode</key>
             <enum type="ScaleMode">Smooth</enum>
             <key>extrude</key>
-            <uint>0</uint>
+            <uint>1</uint>
             <key>trimThreshold</key>
             <uint>1</uint>
             <key>trimMargin</key>
@@ -173,8 +173,8 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">walk_right/walk_right_01_wsword_256.png</key>
-            <key type="filename">walk_right/walk_right_02_wsword_256.png</key>
+            <key type="filename">raw/walk_right_01_wsword_256.png</key>
+            <key type="filename">raw/walk_right_02_wsword_256.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -196,7 +196,7 @@
             <struct type="SpriteSheet">
                 <key>files</key>
                 <array>
-                    <filename>walk_right</filename>
+                    <filename>raw</filename>
                 </array>
             </struct>
         </map>

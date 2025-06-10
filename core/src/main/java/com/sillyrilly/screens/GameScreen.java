@@ -37,6 +37,8 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
 
+
+
         TmxMapLoader loader = new TmxMapLoader();
         map = loader.load("maps/test-map.tmx");
         renderer = new OrthogonalTiledMapRenderer(map);
@@ -79,6 +81,12 @@ public class GameScreen implements Screen {
         CameraManager.getInstance().getCamera().update();
         renderer.setView(CameraManager.getInstance().getCamera());
         renderer.render();
+
+        float stateTime = 0f;
+
+
+
+
 
         engine.update(delta);
     }

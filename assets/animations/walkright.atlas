@@ -1,0 +1,19 @@
+walkright-0.png
+size: 516, 258
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+walk_right_01_wsword
+  rotate: false
+  xy: 1, 1
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 256
+walk_right_02_wsword
+  rotate: false
+  xy: 259, 1
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 256
