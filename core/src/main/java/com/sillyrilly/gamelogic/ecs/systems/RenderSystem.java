@@ -2,7 +2,10 @@ package com.sillyrilly.gamelogic.ecs.systems;
 
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
 import com.sillyrilly.gamelogic.ecs.components.PositionComponent;
 import com.sillyrilly.gamelogic.ecs.components.TextureComponent;
 import com.sillyrilly.managers.CameraManager;
@@ -10,6 +13,7 @@ import com.sillyrilly.managers.CameraManager;
 public class RenderSystem extends EntitySystem {
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<TextureComponent> tm = ComponentMapper.getFor(TextureComponent.class);
+    private ComponentMapper<AnimationComponent> am = ComponentMapper.getFor(AnimationComponent.class);
 
     private ImmutableArray<Entity> entities;
     private SpriteBatch batch;
@@ -33,8 +37,10 @@ public class RenderSystem extends EntitySystem {
         for (Entity entity : entities) {
             PositionComponent pos = pm.get(entity);
             TextureComponent tex = tm.get(entity);
-
-            batch.draw(tex.texture, pos.position.x, pos.position.y);
+            AnimationComponent anim = am.get(entity);
+            anim.stateTime += Gdx.graphics.getDeltaTime();
+            TextureRegion frame = anim.animation.getKeyFrame(anim.stateTime);
+            batch.draw(frame, pos.position.x, pos.position.y);
         }
         batch.end();
     }
