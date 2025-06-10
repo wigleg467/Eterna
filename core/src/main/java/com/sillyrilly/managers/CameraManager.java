@@ -1,5 +1,6 @@
 package com.sillyrilly.managers;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -51,6 +52,10 @@ public class CameraManager {
 
     public void setZoom(float zoom) {
         camera.zoom += zoom;
+        if (camera.zoom < 0.1f)
+            camera.zoom = 0.1f;
+
+        Gdx.app.log("CameraManager", "Zoom: " + camera.zoom);
         camera.update();
     }
 }

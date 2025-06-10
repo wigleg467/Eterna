@@ -36,13 +36,10 @@ public class CameraFollowSystem extends EntitySystem {
 
         PositionComponent pos = pm.get(target);
         if (cameraSmoothing) {
-            cameraManager.centerOnSmooth(pos.position.x, pos.position.y);
-            Gdx.app.log("Camera", "Smooth");
+            cameraManager.centerOnSmooth(pos.position.x+16, pos.position.y+16);
         } else {
-            cameraManager.centerOn(pos.position.x, pos.position.y);
-            Gdx.app.log("Camera", "Normal");
+            cameraManager.centerOn(pos.position.x+16, pos.position.y+16);
         }
-        Gdx.app.log("Pos", "\nX: " + pos.position.x + "\nY: " + pos.position.y);
     }
 
     public static void changeCameraSmoothing() {

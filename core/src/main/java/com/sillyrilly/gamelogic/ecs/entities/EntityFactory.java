@@ -15,7 +15,7 @@ public class EntityFactory implements Disposable {
     private final Map<EntityType, Texture> textureMap = new EnumMap<>(EntityType.class);
 
     public enum EntityType {
-        PLAYER("images/entity/cat.png", 300f),
+        PLAYER("images/entity/test.png", 300f),
         ENEMY("images/entity/cat.png", 100f),
         NPC("images/entity/cat.png", 100f);
 

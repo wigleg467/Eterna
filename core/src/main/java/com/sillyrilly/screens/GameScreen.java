@@ -41,6 +41,9 @@ public class GameScreen implements Screen {
 
         renderer = new OrthogonalTiledMapRenderer(map);
         renderer.setView(CameraManager.getInstance().getCamera());
+        renderer.render();
+        CameraManager.getInstance().getCamera().position.set(1280f/2, 720f/2, 0);
+
 
         float mapWidth = map.getProperties().get("width", Integer.class);
         float mapHeight = map.getProperties().get("height", Integer.class);
