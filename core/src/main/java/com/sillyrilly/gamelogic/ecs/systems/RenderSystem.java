@@ -39,7 +39,9 @@ public class RenderSystem extends EntitySystem {
             AnimationComponent anim = am.get(entity);
             anim.stateTime += Gdx.graphics.getDeltaTime();
             TextureRegion frame = anim.animation.getKeyFrame(anim.stateTime);
-            batch.draw(frame, pos.position.x, pos.position.y);
+            batch.draw(frame, pos.position.x, pos.position.y,
+                    frame.getRegionWidth() / 4f,
+                    frame.getRegionHeight() / 4f);
         }
         batch.end();
     }
