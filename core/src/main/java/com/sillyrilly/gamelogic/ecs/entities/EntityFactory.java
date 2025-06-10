@@ -65,6 +65,7 @@ public class EntityFactory implements Disposable {
         entity.add(vel);
         entity.add(speed);
         entity.add(animationComp);
+        entity.add(new FacingComponent());
 
         if (EntityType.NPC == type || EntityType.PLAYER == type) {
             entity.add(new CameraFollowableComponent());

@@ -15,6 +15,7 @@ public class InputSystem extends EntitySystem {
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
 
+
     private ImmutableArray<Entity> controlledEntities;
 
     @Override
