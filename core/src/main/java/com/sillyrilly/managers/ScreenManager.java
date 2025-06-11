@@ -56,6 +56,10 @@ public class ScreenManager implements Disposable {
         ScreenType.setScreenType(type);
     }
 
+    public Screen getCurrentScreen() {
+        return screenMap.get(ScreenManager.ScreenType.current);
+    }
+
     public void dispose() {
         for (Screen screen : screenMap.values()) screen.dispose();
         screenMap.clear();

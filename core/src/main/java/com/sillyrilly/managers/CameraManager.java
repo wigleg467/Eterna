@@ -1,9 +1,12 @@
 package com.sillyrilly.managers;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+import static com.badlogic.gdx.math.MathUtils.round;
 
 public class CameraManager {
     private static CameraManager instance;
@@ -45,12 +48,15 @@ public class CameraManager {
     }
 
     public void centerOnSmooth(float x, float y) {
-        camera.position.lerp(new Vector3(x, y, 0), 0.1f);
+        camera.position.lerp(new Vector3(x, y, 0), 0.05f);
         camera.update();
     }
 
     public void setZoom(float zoom) {
-        camera.zoom += zoom;
-        camera.update();
+        camera.zoom = round((camera.zoom - zoom) * 100) / 100f;
+        if (camera.zoom < 0.1f)
+            camera.zoom = 0.1f;
+
+        Gdx.app.log("CameraManager", "Zoom: " + camera.zoom);
     }
 }

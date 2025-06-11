@@ -15,13 +15,15 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.sillyrilly.gamelogic.ecs.entities.EntityFactory;
 import com.sillyrilly.gamelogic.ecs.systems.CameraFollowSystem;
 import com.sillyrilly.gamelogic.ecs.systems.InputSystem;
-import com.sillyrilly.gamelogic.ecs.systems.MovementSystem;
 import com.sillyrilly.gamelogic.ecs.systems.RenderSystem;
 import com.sillyrilly.managers.CameraManager;
+import com.sillyrilly.managers.CollisionManager;
+import com.sillyrilly.managers.InputManager;
 import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
 
-
 public class GameScreen implements Screen {
+    private static final float tileScale = 1f / 32f;
+
     private Engine engine;
     private SpriteBatch batch;
     private EntityFactory factory;
@@ -29,41 +31,53 @@ public class GameScreen implements Screen {
     private OrthogonalTiledMapRenderer renderer;
     private World world;
     private Box2DMapObjectParser parser;
-    float tileScale = 1f / 32f;
+
+    private float zoom = 0.6f;
+    private boolean initialized = false;
 
     /**
      * Called when this screen becomes the current screen for a {@link Game}.
      */
     @Override
     public void show() {
-        TmxMapLoader loader = new TmxMapLoader();
-        map = loader.load("maps/test-map.tmx");
-        renderer = new OrthogonalTiledMapRenderer(map);
-        renderer.setView(CameraManager.getInstance().getCamera());
+        if (!initialized) {
+            map = new TmxMapLoader().load("maps/firstlevel.tmx");
+            new CollisionManager(map, "Collision", 32);
 
-        float mapWidth = map.getProperties().get("width", Integer.class);
-        float mapHeight = map.getProperties().get("height", Integer.class);
-        float tileWidth = map.getProperties().get("tilewidth", Integer.class);
-        float tileHeight = map.getProperties().get("tileheight", Integer.class);
+            renderer = new OrthogonalTiledMapRenderer(map);
+            renderer.setView(CameraManager.getInstance().getCamera());
+            renderer.render();
+            CameraManager.getInstance().getCamera().position.set(1280f / 2, 720f / 2, 0);
 
-        world = new World(new Vector2(0, 0), true);
-         parser = new Box2DMapObjectParser(tileScale);
-        parser.load(world, map);
+            float mapWidth = map.getProperties().get("width", Integer.class);
+            float mapHeight = map.getProperties().get("height", Integer.class);
+            float tileWidth = map.getProperties().get("tilewidth", Integer.class);
+            float tileHeight = map.getProperties().get("tileheight", Integer.class);
 
-        float centerX = mapWidth * tileWidth / 2f;
-        float centerY = mapHeight * tileHeight / 2f;
+            world = new World(new Vector2(0, 0), true);
+            parser = new Box2DMapObjectParser(tileScale);
+            parser.load(world, map);
 
-        batch = new SpriteBatch();
-        engine = new Engine();
+            float centerX = mapWidth * tileWidth / 2f;
+            float centerY = mapHeight * tileHeight / 2f;
 
-        engine.addSystem(new MovementSystem());
-        engine.addSystem(new RenderSystem(batch));
-        engine.addSystem(new InputSystem());
-        engine.addSystem(new CameraFollowSystem(CameraManager.getInstance()));
+            batch = new SpriteBatch();
 
-        factory = new EntityFactory(engine);
+            engine = new Engine();
+            engine.addSystem(new InputSystem());
+        //    engine.addSystem(new MovementSystem());
+            engine.addSystem(new CameraFollowSystem(CameraManager.getInstance()));
+            engine.addSystem(new RenderSystem(batch));
 
-        factory.createEntity(EntityFactory.EntityType.PLAYER, centerX, centerY);
+            factory = new EntityFactory(engine, world);
+
+            factory.createPlayer(centerX, centerY);
+
+            initialized = true;
+        }
+
+        CameraManager.getInstance().getCamera().zoom = zoom;
+        InputManager.getInstance().getMultiplexer().addProcessor(InputManager.getInstance());
     }
 
     /**
@@ -75,16 +89,11 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        CameraManager.getInstance().getCamera().update();
+
         renderer.setView(CameraManager.getInstance().getCamera());
         renderer.render();
 
-        float stateTime = 0f;
-
-
-
-
-
+        world.step(delta, 6, 2);
         engine.update(delta);
     }
 
@@ -119,6 +128,8 @@ public class GameScreen implements Screen {
      */
     @Override
     public void hide() {
+        zoom = CameraManager.getInstance().getCamera().zoom;
+        InputManager.getInstance().getMultiplexer().removeProcessor(InputManager.getInstance());
     }
 
     /**
@@ -130,5 +141,6 @@ public class GameScreen implements Screen {
         renderer.dispose();
         batch.dispose();
         factory.dispose();
+        world.dispose();
     }
 }

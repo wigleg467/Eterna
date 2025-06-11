@@ -26,6 +26,7 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.*;
 import com.sillyrilly.managers.AudioManager;
 import com.sillyrilly.managers.CameraManager;
+import com.sillyrilly.managers.InputManager;
 import com.sillyrilly.managers.ScreenManager;
 
 import java.util.ArrayList;
@@ -62,16 +63,22 @@ public class MenuScreen implements Screen {
     private String hoveredHint;
     private Skin skin;
 
+    private boolean initialized = false;
+
     /**
      * Called when this screen becomes the current screen for a {@link Game}.
      */
     @Override
     public void show() {
         initFOV();
-        loadTextures();
-        createSprites();
-        initFonts();
-        initSettingWindow();
+
+        if (!initialized) {
+            loadTextures();
+            createSprites();
+            initFonts();
+            initSettingWindow();
+            initialized = true;
+        }
     }
 
     /**
@@ -109,7 +116,6 @@ public class MenuScreen implements Screen {
      */
     @Override
     public void resume() {
-
     }
 
     /**
@@ -117,6 +123,7 @@ public class MenuScreen implements Screen {
      */
     @Override
     public void hide() {
+        InputManager.getInstance().getMultiplexer().removeProcessor(stage);
     }
 
     /**
@@ -150,11 +157,12 @@ public class MenuScreen implements Screen {
         viewport.apply();
 
         camera = CameraManager.getInstance().getCamera();
-        camera.position.set(CENTRE_X, CENTRE_Y, 0);
+        if (!initialized) camera.position.set(CENTRE_X, CENTRE_Y, 0);
+        camera.zoom = 1f;
         camera.update();
 
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
+        if (!initialized) stage = new Stage(new ScreenViewport());
+        InputManager.getInstance().getMultiplexer().addProcessor(stage);
     }
 
     private void loadTextures() {
@@ -259,8 +267,6 @@ public class MenuScreen implements Screen {
 
         settingsWindow.add(header).colspan(2).expandX().fillX().row();
 
-
-
         volumeSlider = new VisSlider(0, 1, 0.05f, false, skin.get("default-horizontal", VisSlider.SliderStyle.class));
         volumeSlider.setValue(0.05f);
 
@@ -315,6 +321,7 @@ public class MenuScreen implements Screen {
 
         time += delta;
 
+        if (initialized) camera.position.set(CENTRE_X, CENTRE_Y, 0);
         camera.update();
         batch.setProjectionMatrix(camera.combined);
     }
