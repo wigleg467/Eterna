@@ -51,18 +51,9 @@ public class RenderSystem extends EntitySystem {
                 frame.flip(true, false);
             }
             float scale = 0.25f;
-            float drawX = pos.position.x;
-            float width = frame.getRegionWidth() * scale;
 
-//            if (!facing.facingRight) {
-//                drawX += width; // посунути правіше на ширину
-//                width *= -1;    // а ширину зробити від’ємною — це дзеркало
-//            }
-
-            //це тре уважно порахувати :(
-
-            batch.draw(frame, drawX, pos.position.y,
-                    width,
+            batch.draw(frame, pos.position.x, pos.position.y,
+                    frame.getRegionWidth() * scale,
                     frame.getRegionHeight() * scale);
 
             batch.end();
