@@ -59,10 +59,6 @@ public class RenderSystem extends EntitySystem {
 //                width *= -1;    // а ширину зробити від’ємною — це дзеркало
 //            }
 
-            if (!facing.facingRight && anim.currentState == AnimationComponent.State.ATTACK) {
-//                drawX -= frame.offsetX;
-                drawX -= width/4;
-            }
             //це тре уважно порахувати :(
 
             batch.draw(frame, drawX, pos.position.y,
