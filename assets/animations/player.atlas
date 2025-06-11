@@ -1,47 +1,47 @@
-player-0.png
-size: 453, 774
+player.png
+size: 1836, 258
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 attack
   rotate: false
   xy: 1, 1
-  size: 256, 256
-  orig: 256, 256
-  offset: 9, 0
+  size: 304, 256
+  orig: 304, 256
+  offset: 0, 0
   index: 1
 attack
   rotate: false
-  xy: 1, 259
-  size: 225, 256
-  orig: 256, 256
-  offset: 7, 0
+  xy: 307, 1
+  size: 304, 256
+  orig: 304, 256
+  offset: 0, 0
   index: 2
 attack
   rotate: false
-  xy: 259, 1
-  size: 193, 256
-  orig: 256, 256
-  offset: 5, 0
+  xy: 613, 1
+  size: 304, 256
+  orig: 304, 256
+  offset: 0, 0
   index: 3
 idle
   rotate: false
-  xy: 1, 517
-  size: 193, 256
-  orig: 256, 256
+  xy: 919, 1
+  size: 304, 256
+  orig: 304, 256
   offset: 0, 0
   index: 1
 walk_right
   rotate: false
-  xy: 228, 259
-  size: 193, 256
-  orig: 256, 256
+  xy: 1225, 1
+  size: 304, 256
+  orig: 304, 256
   offset: 0, 0
   index: 1
 walk_right
   rotate: false
-  xy: 196, 517
-  size: 193, 256
-  orig: 256, 256
+  xy: 1531, 1
+  size: 304, 256
+  orig: 304, 256
   offset: 0, 0
   index: 2

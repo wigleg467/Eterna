@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
 import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
 import com.sillyrilly.gamelogic.ecs.components.FacingComponent;
@@ -55,20 +56,13 @@ public class RenderSystem extends EntitySystem {
             } else if (facing != null && facing.facingRight && frame.isFlipX()) {
                 frame.flip(true, false);
             }
+
             float scale = 0.25f;
             float width = frame.getRegionWidth() * scale;
+            float height = frame.getRegionHeight() * scale;
+            Vector2 pos = body.getPosition().scl(PPM);
 
-//            if (!facing.facingRight) {
-//                drawX += width; // посунути правіше на ширину
-//                width *= -1;    // а ширину зробити від’ємною — це дзеркало
-//            }
-//            if (!facing.facingRight && anim.currentState == AnimationComponent.State.ATTACK) {
-//                drawX -= frame.offsetX;
-//                drawX -= width / 4;
-//            }
-//       це тре уважно порахувати :(
-
-            batch.draw(frame, body.getPosition().x * PPM, body.getPosition().y * PPM, width, frame.getRegionHeight() * scale);
+            batch.draw(frame, pos.x, pos.y, width, height);
         }
 
         batch.end();
