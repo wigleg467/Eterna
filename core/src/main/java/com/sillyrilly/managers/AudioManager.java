@@ -20,7 +20,7 @@ public class AudioManager implements Disposable {
 
     public void load() {
         //      Приблизно так
-        music = Gdx.audio.newMusic(Gdx.files.internal("audio/music/policy-of-truth.mp3"));
+        music = Gdx.audio.newMusic(Gdx.files.internal("audio/music/01 - Vehicle 4.mp3"));
         playMusic(true);
         setVolume(0.05f);
         //   clickSound = Gdx.audio.newSound(Gdx.files.internal("audio/click.wav"));

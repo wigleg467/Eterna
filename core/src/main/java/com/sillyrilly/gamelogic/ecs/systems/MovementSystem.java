@@ -27,7 +27,7 @@ public class MovementSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
-        Vector2 inputDir = inputManager.getMovementDirection();
+        Vector2 inputDir = inputManager.getMovement();
 
         for (Entity entity : entities) {
             PositionComponent pos = pm.get(entity);

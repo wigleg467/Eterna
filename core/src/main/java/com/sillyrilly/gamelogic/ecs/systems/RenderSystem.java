@@ -32,7 +32,9 @@ public class RenderSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
+
         batch.setProjectionMatrix(cameraManager.getCamera().combined);
+
         batch.begin();
 
         for (Entity entity : entities) {

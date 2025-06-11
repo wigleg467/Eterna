@@ -36,9 +36,9 @@ public class CameraFollowSystem extends EntitySystem {
 
         PositionComponent pos = pm.get(target);
         if (cameraSmoothing) {
-            cameraManager.centerOnSmooth(pos.position.x + 16, pos.position.y + 16);
+            cameraManager.centerOnSmooth(pos.position.x + 32, pos.position.y + 32);
         } else {
-            cameraManager.centerOn(pos.position.x + 16, pos.position.y + 16);
+            cameraManager.centerOn(pos.position.x + 32, pos.position.y + 32);
         }
     }
 

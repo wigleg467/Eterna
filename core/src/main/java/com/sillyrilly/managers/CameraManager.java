@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import static com.badlogic.gdx.math.MathUtils.round;
+
 public class CameraManager {
     private static CameraManager instance;
 
@@ -51,11 +53,10 @@ public class CameraManager {
     }
 
     public void setZoom(float zoom) {
-        camera.zoom -= zoom;
+        camera.zoom = round((camera.zoom - zoom) * 100) / 100f;
         if (camera.zoom < 0.1f)
             camera.zoom = 0.1f;
 
         Gdx.app.log("CameraManager", "Zoom: " + camera.zoom);
-        camera.update();
     }
 }

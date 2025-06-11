@@ -64,7 +64,6 @@ public class EntityFactory implements Disposable {
         anim.animations.put(AnimationComponent.State.ATTACK, attackAnimation);
         anim.currentState = AnimationComponent.State.IDLE;
 
-
         entity.add(pos);
         entity.add(vel);
         entity.add(speed);

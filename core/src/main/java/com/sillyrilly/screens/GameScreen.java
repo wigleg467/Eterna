@@ -19,10 +19,12 @@ import com.sillyrilly.gamelogic.ecs.systems.MovementSystem;
 import com.sillyrilly.gamelogic.ecs.systems.RenderSystem;
 import com.sillyrilly.managers.CameraManager;
 import com.sillyrilly.managers.CollisionManager;
+import com.sillyrilly.managers.InputManager;
 import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
 
-
 public class GameScreen implements Screen {
+    private static final float tileScale = 1f / 32f;
+
     private Engine engine;
     private SpriteBatch batch;
     private EntityFactory factory;
@@ -30,45 +32,53 @@ public class GameScreen implements Screen {
     private OrthogonalTiledMapRenderer renderer;
     private World world;
     private Box2DMapObjectParser parser;
-    private static final float tileScale = 1f / 32f;
+
+    private float zoom = 1f;
+    private boolean initialized = false;
 
     /**
      * Called when this screen becomes the current screen for a {@link Game}.
      */
     @Override
     public void show() {
-        map = new TmxMapLoader().load("maps/test-map.tmx");
-        new CollisionManager(map, "Collision", 32);
+        if (!initialized) {
+            map = new TmxMapLoader().load("maps/test-map.tmx");
+            new CollisionManager(map, "Collision", 32);
 
-        renderer = new OrthogonalTiledMapRenderer(map);
-        renderer.setView(CameraManager.getInstance().getCamera());
-        renderer.render();
-        CameraManager.getInstance().getCamera().position.set(1280f/2, 720f/2, 0);
+            renderer = new OrthogonalTiledMapRenderer(map);
+            renderer.setView(CameraManager.getInstance().getCamera());
+            renderer.render();
+            CameraManager.getInstance().getCamera().position.set(1280f / 2, 720f / 2, 0);
 
+            float mapWidth = map.getProperties().get("width", Integer.class);
+            float mapHeight = map.getProperties().get("height", Integer.class);
+            float tileWidth = map.getProperties().get("tilewidth", Integer.class);
+            float tileHeight = map.getProperties().get("tileheight", Integer.class);
 
-        float mapWidth = map.getProperties().get("width", Integer.class);
-        float mapHeight = map.getProperties().get("height", Integer.class);
-        float tileWidth = map.getProperties().get("tilewidth", Integer.class);
-        float tileHeight = map.getProperties().get("tileheight", Integer.class);
+            world = new World(new Vector2(0, 0), true);
+            parser = new Box2DMapObjectParser(tileScale);
+            parser.load(world, map);
 
-        world = new World(new Vector2(0, 0), true);
-         parser = new Box2DMapObjectParser(tileScale);
-        parser.load(world, map);
+            float centerX = mapWidth * tileWidth / 2f;
+            float centerY = mapHeight * tileHeight / 2f;
 
-        float centerX = mapWidth * tileWidth / 2f;
-        float centerY = mapHeight * tileHeight / 2f;
+            batch = new SpriteBatch();
 
-        batch = new SpriteBatch();
-        engine = new Engine();
+            engine = new Engine();
+            engine.addSystem(new InputSystem());
+            engine.addSystem(new MovementSystem());
+            engine.addSystem(new CameraFollowSystem(CameraManager.getInstance()));
+            engine.addSystem(new RenderSystem(batch));
 
-        engine.addSystem(new MovementSystem());
-        engine.addSystem(new RenderSystem(batch));
-        engine.addSystem(new InputSystem());
-        engine.addSystem(new CameraFollowSystem(CameraManager.getInstance()));
+            factory = new EntityFactory(engine);
 
-        factory = new EntityFactory(engine);
+            factory.createEntity(EntityFactory.EntityType.PLAYER, centerX, centerY);
 
-        factory.createEntity(EntityFactory.EntityType.PLAYER, centerX, centerY);
+            initialized = true;
+        }
+
+        CameraManager.getInstance().getCamera().zoom = zoom;
+        InputManager.getInstance().getMultiplexer().addProcessor(InputManager.getInstance());
     }
 
     /**
@@ -80,7 +90,7 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        CameraManager.getInstance().getCamera().update();
+
         renderer.setView(CameraManager.getInstance().getCamera());
         renderer.render();
 
@@ -118,6 +128,8 @@ public class GameScreen implements Screen {
      */
     @Override
     public void hide() {
+        zoom = CameraManager.getInstance().getCamera().zoom;
+        InputManager.getInstance().getMultiplexer().removeProcessor(InputManager.getInstance());
     }
 
     /**
@@ -129,5 +141,6 @@ public class GameScreen implements Screen {
         renderer.dispose();
         batch.dispose();
         factory.dispose();
+        world.dispose();
     }
 }

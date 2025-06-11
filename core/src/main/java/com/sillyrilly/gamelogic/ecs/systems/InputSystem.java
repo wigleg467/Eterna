@@ -12,38 +12,36 @@ import com.sillyrilly.managers.InputManager;
 
 
 public class InputSystem extends EntitySystem {
-    private ComponentMapper<SpeedComponent> sm = ComponentMapper.getFor(SpeedComponent.class);
-    private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
-    private ComponentMapper<AnimationComponent> am = ComponentMapper.getFor(AnimationComponent.class);
-    private ComponentMapper<FacingComponent> fm = ComponentMapper.getFor(FacingComponent.class);
+    private final ComponentMapper<SpeedComponent> sm = ComponentMapper.getFor(SpeedComponent.class);
+    private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
+    private final ComponentMapper<AnimationComponent> am = ComponentMapper.getFor(AnimationComponent.class);
 
-private InputManager inputManager;
+    private InputManager inputManager;
 
     private ImmutableArray<Entity> controlledEntities;
 
     @Override
     public void addedToEngine(Engine engine) {
         controlledEntities = engine.getEntitiesFor(Family.all(PositionComponent.class, VelocityComponent.class).get());
-    inputManager = InputManager.getInstance();
+        inputManager = InputManager.getInstance();
     }
 
     @Override
     public void update(float deltaTime) {
-        InputManager.getInstance().update();
-        Vector2 movement = InputManager.getInstance().getMovementDirection();
+        inputManager.update();
+        Vector2 movement = inputManager.getMovement();
 
         for (Entity entity : controlledEntities) {
             VelocityComponent vel = vm.get(entity);
             SpeedComponent speed = sm.get(entity);
             AnimationComponent anim = am.get(entity);
-            FacingComponent facing = fm.get(entity);
 
             if (speed != null) {
                 vel.velocity.set(movement).scl(speed.speed);
             } else {
                 vel.velocity.set(movement).scl(100f);
             }
+
             if (anim.currentState == AnimationComponent.State.ATTACK) {
                 anim.stateTime += Gdx.graphics.getDeltaTime();
 
