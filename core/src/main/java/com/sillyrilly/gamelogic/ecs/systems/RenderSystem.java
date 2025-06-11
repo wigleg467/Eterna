@@ -2,14 +2,18 @@ package com.sillyrilly.gamelogic.ecs.systems;
 
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
+import com.sillyrilly.gamelogic.ecs.components.FacingComponent;
 import com.sillyrilly.gamelogic.ecs.components.PositionComponent;
-import com.sillyrilly.gamelogic.ecs.components.TextureComponent;
 import com.sillyrilly.managers.CameraManager;
 
 public class RenderSystem extends EntitySystem {
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
-    private ComponentMapper<TextureComponent> tm = ComponentMapper.getFor(TextureComponent.class);
+    private ComponentMapper<AnimationComponent> am = ComponentMapper.getFor(AnimationComponent.class);
+    private ComponentMapper<FacingComponent> fm = ComponentMapper.getFor(FacingComponent.class);
 
     private ImmutableArray<Entity> entities;
     private SpriteBatch batch;
@@ -22,7 +26,7 @@ public class RenderSystem extends EntitySystem {
 
     @Override
     public void addedToEngine(Engine engine) {
-        entities = engine.getEntitiesFor(Family.all(PositionComponent.class, TextureComponent.class).get());
+        entities = engine.getEntitiesFor(Family.all(PositionComponent.class, AnimationComponent.class, FacingComponent.class).get());
     }
 
     @Override
@@ -32,10 +36,24 @@ public class RenderSystem extends EntitySystem {
 
         for (Entity entity : entities) {
             PositionComponent pos = pm.get(entity);
-            TextureComponent tex = tm.get(entity);
+            AnimationComponent anim = am.get(entity);
+            FacingComponent facing = fm.get(entity);
+            anim.stateTime += Gdx.graphics.getDeltaTime();
+            TextureRegion frame = anim.animation.getKeyFrame(anim.stateTime);
 
-            batch.draw(tex.texture, pos.position.x, pos.position.y);
+
+            if (facing != null && !facing.facingRight && !frame.isFlipX()) {
+                frame.flip(true, false);
+            } else if (facing != null && facing.facingRight && frame.isFlipX()) {
+                frame.flip(true, false);
+            }
+
+            batch.draw(frame, pos.position.x, pos.position.y,
+                    frame.getRegionWidth() / 4f,
+                    frame.getRegionHeight() / 4f);
+
+
+            batch.end();
         }
-        batch.end();
     }
 }

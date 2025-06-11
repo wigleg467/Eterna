@@ -28,7 +28,8 @@ public class GameScreen implements Screen {
     private EntityFactory factory;
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
-
+    private World world;
+    private Box2DMapObjectParser parser;
     private static final float tileScale = 1f / 32f;
 
     /**
@@ -49,6 +50,10 @@ public class GameScreen implements Screen {
         float mapHeight = map.getProperties().get("height", Integer.class);
         float tileWidth = map.getProperties().get("tilewidth", Integer.class);
         float tileHeight = map.getProperties().get("tileheight", Integer.class);
+
+        world = new World(new Vector2(0, 0), true);
+         parser = new Box2DMapObjectParser(tileScale);
+        parser.load(world, map);
 
         float centerX = mapWidth * tileWidth / 2f;
         float centerY = mapHeight * tileHeight / 2f;

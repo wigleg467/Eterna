@@ -4,6 +4,10 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.sillyrilly.gamelogic.ecs.components.*;
 
@@ -15,20 +19,21 @@ public class EntityFactory implements Disposable {
     private final Map<EntityType, Texture> textureMap = new EnumMap<>(EntityType.class);
 
     public enum EntityType {
-        PLAYER("images/entity/test.png", 300f),
-        ENEMY("images/entity/cat.png", 100f),
-        NPC("images/entity/cat.png", 100f);
+        PLAYER("animations/player.atlas", 300f),
+        ENEMY("animations/player.atlas", 100f),
+        NPC("animations/player.atlas", 100f);
 
-        private final String texturePath;
+
+        private final String animationPath;
         private final float speed;
 
-        EntityType(String texturePath, float speed) {
-            this.texturePath = texturePath;
+        EntityType(String animationPath, float speed) {
+            this.animationPath=animationPath;
             this.speed = speed;
         }
 
-        public String getTexturePath() {
-            return texturePath;
+        public String getAnimationPath() {
+            return animationPath;
         }
 
         public float getSpeed() {
@@ -51,13 +56,15 @@ public class EntityFactory implements Disposable {
 
         SpeedComponent speed = new SpeedComponent(type.getSpeed());
 
-        TextureComponent tex = new TextureComponent();
-        tex.texture = getOrLoadTexture(type);
+        AnimationComponent animationComp = new AnimationComponent();
+        animationComp.animation = createWalkAnimation(type);
+        entity.add(animationComp);
 
         entity.add(pos);
         entity.add(vel);
         entity.add(speed);
-        entity.add(tex);
+        entity.add(animationComp);
+        entity.add(new FacingComponent());
 
         if (EntityType.NPC == type || EntityType.PLAYER == type) {
             entity.add(new CameraFollowableComponent());
@@ -72,12 +79,10 @@ public class EntityFactory implements Disposable {
         return entity;
     }
 
-    private Texture getOrLoadTexture(EntityType type) {
-        if (!textureMap.containsKey(type)) {
-            Texture tex = new Texture(Gdx.files.internal(type.getTexturePath()));
-            textureMap.put(type, tex);
-        }
-        return textureMap.get(type);
+    private Animation<TextureRegion> createWalkAnimation(EntityType type) {
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(type.getAnimationPath()));
+        Array<TextureAtlas.AtlasRegion> frames = atlas.findRegions("walk_right");
+        return new Animation<>(0.2f, frames, Animation.PlayMode.LOOP);
     }
 
     public void dispose() {
