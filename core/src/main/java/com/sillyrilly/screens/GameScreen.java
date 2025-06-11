@@ -15,7 +15,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.sillyrilly.gamelogic.ecs.entities.EntityFactory;
 import com.sillyrilly.gamelogic.ecs.systems.CameraFollowSystem;
 import com.sillyrilly.gamelogic.ecs.systems.InputSystem;
-import com.sillyrilly.gamelogic.ecs.systems.MovementSystem;
 import com.sillyrilly.gamelogic.ecs.systems.RenderSystem;
 import com.sillyrilly.managers.CameraManager;
 import com.sillyrilly.managers.CollisionManager;
@@ -33,7 +32,7 @@ public class GameScreen implements Screen {
     private World world;
     private Box2DMapObjectParser parser;
 
-    private float zoom = 1f;
+    private float zoom = 0.6f;
     private boolean initialized = false;
 
     /**
@@ -66,13 +65,13 @@ public class GameScreen implements Screen {
 
             engine = new Engine();
             engine.addSystem(new InputSystem());
-            engine.addSystem(new MovementSystem());
+        //    engine.addSystem(new MovementSystem());
             engine.addSystem(new CameraFollowSystem(CameraManager.getInstance()));
             engine.addSystem(new RenderSystem(batch));
 
-            factory = new EntityFactory(engine);
+            factory = new EntityFactory(engine, world);
 
-            factory.createEntity(EntityFactory.EntityType.PLAYER, centerX, centerY);
+            factory.createPlayer(centerX, centerY);
 
             initialized = true;
         }
@@ -94,6 +93,7 @@ public class GameScreen implements Screen {
         renderer.setView(CameraManager.getInstance().getCamera());
         renderer.render();
 
+        world.step(delta, 6, 2);
         engine.update(delta);
     }
 

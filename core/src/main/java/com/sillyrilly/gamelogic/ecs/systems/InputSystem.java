@@ -12,9 +12,9 @@ import com.sillyrilly.managers.InputManager;
 
 
 public class InputSystem extends EntitySystem {
-    private final ComponentMapper<SpeedComponent> sm = ComponentMapper.getFor(SpeedComponent.class);
-    private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
+    private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<AnimationComponent> am = ComponentMapper.getFor(AnimationComponent.class);
+    private final ComponentMapper<FacingComponent> fc = ComponentMapper.getFor(FacingComponent.class);
 
     private InputManager inputManager;
 
@@ -22,7 +22,7 @@ public class InputSystem extends EntitySystem {
 
     @Override
     public void addedToEngine(Engine engine) {
-        controlledEntities = engine.getEntitiesFor(Family.all(PositionComponent.class, VelocityComponent.class).get());
+        controlledEntities = engine.getEntitiesFor(Family.all(BodyComponent.class, AnimationComponent.class, FacingComponent.class).get());
         inputManager = InputManager.getInstance();
     }
 
@@ -32,14 +32,16 @@ public class InputSystem extends EntitySystem {
         Vector2 movement = inputManager.getMovement();
 
         for (Entity entity : controlledEntities) {
-            VelocityComponent vel = vm.get(entity);
-            SpeedComponent speed = sm.get(entity);
+            BodyComponent body = bc.get(entity);
             AnimationComponent anim = am.get(entity);
+            FacingComponent facing = fc.get(entity);
 
-            if (speed != null) {
-                vel.velocity.set(movement).scl(speed.speed);
-            } else {
-                vel.velocity.set(movement).scl(100f);
+            body.getBody().setLinearVelocity(movement.scl(7f));;
+
+            if (movement.x > 0) {
+                facing.facingRight = true;
+            } else if (movement.x < 0) {
+                facing.facingRight = false;
             }
 
             if (anim.currentState == AnimationComponent.State.ATTACK) {
