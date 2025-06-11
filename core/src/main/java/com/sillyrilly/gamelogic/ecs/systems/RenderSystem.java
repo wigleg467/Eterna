@@ -60,7 +60,8 @@ public class RenderSystem extends EntitySystem {
 //            }
 
             if (!facing.facingRight && anim.currentState == AnimationComponent.State.ATTACK) {
-                drawX -= frame.offsetX;
+//                drawX -= frame.offsetX;
+                drawX -= width/4;
             }
             //це тре уважно порахувати :(
 
