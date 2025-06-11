@@ -3,8 +3,9 @@ package com.sillyrilly.gamelogic.ecs.systems;
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
 import com.sillyrilly.gamelogic.ecs.components.FacingComponent;
 import com.sillyrilly.gamelogic.ecs.components.PositionComponent;
@@ -39,7 +40,9 @@ public class RenderSystem extends EntitySystem {
             AnimationComponent anim = am.get(entity);
             FacingComponent facing = fm.get(entity);
             anim.stateTime += Gdx.graphics.getDeltaTime();
-            TextureRegion frame = anim.animation.getKeyFrame(anim.stateTime);
+
+            Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
+            TextureAtlas.AtlasRegion frame = currentAnim.getKeyFrame(anim.stateTime, true);
 
 
             if (facing != null && !facing.facingRight && !frame.isFlipX()) {
@@ -47,11 +50,24 @@ public class RenderSystem extends EntitySystem {
             } else if (facing != null && facing.facingRight && frame.isFlipX()) {
                 frame.flip(true, false);
             }
+            float scale = 0.25f;
+            float drawX = pos.position.x;
+            float width = frame.getRegionWidth() * scale;
 
-            batch.draw(frame, pos.position.x, pos.position.y,
-                    frame.getRegionWidth() / 4f,
-                    frame.getRegionHeight() / 4f);
+//            if (!facing.facingRight) {
+//                drawX += width; // посунути правіше на ширину
+//                width *= -1;    // а ширину зробити від’ємною — це дзеркало
+//            }
 
+            if (!facing.facingRight && anim.currentState == AnimationComponent.State.ATTACK) {
+//                drawX -= frame.offsetX;
+                drawX -= width/4;
+            }
+            //це тре уважно порахувати :(
+
+            batch.draw(frame, drawX, pos.position.y,
+                    width,
+                    frame.getRegionHeight() * scale);
 
             batch.end();
         }

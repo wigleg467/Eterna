@@ -6,7 +6,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.sillyrilly.gamelogic.ecs.components.*;
@@ -55,15 +54,21 @@ public class EntityFactory implements Disposable {
         vel.velocity.set(1f, 1f);
 
         SpeedComponent speed = new SpeedComponent(type.getSpeed());
+        Animation<TextureAtlas.AtlasRegion>  idleAnimation=createIdleAnimation(type);
+        Animation<TextureAtlas.AtlasRegion>  walkAnimation=createWalkAnimation(type);
+        Animation<TextureAtlas.AtlasRegion>  attackAnimation=createAtackAnimation(type);
 
-        AnimationComponent animationComp = new AnimationComponent();
-        animationComp.animation = createWalkAnimation(type);
-        entity.add(animationComp);
+        AnimationComponent anim = new AnimationComponent();
+        anim.animations.put(AnimationComponent.State.IDLE, idleAnimation);
+        anim.animations.put(AnimationComponent.State.WALK, walkAnimation);
+        anim.animations.put(AnimationComponent.State.ATTACK, attackAnimation);
+        anim.currentState = AnimationComponent.State.IDLE;
+
 
         entity.add(pos);
         entity.add(vel);
         entity.add(speed);
-        entity.add(animationComp);
+        entity.add(anim);
         entity.add(new FacingComponent());
 
         if (EntityType.NPC == type || EntityType.PLAYER == type) {
@@ -79,10 +84,20 @@ public class EntityFactory implements Disposable {
         return entity;
     }
 
-    private Animation<TextureRegion> createWalkAnimation(EntityType type) {
+    private Animation<TextureAtlas.AtlasRegion>  createWalkAnimation(EntityType type) {
         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(type.getAnimationPath()));
-        Array<TextureAtlas.AtlasRegion> frames = atlas.findRegions("walk_right");
-        return new Animation<>(0.2f, frames, Animation.PlayMode.LOOP);
+        Array<TextureAtlas.AtlasRegion> regions = atlas.findRegions("walk_right");
+        return new Animation<>(0.2f, regions, Animation.PlayMode.LOOP);
+    }
+    private Animation<TextureAtlas.AtlasRegion>  createIdleAnimation(EntityType type) {
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(type.getAnimationPath()));
+        Array<TextureAtlas.AtlasRegion> regions = atlas.findRegions("idle");
+        return new Animation<>(0.2f, regions, Animation.PlayMode.LOOP);
+    }
+    private Animation<TextureAtlas.AtlasRegion>  createAtackAnimation(EntityType type) {
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(type.getAnimationPath()));
+        Array<TextureAtlas.AtlasRegion> regions = atlas.findRegions("attack");
+        return new Animation<>(0.2f, regions, Animation.PlayMode.LOOP);
     }
 
     public void dispose() {
