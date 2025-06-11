@@ -33,7 +33,7 @@ public class Main extends Game {
         CameraManager.getInstance().initialize(GameConfig.VIRTUAL_WIDTH, GameConfig.VIRTUAL_HEIGHT);
         ScreenManager.getInstance().initialize(this);
         AudioManager.getInstance().load();
-        InputManager.getInstance();
+        Gdx.input.setInputProcessor(InputManager.getInstance());
 
         // Завантаження ресурсів
         // AssetManagerWrapper.getInstance().loadAssets();

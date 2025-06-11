@@ -46,12 +46,12 @@ public class CameraManager {
     }
 
     public void centerOnSmooth(float x, float y) {
-        camera.position.lerp(new Vector3(x, y, 0), 0.1f);
+        camera.position.lerp(new Vector3(x, y, 0), 0.05f);
         camera.update();
     }
 
     public void setZoom(float zoom) {
-        camera.zoom += zoom;
+        camera.zoom -= zoom;
         if (camera.zoom < 0.1f)
             camera.zoom = 0.1f;
 
