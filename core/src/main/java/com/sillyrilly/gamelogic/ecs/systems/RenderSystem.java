@@ -6,23 +6,26 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.math.Vector2;
-import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
-import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
-import com.sillyrilly.gamelogic.ecs.components.FacingComponent;
+import com.badlogic.gdx.utils.Array;
+import com.sillyrilly.gamelogic.ecs.components.*;
 import com.sillyrilly.managers.CameraManager;
 
 import static com.sillyrilly.gamelogic.ecs.entities.EntityFactory.PPM;
+import static com.sillyrilly.gamelogic.ecs.entities.EntityFactory.TILE_SIZE;
 
 public class RenderSystem extends EntitySystem {
-    private ComponentMapper<AnimationComponent> am = ComponentMapper.getFor(AnimationComponent.class);
-    private ComponentMapper<FacingComponent> fm = ComponentMapper.getFor(FacingComponent.class);
+    private final ComponentMapper<AnimationComponent> ac = ComponentMapper.getFor(AnimationComponent.class);
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
-
+    private final ComponentMapper<LevelComponent> lc = ComponentMapper.getFor(LevelComponent.class);
+    private final ComponentMapper<TileComponent> tc = ComponentMapper.getFor(TileComponent.class);
 
     private ImmutableArray<Entity> entities;
     private SpriteBatch batch;
     private CameraManager cameraManager;
+    private Array<Entity> sortedEntities = new Array<>();
 
     public RenderSystem(SpriteBatch batch) {
         this.batch = batch;
@@ -31,38 +34,65 @@ public class RenderSystem extends EntitySystem {
 
     @Override
     public void addedToEngine(Engine engine) {
-        entities = engine.getEntitiesFor(Family.all(AnimationComponent.class, BodyComponent.class, FacingComponent.class).get());
+        entities = engine.getEntitiesFor(Family.all(BodyComponent.class, LevelComponent.class).get());
+
     }
 
     @Override
     public void update(float deltaTime) {
+        sortedEntities.clear();
+        for (int i = 0; i < entities.size(); i++) {
+            sortedEntities.add(entities.get(i));
+        }
 
+        sortedEntities.sort((a, b) -> {
+            LevelComponent la = lc.get(a);
+            LevelComponent lb = lc.get(b);
+
+            if (la.level != lb.level) {
+                return Integer.compare(la.level, lb.level);
+            }
+
+            float ya = bc.get(a).body.getPosition().y;
+            float yb = bc.get(b).body.getPosition().y;
+
+            if (tc.has(a)) ya -= tc.get(a).renderOffsetY;
+            if (tc.has(b)) yb -= tc.get(b).renderOffsetY;
+
+            return Float.compare(yb, ya);
+        });
+
+
+        cameraManager.getCamera().update();
         batch.setProjectionMatrix(cameraManager.getCamera().combined);
 
         batch.begin();
 
-        for (Entity entity : entities) {
-            AnimationComponent anim = am.get(entity);
-            FacingComponent facing = fm.get(entity);
-            BodyComponent body = bc.get(entity);
+        for (Entity entity : sortedEntities) {
+            if (ac.has(entity)) {
+                AnimationComponent anim = ac.get(entity);
+                BodyComponent body = bc.get(entity);
 
-            anim.stateTime += Gdx.graphics.getDeltaTime();
+                TextureAtlas.AtlasRegion frame = anim.currentFrame;
+                //        if (frame == null) continue; // ще не оновлено
 
-            Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
-            TextureAtlas.AtlasRegion frame = currentAnim.getKeyFrame(anim.stateTime, true);
+                float scale = 0.25f;
+                float width = frame.getRegionWidth() * scale;
+                float height = frame.getRegionHeight() * scale;
 
-            if (facing != null && !facing.facingRight && !frame.isFlipX()) {
-                frame.flip(true, false);
-            } else if (facing != null && facing.facingRight && frame.isFlipX()) {
-                frame.flip(true, false);
+                Vector2 pos = body.getPosition().scl(PPM);
+                batch.draw(frame, pos.x, pos.y, width, height);
+            } else if (tc.has(entity)) {
+                BodyComponent bodyC = bc.get(entity);
+                TileComponent tileC = tc.get(entity);
+
+                Vector2 pos = bodyC.body.getPosition().scl(PPM);
+                TiledMapTile tile = tileC.tile;
+                TextureRegion region = tile.getTextureRegion();
+
+                batch.draw(region, pos.x, pos.y,
+                    TILE_SIZE, tileC.renderOffsetY + TILE_SIZE);
             }
-
-            float scale = 0.25f;
-            float width = frame.getRegionWidth() * scale;
-            float height = frame.getRegionHeight() * scale;
-            Vector2 pos = body.getPosition().scl(PPM);
-
-            batch.draw(frame, pos.x, pos.y, width, height);
         }
 
         batch.end();

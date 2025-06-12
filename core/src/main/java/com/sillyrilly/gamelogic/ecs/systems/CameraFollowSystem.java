@@ -5,45 +5,47 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
+import com.sillyrilly.gamelogic.ecs.components.CameraFollowableComponent;
 import com.sillyrilly.gamelogic.ecs.components.CameraTargetComponent;
 import com.sillyrilly.managers.CameraManager;
+import com.sillyrilly.managers.InputManager;
 
 import static com.sillyrilly.gamelogic.ecs.entities.EntityFactory.PPM;
 
 public class CameraFollowSystem extends EntitySystem {
-
-    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    private ImmutableArray<Entity> targets;
+    private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<CameraFollowableComponent> cfc = ComponentMapper.getFor(CameraFollowableComponent.class);
+    private final ComponentMapper<CameraTargetComponent> ctc = ComponentMapper.getFor(CameraTargetComponent.class);
     private final CameraManager cameraManager;
-    private Engine engine;
+    private final InputManager inputManager;
 
+    private ImmutableArray<Entity> targets;
     private static boolean cameraSmoothing = false;
 
-    public CameraFollowSystem(CameraManager cameraManager) {
-        this.cameraManager = cameraManager;
+    public CameraFollowSystem() {
+        this.cameraManager = CameraManager.getInstance();
+        this.inputManager = InputManager.getInstance();
     }
 
     @Override
     public void addedToEngine(Engine engine) {
-        this.engine = engine;
-        targets = engine.getEntitiesFor(Family.all(BodyComponent.class, CameraTargetComponent.class).get());
+        targets = engine.getEntitiesFor(Family.all(CameraFollowableComponent.class).get());
     }
 
     @Override
     public void update(float deltaTime) {
-        if (targets.size() == 0) {
-            targets = engine.getEntitiesFor(Family.all(CameraTargetComponent.class).get());
-            return;
-        }
-        Entity target = targets.first();
+        for (Entity entity : targets) {
+            if(ctc.has(entity)) {
+            //    if(){}
 
-        BodyComponent body = pm.get(target);
-        Vector2 pos = body.getPosition();
-
-        if (cameraSmoothing) {
-            cameraManager.centerOnSmooth((pos.x) * PPM + 32, (pos.y) * PPM + 32);
-        } else {
-            cameraManager.centerOn((pos.x) * PPM + 32, (pos.y) * PPM + 32);
+                Vector2 pos = bc.get(entity).body.getPosition();
+                if (cameraSmoothing) {
+                    cameraManager.centerOnSmooth((pos.x) * PPM + 32, (pos.y) * PPM + 32);
+                } else {
+                    cameraManager.centerOn((pos.x) * PPM + 32, (pos.y) * PPM + 32);
+                }
+                break;
+            }
         }
     }
 

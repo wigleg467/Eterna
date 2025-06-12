@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
 import com.sillyrilly.gamelogic.ecs.systems.CameraFollowSystem;
@@ -16,7 +17,7 @@ public class InputManager extends InputAdapter {
 
     private final Vector2 movement = new Vector2();
     private AnimationComponent.State state;
-    private float stateTime = 0;
+    private boolean changeCamera = false;
 
     private InputManager() {
         this.multiplexer = new InputMultiplexer();
@@ -31,7 +32,6 @@ public class InputManager extends InputAdapter {
     }
 
     public void update() {
-        AnimationComponent.State previousState = state;
         state = AnimationComponent.State.IDLE;
 
         movement.set(0, 0);
@@ -40,7 +40,6 @@ public class InputManager extends InputAdapter {
             // ### Удар ###
             if (state != AnimationComponent.State.ATTACK) {
                 state = AnimationComponent.State.ATTACK;
-                stateTime = 0f;
             }
         } else {
             // ### Рух ###
@@ -68,12 +67,6 @@ public class InputManager extends InputAdapter {
             }
         }
 
-        if (!state.equals(previousState)) {
-            stateTime = 0f;
-        } else {
-            stateTime += Gdx.graphics.getDeltaTime();
-        }
-
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             // ### Перемикання згладження камери ###
             CameraFollowSystem.changeCameraSmoothing();
@@ -89,24 +82,32 @@ public class InputManager extends InputAdapter {
             CameraManager.getInstance().setZoom(-0.02f);
         }
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
+            changeCamera = true;
+        }
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             ScreenManager.getInstance().setScreen(ScreenManager.ScreenType.MENU);
         }
     }
 
-    public Vector2 getMovement() {
-        return movement;
+    public void setChangeCamera(boolean changeCamera) {
+        this.changeCamera = changeCamera;
     }
 
-    public float getStateTime() {
-        return stateTime;
+    public InputMultiplexer getMultiplexer() {
+        return multiplexer;
     }
 
     public AnimationComponent.State getState() {
         return state;
     }
 
-    public InputMultiplexer getMultiplexer() {
-        return multiplexer;
+    public Vector2 getMovement() {
+        return movement;
+    }
+
+    public boolean isChangeCamera() {
+        return changeCamera;
     }
 }

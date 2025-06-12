@@ -13,24 +13,22 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.sillyrilly.gamelogic.ecs.entities.EntityFactory;
-import com.sillyrilly.gamelogic.ecs.systems.CameraFollowSystem;
-import com.sillyrilly.gamelogic.ecs.systems.InputSystem;
-import com.sillyrilly.gamelogic.ecs.systems.RenderSystem;
+import com.sillyrilly.gamelogic.ecs.systems.*;
 import com.sillyrilly.managers.CameraManager;
-import com.sillyrilly.managers.CollisionManager;
 import com.sillyrilly.managers.InputManager;
 import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
 
 public class GameScreen implements Screen {
     private static final float tileScale = 1f / 32f;
 
-    private Engine engine;
-    private SpriteBatch batch;
-    private EntityFactory factory;
-    private TiledMap map;
-    private OrthogonalTiledMapRenderer renderer;
-    private World world;
     private Box2DMapObjectParser parser;
+    private CameraManager cameraManager = CameraManager.getInstance();
+    private Engine engine;
+    private EntityFactory factory;
+    public static OrthogonalTiledMapRenderer renderer;
+    private SpriteBatch batch;
+    private TiledMap map;
+    private World world;
 
     private float zoom = 0.6f;
     private boolean initialized = false;
@@ -42,41 +40,41 @@ public class GameScreen implements Screen {
     public void show() {
         if (!initialized) {
             map = new TmxMapLoader().load("maps/test-map.tmx");
-            new CollisionManager(map, "Collision", 32);
-
-            renderer = new OrthogonalTiledMapRenderer(map);
-            renderer.setView(CameraManager.getInstance().getCamera());
-            renderer.render();
-            CameraManager.getInstance().getCamera().position.set(1280f / 2, 720f / 2, 0);
-
-            float mapWidth = map.getProperties().get("width", Integer.class);
-            float mapHeight = map.getProperties().get("height", Integer.class);
-            float tileWidth = map.getProperties().get("tilewidth", Integer.class);
-            float tileHeight = map.getProperties().get("tileheight", Integer.class);
+            //   renderer = new OrthogonalTiledMapRenderer(map);
+            //   renderer.setView(cameraManager.getCamera());
 
             world = new World(new Vector2(0, 0), true);
             parser = new Box2DMapObjectParser(tileScale);
             parser.load(world, map);
+            {
+                //     float mapWidth = map.getProperties().get("width", Integer.class);
+                //     float mapHeight = map.getProperties().get("height", Integer.class);
+                //     float tileWidth = map.getProperties().get("tilewidth", Integer.class);
+                //     float tileHeight = map.getProperties().get("tileheight", Integer.class);
 
-            float centerX = mapWidth * tileWidth / 2f;
-            float centerY = mapHeight * tileHeight / 2f;
+                //     float centerX = mapWidth * tileWidth / 2f;
+                //     float centerY = mapHeight * tileHeight / 2f;
 
-            batch = new SpriteBatch();
+                batch = new SpriteBatch();
 
-            engine = new Engine();
-            engine.addSystem(new InputSystem());
-        //    engine.addSystem(new MovementSystem());
-            engine.addSystem(new CameraFollowSystem(CameraManager.getInstance()));
-            engine.addSystem(new RenderSystem(batch));
+                engine = new Engine();
+                engine.addSystem(new InputSystem());
+                engine.addSystem(new MovementSystem());
+                engine.addSystem(new AnimationSystem());
+                engine.addSystem(new CameraFollowSystem());
+                engine.addSystem(new RenderSystem(batch));
 
-            factory = new EntityFactory(engine, world);
+                factory = new EntityFactory(engine, world);
+            }
 
-            factory.createPlayer(centerX, centerY);
-
+            factory.createPlayer(300f, 300f, 1);
+            factory.createTileLayer(map, "Base", 0);
+            factory.createTileLayer(map, "props", 1);
+           //v factory.createTileLayer(map, "Collision", 1, 1, 0.01f, 0.01f);
             initialized = true;
         }
 
-        CameraManager.getInstance().getCamera().zoom = zoom;
+        cameraManager.getCamera().zoom = zoom;
         InputManager.getInstance().getMultiplexer().addProcessor(InputManager.getInstance());
     }
 
@@ -90,10 +88,8 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        renderer.setView(CameraManager.getInstance().getCamera());
-        renderer.render();
-
         world.step(delta, 6, 2);
+
         engine.update(delta);
     }
 
@@ -138,9 +134,8 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         map.dispose();
-        renderer.dispose();
+        //   renderer.dispose();
         batch.dispose();
-        factory.dispose();
         world.dispose();
     }
 }
