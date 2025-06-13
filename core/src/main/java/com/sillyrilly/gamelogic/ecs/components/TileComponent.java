@@ -6,7 +6,6 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile;
 public class TileComponent implements Component {
     public TiledMapTile tile;
     public float renderOffsetY = 0;
-
     public TileComponent(TiledMapTile tile) {
         this.tile = tile;
     }
@@ -15,4 +14,6 @@ public class TileComponent implements Component {
         this.tile = tile;
         this.renderOffsetY = renderOffsetY;
     }
+
+
 }

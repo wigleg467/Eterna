@@ -32,14 +32,13 @@ public class GameScreen implements Screen {
 
     private float zoom = 0.6f;
     private boolean initialized = false;
-
     /**
      * Called when this screen becomes the current screen for a {@link Game}.
      */
     @Override
     public void show() {
         if (!initialized) {
-            map = new TmxMapLoader().load("maps/test-map.tmx");
+            map = new TmxMapLoader().load("maps/firstlevel.tmx");
             //   renderer = new OrthogonalTiledMapRenderer(map);
             //   renderer.setView(cameraManager.getCamera());
 
@@ -68,9 +67,12 @@ public class GameScreen implements Screen {
             }
 
             factory.createPlayer(300f, 300f, 1);
-            factory.createTileLayer(map, "Base", 0);
+            factory.createTileLayer(map, "base", 0);
+            factory.createTileLayer(map, "landscape", 0);
+            factory.createTileLayer(map, "base2", 0);
+            factory.createTileLayer(map, "house", 0);
+            //factory.createTileLayer(map, "Collosion land", 1, 1, 0.01f, 0.01f);
             factory.createTileLayer(map, "props", 1);
-           //v factory.createTileLayer(map, "Collision", 1, 1, 0.01f, 0.01f);
             initialized = true;
         }
 
