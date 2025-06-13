@@ -2,5 +2,5 @@
 <tileset version="1.10" tiledversion="1.11.2" name="TX Tileset Grass" tilewidth="32" tileheight="32" tilecount="64" columns="8">
  <image source="../images/TX Tileset Grass.png" width="256" height="256"/>
  <tile id="8" probability="0.1"/>
- <tile id="9" probability="0.1"/>
+ <tile id="9" probability="0.05"/>
 </tileset>
