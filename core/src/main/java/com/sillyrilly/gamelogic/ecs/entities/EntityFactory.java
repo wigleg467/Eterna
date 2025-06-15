@@ -57,8 +57,8 @@ public class EntityFactory {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 0f;  // вага тіла
-        fixtureDef.friction = 0f;  // тертя із землею (max 1f)
+        fixtureDef.density = 0.3f;  // вага тіла
+        fixtureDef.friction = 0.3f;  // тертя із землею (max 1f)
         fixtureDef.restitution = 0f; // пружність (відскок)
 
         body.createFixture(fixtureDef);

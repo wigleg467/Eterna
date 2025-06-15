@@ -39,13 +39,12 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         if (!initialized) {
-            map = new TmxMapLoader().load("maps/test-map.tmx");
-            //   renderer = new OrthogonalTiledMapRenderer(map);
-            //   renderer.setView(cameraManager.getCamera());
+            map = new TmxMapLoader().load("maps/firstlevel.tmx");
 
             world = new World(new Vector2(0, 0), true);
             parser = new Box2DMapObjectParser(tileScale);
             parser.load(world, map);
+
             {
                 //     float mapWidth = map.getProperties().get("width", Integer.class);
                 //     float mapHeight = map.getProperties().get("height", Integer.class);
@@ -67,10 +66,20 @@ public class GameScreen implements Screen {
                 factory = new EntityFactory(engine, world);
             }
 
-            factory.createPlayer(300f, 300f, 1);
-            factory.createTileLayer(map, "Base", 0);
-            factory.createTileLayer(map, "props", 1);
-           //v factory.createTileLayer(map, "Collision", 1, 1, 0.01f, 0.01f);
+            factory.createPlayer(300f, 300f, 3);
+
+            factory.createTileLayer(map, "base", 0);
+          //  factory.createTileLayer(map, "base2", 1);
+          //  factory.createTileLayer(map, "landscape", 2);
+          //  factory.createTileLayer(map, "house", 3);
+          //
+             //  factory.createTileLayer(map, "props", 3);
+
+                 factory.createObjectLayer(map, "Collosion land", 3, 1, 1, 1);
+            //    factory.createObjectLayer(map, "Little platform", 0);
+
+            //   factory.createTileLayer(map, "props", 1);
+            //v factory.createTileLayer(map, "Collision", 1, 1, 0.01f, 0.01f);
             initialized = true;
         }
 

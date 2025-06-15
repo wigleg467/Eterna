@@ -3,7 +3,7 @@ package com.sillyrilly;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.sillyrilly.managers.*;
-import com.sillyrilly.util.GameConfig;
+import com.sillyrilly.util.d2.GameConfig;
 
 /**
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
@@ -22,7 +22,7 @@ public class Main extends Game {
 
     @Override
     public void dispose() {
-        AudioManager.getInstance().dispose();
+    //    AudioManager.getInstance().dispose();
         ScreenManager.getInstance().dispose();
         Gdx.app.log("DISPOSE", "Game disposed");
         Gdx.app.exit();
@@ -30,7 +30,7 @@ public class Main extends Game {
 
     private void initialize() {
         CameraManager.getInstance().initialize(GameConfig.VIRTUAL_WIDTH, GameConfig.VIRTUAL_HEIGHT);
-        ScreenManager.getInstance().initialize(this);
-        AudioManager.getInstance().load();
+        ScreenManager.getInstance().initialize(this, ScreenManager.ScreenType.ASCII);
+        //    AudioManager.getInstance().load();
     }
 }

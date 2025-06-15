@@ -464,11 +464,6 @@ public class MenuScreen implements Screen {
             settingsTable.add(settingsLabel).width(labelColumnWidth).padLeft(30).left();
             settingsTable.add(actor).expandX().fillX().padRight(30).left();
         }
-
-//        public Actor getActor() {
-//            return actor;
-//        }
-
     }
 }
 

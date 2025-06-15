@@ -3,6 +3,8 @@ package com.sillyrilly.managers;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.Disposable;
+import com.sillyrilly.screens.ASCII3DScreen;
+import com.sillyrilly.screens.ASCIIScreen;
 import com.sillyrilly.screens.GameScreen;
 import com.sillyrilly.screens.MenuScreen;
 
@@ -10,7 +12,7 @@ import java.util.EnumMap;
 
 public class ScreenManager implements Disposable {
     public enum ScreenType {
-        MENU, GAME;
+        MENU, GAME, ASCII, ASCII3D;
 
         private static ScreenType current;
 
@@ -18,6 +20,8 @@ public class ScreenManager implements Disposable {
             return switch (type) {
                 case MENU -> new MenuScreen();
                 case GAME -> new GameScreen();
+                case ASCII -> new ASCIIScreen();
+                case ASCII3D -> new ASCII3DScreen();
             };
         }
 
@@ -46,6 +50,11 @@ public class ScreenManager implements Disposable {
     public void initialize(Game game) {
         this.game = game;
         setScreen(ScreenType.MENU);
+    }
+
+    public void initialize(Game game, ScreenType type) {
+        this.game = game;
+        setScreen(type);
     }
 
     public void setScreen(ScreenType type) {
