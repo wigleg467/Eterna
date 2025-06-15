@@ -7,13 +7,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.sillyrilly.gamelogic.ecs.entities.EntityFactory;
 import com.sillyrilly.gamelogic.ecs.systems.*;
+import com.sillyrilly.gamelogic.ecs.types.EnemyType;
 import com.sillyrilly.managers.CameraManager;
 import com.sillyrilly.managers.InputManager;
 import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
@@ -40,6 +45,8 @@ public class GameScreen implements Screen {
     public void show() {
         if (!initialized) {
             map = new TmxMapLoader().load("maps/firstlevel.tmx");
+            //   renderer = new OrthogonalTiledMapRenderer(map);
+            //   renderer.setView(cameraManager.getCamera());
 
             world = new World(new Vector2(0, 0), true);
             parser = new Box2DMapObjectParser(tileScale);
@@ -61,25 +68,27 @@ public class GameScreen implements Screen {
                 engine.addSystem(new MovementSystem());
                 engine.addSystem(new AnimationSystem());
                 engine.addSystem(new CameraFollowSystem());
+                engine.addSystem(new EnemyAISystem());
                 engine.addSystem(new RenderSystem(batch));
 
                 factory = new EntityFactory(engine, world);
             }
 
-            factory.createPlayer(300f, 300f, 3);
-
+            factory.createPlayer(300f, 300f, 1);
             factory.createTileLayer(map, "base", 0);
-          //  factory.createTileLayer(map, "base2", 1);
-          //  factory.createTileLayer(map, "landscape", 2);
-          //  factory.createTileLayer(map, "house", 3);
-          //
-             //  factory.createTileLayer(map, "props", 3);
+            factory.createTileLayer(map, "landscape", 0);
+            factory.createTileLayer(map, "base2", 0);
+            factory.createTileLayer(map, "house", 1);
+            factory.createObjectLayer(map, "Collosion_lvl_1", 1, 1, 0.01f, 0.01f);
+            factory.createTileLayer(map, "props", 1);
 
-                 factory.createObjectLayer(map, "Collosion land", 3, 1, 1, 1);
-            //    factory.createObjectLayer(map, "Little platform", 0);
-
-            //   factory.createTileLayer(map, "props", 1);
-            //v factory.createTileLayer(map, "Collision", 1, 1, 0.01f, 0.01f);
+            MapObjects objects = map.getLayers().get("Enemies").getObjects();
+            for (MapObject object : objects) {
+                Rectangle rect = ((RectangleMapObject) object).getRectangle();
+                String typeStr = object.getProperties().get("type", String.class);
+                EnemyType type = EnemyType.valueOf(typeStr.toUpperCase());
+                factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 1);
+            }
             initialized = true;
         }
 

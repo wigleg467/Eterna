@@ -2,15 +2,17 @@ package com.sillyrilly.gamelogic.ecs.systems;
 
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.sillyrilly.gamelogic.ecs.components.*;
+import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
+import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
+import com.sillyrilly.gamelogic.ecs.components.LevelComponent;
+import com.sillyrilly.gamelogic.ecs.components.TileComponent;
 import com.sillyrilly.managers.CameraManager;
 
 import static com.sillyrilly.gamelogic.ecs.entities.EntityFactory.PPM;
@@ -56,8 +58,14 @@ public class RenderSystem extends EntitySystem {
             float ya = bc.get(a).body.getPosition().y;
             float yb = bc.get(b).body.getPosition().y;
 
-            if (tc.has(a)) ya -= tc.get(a).renderOffsetY;
-            if (tc.has(b)) yb -= tc.get(b).renderOffsetY;
+            if (tc.has(a)) {
+                ya -= tc.get(a).renderOffsetY;
+                ya -= getTileHeightOffset(a);
+            }
+            if (tc.has(b)) {
+                yb -= tc.get(b).renderOffsetY;
+                yb -= getTileHeightOffset(b);
+            }
 
             return Float.compare(yb, ya);
         });
@@ -74,14 +82,14 @@ public class RenderSystem extends EntitySystem {
                 BodyComponent body = bc.get(entity);
 
                 TextureAtlas.AtlasRegion frame = anim.currentFrame;
-                //        if (frame == null) continue; // ще не оновлено
+                //      if (frame == null) continue; // ще не оновлено
 
                 float scale = 0.25f;
                 float width = frame.getRegionWidth() * scale;
                 float height = frame.getRegionHeight() * scale;
 
                 Vector2 pos = body.getPosition().scl(PPM);
-                batch.draw(frame, pos.x, pos.y, width, height);
+                batch.draw(frame, pos.x- width / 2f, pos.y, width, height);
             } else if (tc.has(entity)) {
                 BodyComponent bodyC = bc.get(entity);
                 TileComponent tileC = tc.get(entity);
@@ -96,5 +104,12 @@ public class RenderSystem extends EntitySystem {
         }
 
         batch.end();
+    }
+
+    int getTileHeightOffset(Entity entity) {
+        if (!tc.has(entity)) return 0;
+        TileComponent tile = tc.get(entity);
+        MapProperties props = tile.tile.getProperties();
+        return props.containsKey("height") ? (int) props.get("height") : 0;
     }
 }

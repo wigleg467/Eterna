@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.2" name="landscape" tilewidth="32" tileheight="32" tilecount="64" columns="8">
- <image source="../images/landscape.png" width="256" height="256"/>
+<tileset version="1.10" tiledversion="1.11.2" name="landscape_flip" tilewidth="32" tileheight="32" tilecount="64" columns="8">
+ <image source="../images/landscape_flip.png" width="256" height="256"/>
  <tile id="9">
   <properties>
    <property name="blocked" type="bool" value="true"/>

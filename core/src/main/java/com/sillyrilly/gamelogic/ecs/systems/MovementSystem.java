@@ -5,6 +5,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
 import com.sillyrilly.gamelogic.ecs.components.CameraTargetComponent;
+import com.sillyrilly.gamelogic.ecs.components.PlayerComponent;
 import com.sillyrilly.managers.InputManager;
 
 public class MovementSystem extends EntitySystem {
@@ -17,18 +18,18 @@ public class MovementSystem extends EntitySystem {
 
     @Override
     public void addedToEngine(Engine engine) {
-        controlledEntities = engine.getEntitiesFor(Family.all(BodyComponent.class).get());
+        controlledEntities = engine.getEntitiesFor(Family.all(BodyComponent.class, PlayerComponent.class).get());
         inputManager = InputManager.getInstance();
     }
 
     @Override
     public void update(float deltaTime) {
-        Vector2 movement = inputManager.getMovement();
+        Vector2 movement = new Vector2(inputManager.getMovement()); // робимо копію
+        movement.scl(7f);
         for (Entity entity : controlledEntities) {
-            if(ctc.has(entity)){
+            if (ctc.has(entity)) {
                 BodyComponent body = bc.get(entity);
-                body.getBody().setLinearVelocity(movement.scl(7f));
-
+                body.getBody().setLinearVelocity(movement);
                 break;
             }
         }
