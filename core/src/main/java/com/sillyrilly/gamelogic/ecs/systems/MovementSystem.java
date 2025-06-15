@@ -24,12 +24,12 @@ public class MovementSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
-        Vector2 movement = inputManager.getMovement();
+        Vector2 movement = new Vector2(inputManager.getMovement()); // робимо копію
+        movement.scl(7f);
         for (Entity entity : controlledEntities) {
-            if(ctc.has(entity)){
+            if (ctc.has(entity)) {
                 BodyComponent body = bc.get(entity);
-                body.getBody().setLinearVelocity(movement.scl(7f));
-
+                body.getBody().setLinearVelocity(movement);
                 break;
             }
         }

@@ -1,7 +1,8 @@
 package com.sillyrilly.gamelogic.ecs.types;
 
 public enum EnemyType implements Animatable {
-    GUARD("animations/guard.atlas", 1f, 0.2f);
+    GUARD("animations/guard.atlas", 1f, 0.0625f*2);
+    //0.0625 це висота ступнів поділена на два
 
 
     private final String path;

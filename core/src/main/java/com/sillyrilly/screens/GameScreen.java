@@ -66,6 +66,7 @@ public class GameScreen implements Screen {
                 engine.addSystem(new MovementSystem());
                 engine.addSystem(new AnimationSystem());
                 engine.addSystem(new CameraFollowSystem());
+                engine.addSystem(new EnemyAISystem());
                 engine.addSystem(new RenderSystem(batch));
 
                 factory = new EntityFactory(engine, world);

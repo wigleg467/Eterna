@@ -6,23 +6,27 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
+import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
 import com.sillyrilly.gamelogic.ecs.components.FacingComponent;
 import com.sillyrilly.managers.InputManager;
 
 public class AnimationSystem extends EntitySystem {
     private final ComponentMapper<AnimationComponent> am = ComponentMapper.getFor(AnimationComponent.class);
     private final ComponentMapper<FacingComponent> fm = ComponentMapper.getFor(FacingComponent.class);
+    private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
 
     private ImmutableArray<Entity> entities;
     private InputManager inputManager;
 
     public AnimationSystem() {
-        this.inputManager = InputManager.getInstance();
+//        this.inputManager = InputManager.getInstance();
+
     }
 
     @Override
     public void addedToEngine(Engine engine) {
         entities = engine.getEntitiesFor(Family.all(AnimationComponent.class, FacingComponent.class).get());
+        this.inputManager = InputManager.getInstance();
     }
 
     @Override
@@ -31,11 +35,12 @@ public class AnimationSystem extends EntitySystem {
             AnimationComponent anim = am.get(entity);
             FacingComponent facing = fm.get(entity);
 
-            Vector2 movement = inputManager.getMovement();
+            BodyComponent body = bc.get(entity);
+            Vector2 movement = body.body.getLinearVelocity();
 
-            if (movement.x > 0)
+            if (movement.x > 0.1f)
                 facing.facingRight = true;
-            else if (movement.x < 0)
+            else if (movement.x < -0.1f)
                 facing.facingRight = false;
 
             AnimationComponent.State inputState = InputManager.getInstance().getState();
