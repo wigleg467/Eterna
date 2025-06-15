@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
 import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
 import com.sillyrilly.gamelogic.ecs.components.FacingComponent;
+import com.sillyrilly.gamelogic.ecs.components.PlayerComponent;
 import com.sillyrilly.managers.InputManager;
 
 public class AnimationSystem extends EntitySystem {
@@ -43,6 +44,7 @@ public class AnimationSystem extends EntitySystem {
             else if (movement.x < -0.1f)
                 facing.facingRight = false;
 
+            if (entity.getComponent(PlayerComponent.class) != null) {
             AnimationComponent.State inputState = InputManager.getInstance().getState();
 
             // Якщо анімація атаки ще не завершена — не змінюємо стан
@@ -73,8 +75,21 @@ public class AnimationSystem extends EntitySystem {
             } else if (facing != null && facing.facingRight && frame.isFlipX()) {
                 frame.flip(true, false);
             }
+                anim.currentFrame = frame;
+            } else {
+                Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
+                TextureAtlas.AtlasRegion frame = currentAnim.getKeyFrame(anim.stateTime, true);
 
-            anim.currentFrame = frame;
+                if (facing != null && !facing.facingRight && !frame.isFlipX()) {
+                    frame.flip(true, false);
+                } else if (facing != null && facing.facingRight && frame.isFlipX()) {
+                    frame.flip(true, false);
+                }
+                anim.currentFrame = frame;
+                // Якщо це не гравець — просто оновлюємо таймер
+                anim.stateTime += deltaTime;
+            }
+
         }
     }
 }
