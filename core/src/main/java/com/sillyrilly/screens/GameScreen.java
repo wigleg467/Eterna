@@ -7,13 +7,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.sillyrilly.gamelogic.ecs.entities.EntityFactory;
 import com.sillyrilly.gamelogic.ecs.systems.*;
+import com.sillyrilly.gamelogic.ecs.types.EnemyType;
 import com.sillyrilly.managers.CameraManager;
 import com.sillyrilly.managers.InputManager;
 import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
@@ -73,6 +78,14 @@ public class GameScreen implements Screen {
             factory.createTileLayer(map, "house", 1);
             factory.createObjectLayer(map, "Collosion_lvl_1", 1, 1, 0.01f, 0.01f);
             factory.createTileLayer(map, "props", 1);
+
+            MapObjects objects = map.getLayers().get("Enemies").getObjects();
+            for (MapObject object : objects) {
+                Rectangle rect = ((RectangleMapObject) object).getRectangle();
+                String typeStr = object.getProperties().get("type", String.class);
+                EnemyType type = EnemyType.valueOf(typeStr.toUpperCase());
+                factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 1);
+            }
             initialized = true;
         }
 

@@ -1,20 +1,27 @@
 package com.sillyrilly.gamelogic.ecs.types;
 
-public enum EnemyType {
-    OGRE("animations/ogre.atlas", 1.2f, 2.4f),
-    SLIME("animations/slime.atlas", 0.8f, 1.6f);
+public enum EnemyType implements Animatable {
+    GUARD("animations/guard.atlas", 1f, 0.2f);
 
-    private final String atlasPath;
-    private final float width;
-    private final float height;
 
-    EnemyType(String atlasPath, float width, float height) {
-        this.atlasPath = atlasPath;
-        this.width = width;
-        this.height = height;
+    private final String path;
+    private final float w, h;
+
+    EnemyType(String path, float w, float h) {
+        this.path = path;
+        this.w = w;
+        this.h = h;
     }
 
-    public String getAtlasPath() { return atlasPath; }
-    public float getWidth() { return width; }
-    public float getHeight() { return height; }
+    @Override
+    public String getAnimationPath() {
+        return path;
+    }
+
+    public float getWidth() {
+        return w;
+    }
+    public float getHeight() {
+        return h;
+    }
 }

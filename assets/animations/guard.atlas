@@ -1,4 +1,4 @@
-hell_guard.png
+guard.png
 size: 482, 1548
 format: RGBA8888
 filter: Linear,Linear
@@ -9,7 +9,7 @@ attack
   size: 480, 256
   orig: 480, 256
   offset: 0, 0
-  index: 1
+  index: 3
 attack
   rotate: false
   xy: 1, 259
@@ -23,7 +23,7 @@ attack
   size: 480, 256
   orig: 480, 256
   offset: 0, 0
-  index: 3
+  index: 1
 idle
   rotate: false
   xy: 1, 775
@@ -31,14 +31,14 @@ idle
   orig: 480, 256
   offset: 0, 0
   index: 1
-walking_right
+walk_right
   rotate: false
   xy: 1, 1033
   size: 480, 256
   orig: 480, 256
   offset: 0, 0
   index: 1
-walking_right
+walk_right
   rotate: false
   xy: 1, 1291
   size: 480, 256

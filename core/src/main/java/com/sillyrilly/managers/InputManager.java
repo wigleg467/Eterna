@@ -4,11 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
 import com.sillyrilly.gamelogic.ecs.systems.CameraFollowSystem;
-import net.dermetfan.gdx.Multiplexer;
 
 public class InputManager extends InputAdapter {
     private static InputManager instance;

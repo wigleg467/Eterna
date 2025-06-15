@@ -5,6 +5,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
 import com.sillyrilly.gamelogic.ecs.components.CameraTargetComponent;
+import com.sillyrilly.gamelogic.ecs.components.PlayerComponent;
 import com.sillyrilly.managers.InputManager;
 
 public class MovementSystem extends EntitySystem {
@@ -17,7 +18,7 @@ public class MovementSystem extends EntitySystem {
 
     @Override
     public void addedToEngine(Engine engine) {
-        controlledEntities = engine.getEntitiesFor(Family.all(BodyComponent.class).get());
+        controlledEntities = engine.getEntitiesFor(Family.all(BodyComponent.class, PlayerComponent.class).get());
         inputManager = InputManager.getInstance();
     }
 

@@ -13,6 +13,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.*;
 import com.sillyrilly.gamelogic.ecs.components.*;
+import com.sillyrilly.gamelogic.ecs.types.EnemyType;
+import com.sillyrilly.gamelogic.ecs.types.EntityType;
 
 public class EntityFactory {
     public final static float PPM = 32f;
@@ -21,21 +23,7 @@ public class EntityFactory {
     private final Engine engine;
     private final World world;
 
-    public enum EntityType {
-        PLAYER("animations/player.atlas"),
-        ENEMY("animations/player.atlas"),
-        NPC("animations/player.atlas");
 
-        private final String animationPath;
-
-        EntityType(String animationPath) {
-            this.animationPath = animationPath;
-        }
-
-        public String getAnimationPath() {
-            return animationPath;
-        }
-    }
 
     public EntityFactory(Engine engine, World world) {
         this.engine = engine;
@@ -74,6 +62,7 @@ public class EntityFactory {
         entity.add(new CameraFollowableComponent());
         entity.add(new CameraTargetComponent());
         entity.add(new LevelComponent(lvl));
+        entity.add(new PlayerComponent());
 
         engine.addEntity(entity);
 
@@ -102,15 +91,15 @@ public class EntityFactory {
         shape.dispose();
 
         Entity entity = new Entity();
-        entity.add(new AnimationComponent(type.getAtlasPath(), "idle", "walk"));
+        entity.add(new AnimationComponent(type, "idle", "walk_right", "attack"));
         entity.add(new BodyComponent(body));
         entity.add(new FacingComponent());
         entity.add(new LevelComponent(lvl));
-        entity.add(new EnemyComponent());
+        entity.add(new ClassificationComponent(EntityType.ENEMY));
+        entity.add(new EnemyComponent(type));
 
         engine.addEntity(entity);
     }
-
 
     public void createTileLayer(TiledMap map, String layerName, int lvl) {
         createTileLayer(map, layerName, lvl, 0f, 0f, 0f);
