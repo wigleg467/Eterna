@@ -89,7 +89,7 @@ public class RenderSystem extends EntitySystem {
                 float height = frame.getRegionHeight() * scale;
 
                 Vector2 pos = body.getPosition().scl(PPM);
-                batch.draw(frame, pos.x, pos.y, width, height);
+                batch.draw(frame, pos.x- width / 2f, pos.y, width, height);
             } else if (tc.has(entity)) {
                 BodyComponent bodyC = bc.get(entity);
                 TileComponent tileC = tc.get(entity);

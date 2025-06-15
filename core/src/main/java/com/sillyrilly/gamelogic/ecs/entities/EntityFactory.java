@@ -52,13 +52,15 @@ public class EntityFactory {
 
         Body body = world.createBody(bodyDef);
 
+        CircleShape circle = new CircleShape();
+        circle.setRadius(0.3f);
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(0.05f, 0.05f); // треба потикати
+        shape.setAsBox(0.5f, 0.0625f); // треба потикати
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 0f;  // вага тіла
-        fixtureDef.friction = 0f;  // тертя із землею (max 1f)
+        fixtureDef.density = 1f;  // вага тіла
+        fixtureDef.friction = 1f;  // тертя із землею (max 1f)
         fixtureDef.restitution = 0f; // пружність (відскок)
 
         body.createFixture(fixtureDef);
@@ -148,7 +150,6 @@ public class EntityFactory {
         for (MapObject object : objects) {
             if (object instanceof RectangleMapObject rectObject) {
                 Rectangle rect = rectObject.getRectangle();
-
                 // Створення BodyDef
                 BodyDef bodyDef = new BodyDef();
                 bodyDef.type = BodyDef.BodyType.StaticBody;

@@ -70,8 +70,8 @@ public class GameScreen implements Screen {
             factory.createTileLayer(map, "base", 0);
             factory.createTileLayer(map, "landscape", 0);
             factory.createTileLayer(map, "base2", 0);
-            factory.createTileLayer(map, "house", 0);
-            //factory.createTileLayer(map, "Collosion land", 1, 1, 0.01f, 0.01f);
+            factory.createTileLayer(map, "house", 1);
+            factory.createObjectLayer(map, "Collosion_lvl_1", 1, 1, 0.01f, 0.01f);
             factory.createTileLayer(map, "props", 1);
             initialized = true;
         }
