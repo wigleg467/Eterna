@@ -10,7 +10,6 @@ import com.sillyrilly.gamelogic.ecs.components.EnemyComponent;
 
 public class EnemyAISystem extends EntitySystem {
     private final ComponentMapper<BodyComponent> bm = ComponentMapper.getFor(BodyComponent.class);
-    private final ComponentMapper<EnemyComponent> em = ComponentMapper.getFor(EnemyComponent.class);
     private final ComponentMapper<AnimationComponent> am = ComponentMapper.getFor(AnimationComponent.class);
 
     private ImmutableArray<Entity> enemies;

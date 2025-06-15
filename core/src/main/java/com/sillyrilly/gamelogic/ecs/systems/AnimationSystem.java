@@ -17,7 +17,6 @@ public class AnimationSystem extends EntitySystem {
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
 
     private ImmutableArray<Entity> entities;
-    private InputManager inputManager;
 
     public AnimationSystem() {
 //        this.inputManager = InputManager.getInstance();
@@ -27,7 +26,6 @@ public class AnimationSystem extends EntitySystem {
     @Override
     public void addedToEngine(Engine engine) {
         entities = engine.getEntitiesFor(Family.all(AnimationComponent.class, FacingComponent.class).get());
-        this.inputManager = InputManager.getInstance();
     }
 
     @Override
@@ -45,36 +43,36 @@ public class AnimationSystem extends EntitySystem {
                 facing.facingRight = false;
 
             if (entity.getComponent(PlayerComponent.class) != null) {
-            AnimationComponent.State inputState = InputManager.getInstance().getState();
+                AnimationComponent.State inputState = InputManager.getInstance().getState();
 
-            // Якщо анімація атаки ще не завершена — не змінюємо стан
-            if (anim.currentState == AnimationComponent.State.ATTACK) {
-                anim.stateTime += deltaTime;
-
-                Animation<TextureAtlas.AtlasRegion> attackAnim = anim.animations.get(AnimationComponent.State.ATTACK);
-                if (attackAnim.isAnimationFinished(anim.stateTime)) {
-                    // Атака завершена — повертаємось до поточного введеного стану (наприклад, WALK або IDLE)
-                    anim.currentState = inputState;
-                    anim.stateTime = 0f;
-                }
-            } else {
-                // Якщо не атака — просто оновлюємо стан і таймер
-                if (anim.currentState != inputState) {
-                    anim.currentState = inputState;
-                    anim.stateTime = 0f;
-                } else {
+                // Якщо анімація атаки ще не завершена — не змінюємо стан
+                if (anim.currentState == AnimationComponent.State.ATTACK) {
                     anim.stateTime += deltaTime;
+
+                    Animation<TextureAtlas.AtlasRegion> attackAnim = anim.animations.get(AnimationComponent.State.ATTACK);
+                    if (attackAnim.isAnimationFinished(anim.stateTime)) {
+                        // Атака завершена — повертаємось до поточного введеного стану (наприклад, WALK або IDLE)
+                        anim.currentState = inputState;
+                        anim.stateTime = 0f;
+                    }
+                } else {
+                    // Якщо не атака — просто оновлюємо стан і таймер
+                    if (anim.currentState != inputState) {
+                        anim.currentState = inputState;
+                        anim.stateTime = 0f;
+                    } else {
+                        anim.stateTime += deltaTime;
+                    }
                 }
-            }
 
-            Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
-            TextureAtlas.AtlasRegion frame = currentAnim.getKeyFrame(anim.stateTime, true);
+                Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
+                TextureAtlas.AtlasRegion frame = currentAnim.getKeyFrame(anim.stateTime, true);
 
-            if (facing != null && !facing.facingRight && !frame.isFlipX()) {
-                frame.flip(true, false);
-            } else if (facing != null && facing.facingRight && frame.isFlipX()) {
-                frame.flip(true, false);
-            }
+                if (facing != null && !facing.facingRight && !frame.isFlipX()) {
+                    frame.flip(true, false);
+                } else if (facing != null && facing.facingRight && frame.isFlipX()) {
+                    frame.flip(true, false);
+                }
                 anim.currentFrame = frame;
             } else {
                 Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
@@ -89,7 +87,6 @@ public class AnimationSystem extends EntitySystem {
                 // Якщо це не гравець — просто оновлюємо таймер
                 anim.stateTime += deltaTime;
             }
-
         }
     }
 }

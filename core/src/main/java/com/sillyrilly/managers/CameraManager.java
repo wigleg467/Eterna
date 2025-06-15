@@ -47,13 +47,12 @@ public class CameraManager {
     }
 
     public void centerOnSmooth(float x, float y) {
-        camera.position.lerp(new Vector3(x, y, 0), 0.05f);
+        camera.position.lerp(new Vector3(x, y, 0), 0.02f);
     }
 
     public void setZoom(float zoom) {
         camera.zoom = round((camera.zoom - zoom) * 100) / 100f;
-        if (camera.zoom < 0.1f)
-            camera.zoom = 0.1f;
+        if (camera.zoom < 0.1f) camera.zoom = 0.1f;
 
         Gdx.app.log("CameraManager", "Zoom: " + camera.zoom);
     }

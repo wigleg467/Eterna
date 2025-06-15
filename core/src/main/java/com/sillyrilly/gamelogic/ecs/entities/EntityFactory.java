@@ -23,8 +23,6 @@ public class EntityFactory {
     private final Engine engine;
     private final World world;
 
-
-
     public EntityFactory(Engine engine, World world) {
         this.engine = engine;
         this.world = world;
@@ -43,11 +41,11 @@ public class EntityFactory {
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(0.5f, 0.0625f); // треба потикати
 
-        FixtureDef fixtureDef = new FixtureDef();
+          FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 1f;  // вага тіла
-        fixtureDef.friction = 1f;  // тертя із землею (max 1f)
-        fixtureDef.restitution = 0f; // пружність (відскок)
+     //   fixtureDef.density = 0f;  // вага тіла
+     //   fixtureDef.friction = 0f;  // тертя із землею (max 1f)
+     //   fixtureDef.restitution = 0f; // пружність (відскок)
 
         body.createFixture(fixtureDef);
         shape.dispose();
@@ -81,9 +79,9 @@ public class EntityFactory {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 1f;
-        fixtureDef.friction = 0.5f;
-        fixtureDef.restitution = 0f;
+     //   fixtureDef.density = 1f;
+     //   fixtureDef.friction = 0.5f;
+     //   fixtureDef.restitution = 0f;
 
         body.createFixture(fixtureDef);
         shape.dispose();
@@ -91,10 +89,10 @@ public class EntityFactory {
         Entity entity = new Entity();
         entity.add(new AnimationComponent(type, "idle", "walk_right", "attack"));
         entity.add(new BodyComponent(body));
+        entity.add(new EnemyComponent(type));
         entity.add(new FacingComponent());
         entity.add(new LevelComponent(lvl));
         entity.add(new ClassificationComponent(EntityType.ENEMY));
-        entity.add(new EnemyComponent(type));
 
         engine.addEntity(entity);
     }
@@ -111,16 +109,8 @@ public class EntityFactory {
                 TiledMapTileLayer.Cell cell = layer.getCell(x, y);
                 if (cell == null || cell.getTile() == null) continue;
 
-                // Тут можна додати фільтр — лише тайли, які вважаються "твердими"
-                // Наприклад, можна перевірити властивість:
-                // cell.getTile().getProperties().containsKey("solid")
-
                 TiledMapTile tile = cell.getTile();
                 TextureRegion region = tile.getTextureRegion();
-                int regionHeight = region.getRegionHeight();
-                float offsetY = (regionHeight - TILE_SIZE);
-
-                Gdx.app.log("CreateTileLayer", "Region height: " + regionHeight);
 
                 BodyDef bodyDef = new BodyDef();
                 bodyDef.type = BodyDef.BodyType.StaticBody;
@@ -148,7 +138,7 @@ public class EntityFactory {
 
                 BodyComponent bc = new BodyComponent(body);
                 LevelComponent lc = new LevelComponent(lvl);
-                TileComponent tc = new TileComponent(cell.getTile(), offsetY);
+                TileComponent tc = new TileComponent(cell.getTile());
 
                 entity.add(bc);
                 entity.add(lc);
