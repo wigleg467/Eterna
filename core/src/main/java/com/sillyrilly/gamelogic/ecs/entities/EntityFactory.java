@@ -81,6 +81,37 @@ public class EntityFactory {
 
     }
 
+    public void createEnemy(float x, float y, EnemyType type, int lvl) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(x / PPM, y / PPM);
+        bodyDef.fixedRotation = true;
+
+        Body body = world.createBody(bodyDef);
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(type.getWidth() / 2f, type.getHeight() / 2f);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.density = 1f;
+        fixtureDef.friction = 0.5f;
+        fixtureDef.restitution = 0f;
+
+        body.createFixture(fixtureDef);
+        shape.dispose();
+
+        Entity entity = new Entity();
+        entity.add(new AnimationComponent(type.getAtlasPath(), "idle", "walk"));
+        entity.add(new BodyComponent(body));
+        entity.add(new FacingComponent());
+        entity.add(new LevelComponent(lvl));
+        entity.add(new EnemyComponent());
+
+        engine.addEntity(entity);
+    }
+
+
     public void createTileLayer(TiledMap map, String layerName, int lvl) {
         createTileLayer(map, layerName, lvl, 0f, 0f, 0f);
     }
