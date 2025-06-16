@@ -40,9 +40,9 @@ public class CameraFollowSystem extends EntitySystem {
 
                 Vector2 pos = bc.get(entity).body.getPosition();
                 if (cameraSmoothing) {
-                    cameraManager.centerOnSmooth((pos.x) * PPM + 32, (pos.y) * PPM + 32);
+                    cameraManager.centerOnSmooth((pos.x) * PPM, (pos.y) * PPM + 32);
                 } else {
-                    cameraManager.centerOn((pos.x) * PPM + 32, (pos.y) * PPM + 32);
+                    cameraManager.centerOn((pos.x) * PPM, (pos.y) * PPM + 32);
                 }
                 break;
             }

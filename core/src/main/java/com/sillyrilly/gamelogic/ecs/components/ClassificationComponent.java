@@ -6,8 +6,8 @@ import com.sillyrilly.gamelogic.ecs.types.EntityType;
 
 public class ClassificationComponent implements Component {
     public EntityType type;
+
     public ClassificationComponent(EntityType type) {
         this.type = type;
     }
-
 }

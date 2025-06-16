@@ -66,8 +66,8 @@ public class GameScreen implements Screen {
                 engine = new Engine();
                 engine.addSystem(new InputSystem());
                 engine.addSystem(new MovementSystem());
-                engine.addSystem(new AnimationSystem());
                 engine.addSystem(new CameraFollowSystem());
+                engine.addSystem(new AnimationSystem());
                 engine.addSystem(new EnemyAISystem());
 
 

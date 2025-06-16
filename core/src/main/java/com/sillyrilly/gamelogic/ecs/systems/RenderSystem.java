@@ -5,7 +5,6 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -24,9 +23,9 @@ public class RenderSystem extends EntitySystem {
     private final ComponentMapper<TextureComponent> tm = ComponentMapper.getFor(TextureComponent.class);
 
     private ImmutableArray<Entity> entities;
-    private SpriteBatch batch;
-    private CameraManager cameraManager;
-    private Array<Entity> sortedEntities = new Array<>();
+    private final SpriteBatch batch;
+    private final CameraManager cameraManager;
+    private final Array<Entity> sortedEntities = new Array<>();
 
     public RenderSystem(SpriteBatch batch) {
         this.batch = batch;
@@ -34,13 +33,26 @@ public class RenderSystem extends EntitySystem {
     }
 
     @Override
-    public void addedToEngine(Engine engine) {
+    public void addedToEngine(Engine engine){
         entities = engine.getEntitiesFor(Family.all(BodyComponent.class, LevelComponent.class).get());
 
     }
 
     @Override
     public void update(float deltaTime) {
+        sortEntities();
+
+        cameraManager.getCamera().update();
+        batch.setProjectionMatrix(cameraManager.getCamera().combined);
+
+        batch.begin();
+
+        renderEntities();
+
+        batch.end();
+    }
+
+    private void sortEntities() {
         sortedEntities.clear();
         for (int i = 0; i < entities.size(); i++) {
             sortedEntities.add(entities.get(i));
@@ -59,22 +71,16 @@ public class RenderSystem extends EntitySystem {
 
             if (tc.has(a)) {
                 ya -= tc.get(a).renderOffsetY;
-                ya -= getTileHeightOffset(a);
             }
             if (tc.has(b)) {
                 yb -= tc.get(b).renderOffsetY;
-                yb -= getTileHeightOffset(b);
             }
 
             return Float.compare(yb, ya);
         });
+    }
 
-
-        cameraManager.getCamera().update();
-        batch.setProjectionMatrix(cameraManager.getCamera().combined);
-
-        batch.begin();
-
+    private void renderEntities(){
         for (Entity entity : sortedEntities) {
 
           if (ac.has(entity)) {
@@ -103,14 +109,5 @@ public class RenderSystem extends EntitySystem {
             }
 
         }
-
-        batch.end();
-    }
-
-    int getTileHeightOffset(Entity entity) {
-        if (!tc.has(entity)) return 0;
-        TileComponent tile = tc.get(entity);
-        MapProperties props = tile.tile.getProperties();
-        return props.containsKey("height") ? (int) props.get("height") : 0;
     }
 }
