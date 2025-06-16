@@ -9,10 +9,7 @@ import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
-import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
-import com.sillyrilly.gamelogic.ecs.components.LevelComponent;
-import com.sillyrilly.gamelogic.ecs.components.TileComponent;
+import com.sillyrilly.gamelogic.ecs.components.*;
 import com.sillyrilly.managers.CameraManager;
 
 import static com.sillyrilly.gamelogic.ecs.entities.EntityFactory.PPM;
@@ -23,6 +20,8 @@ public class RenderSystem extends EntitySystem {
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<LevelComponent> lc = ComponentMapper.getFor(LevelComponent.class);
     private final ComponentMapper<TileComponent> tc = ComponentMapper.getFor(TileComponent.class);
+    private final ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private final ComponentMapper<TextureComponent> tm = ComponentMapper.getFor(TextureComponent.class);
 
     private ImmutableArray<Entity> entities;
     private SpriteBatch batch;
@@ -77,7 +76,8 @@ public class RenderSystem extends EntitySystem {
         batch.begin();
 
         for (Entity entity : sortedEntities) {
-            if (ac.has(entity)) {
+
+          if (ac.has(entity)) {
                 AnimationComponent anim = ac.get(entity);
                 BodyComponent body = bc.get(entity);
 
@@ -101,6 +101,7 @@ public class RenderSystem extends EntitySystem {
                 batch.draw(region, pos.x, pos.y,
                     TILE_SIZE, tileC.renderOffsetY + TILE_SIZE);
             }
+
         }
 
         batch.end();

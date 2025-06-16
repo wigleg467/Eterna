@@ -5,10 +5,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
-import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
-import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
-import com.sillyrilly.gamelogic.ecs.components.FacingComponent;
-import com.sillyrilly.gamelogic.ecs.components.PlayerComponent;
+import com.sillyrilly.gamelogic.ecs.components.*;
 import com.sillyrilly.managers.InputManager;
 
 public class AnimationSystem extends EntitySystem {
@@ -76,7 +73,7 @@ public class AnimationSystem extends EntitySystem {
                 frame.flip(true, false);
             }
                 anim.currentFrame = frame;
-            } else {
+            } else if(entity.getComponent(EnemyComponent.class) != null){
                 Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
                 TextureAtlas.AtlasRegion frame = currentAnim.getKeyFrame(anim.stateTime, true);
 
@@ -89,6 +86,7 @@ public class AnimationSystem extends EntitySystem {
                 // Якщо це не гравець — просто оновлюємо таймер
                 anim.stateTime += deltaTime;
             }
+
 
         }
     }

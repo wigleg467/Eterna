@@ -5,6 +5,7 @@ public enum EntityType implements Animatable {
 //    NPC("animations/npc.atlas"),
     ENEMY(null);
 
+
     private final String path;
 
     EntityType(String path) {

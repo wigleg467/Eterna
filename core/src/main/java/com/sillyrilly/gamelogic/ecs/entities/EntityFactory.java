@@ -93,7 +93,7 @@ public class EntityFactory {
         entity.add(new BodyComponent(body));
         entity.add(new FacingComponent());
         entity.add(new LevelComponent(lvl));
-        entity.add(new ClassificationComponent(EntityType.ENEMY));
+      //  entity.add(new ClassificationComponent(EntityType.ENEMY));
         entity.add(new EnemyComponent(type));
 
         engine.addEntity(entity);
@@ -157,6 +157,8 @@ public class EntityFactory {
             }
         }
     }
+
+
 
     public void createObjectLayer(TiledMap map, String layerName, int lvl) {
         createObjectLayer(map, layerName, lvl, 0f, 0f, 0f);

@@ -44,7 +44,7 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         if (!initialized) {
-            map = new TmxMapLoader().load("maps/firstlevel.tmx");
+            map = new TmxMapLoader().load("maps/third_level.tmx");
             //   renderer = new OrthogonalTiledMapRenderer(map);
             //   renderer.setView(cameraManager.getCamera());
 
@@ -69,18 +69,21 @@ public class GameScreen implements Screen {
                 engine.addSystem(new AnimationSystem());
                 engine.addSystem(new CameraFollowSystem());
                 engine.addSystem(new EnemyAISystem());
-                engine.addSystem(new RenderSystem(batch));
 
+
+                engine.addSystem(new RenderSystem(batch));
                 factory = new EntityFactory(engine, world);
             }
 
             factory.createPlayer(300f, 300f, 1);
             factory.createTileLayer(map, "base", 0);
-            factory.createTileLayer(map, "landscape", 0);
-            factory.createTileLayer(map, "base2", 0);
-            factory.createTileLayer(map, "house", 1);
-            factory.createObjectLayer(map, "Collosion_lvl_1", 1, 1, 0.01f, 0.01f);
-            factory.createTileLayer(map, "props", 1);
+//            factory.createTileLayer(map, "landscape", 0);
+//            factory.createTileLayer(map, "base2", 0);
+//            factory.createTileLayer(map, "house", 1);
+//            factory.createObjectLayer(map, "Collosion_lvl_1", 1, 1, 0.01f, 0.01f);
+            //   factory.createTileLayer(map, "castle", 0);
+            factory.createTileLayer(map, "props", 2);
+
 
             MapObjects objects = map.getLayers().get("Enemies").getObjects();
             for (MapObject object : objects) {
@@ -89,6 +92,8 @@ public class GameScreen implements Screen {
                 EnemyType type = EnemyType.valueOf(typeStr.toUpperCase());
                 factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 1);
             }
+
+
             initialized = true;
         }
 

@@ -1,0 +1,19 @@
+castle.png
+size: 426, 498
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+idle
+  rotate: false
+  xy: 1, 1
+  size: 424, 496
+  orig: 600, 640
+  offset: 47, 77
+  index: 1
+idle
+  rotate: false
+  xy: 1, 1
+  size: 424, 496
+  orig: 600, 640
+  offset: 47, 77
+  index: 2

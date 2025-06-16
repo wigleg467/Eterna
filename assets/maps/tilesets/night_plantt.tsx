@@ -3,37 +3,42 @@
  <image source="../images/night_plantt.png" width="512" height="512"/>
  <tile id="1">
   <properties>
-   <property name="4" type="int" value="0"/>
+   <property name="height" type="int" value="4"/>
   </properties>
  </tile>
  <tile id="2">
   <properties>
-   <property name="4" type="int" value="0"/>
+   <property name="height" type="int" value="4"/>
   </properties>
  </tile>
  <tile id="3">
   <properties>
-   <property name="4" type="int" value="0"/>
+   <property name="height" type="int" value="4"/>
   </properties>
  </tile>
  <tile id="4">
   <properties>
-   <property name="4" type="int" value="0"/>
+   <property name="height" type="int" value="4"/>
   </properties>
  </tile>
  <tile id="5">
   <properties>
-   <property name="4" type="int" value="0"/>
+   <property name="height" type="int" value="4"/>
   </properties>
  </tile>
  <tile id="6">
   <properties>
-   <property name="4" type="int" value="0"/>
+   <property name="height" type="int" value="4"/>
   </properties>
  </tile>
  <tile id="7">
   <properties>
-   <property name="4" type="int" value="0"/>
+   <property name="height" type="int" value="4"/>
+  </properties>
+ </tile>
+ <tile id="8">
+  <properties>
+   <property name="height" value="4e"/>
   </properties>
  </tile>
  <tile id="13">
