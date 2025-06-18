@@ -29,6 +29,7 @@ public class AnimationComponent implements Component {
             for (int i = 0; i < animationNames.length; i++) {
                 if (!animationNames[i].isEmpty()) {
                     animations.put(State.get(i), createAnimation(animatable.getAnimationPath(), animationNames[i]));
+                    Gdx.app.log("AnimationComponent", animationNames[i]);
                 }
             }
         }

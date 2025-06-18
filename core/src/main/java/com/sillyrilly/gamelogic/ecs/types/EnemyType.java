@@ -5,9 +5,10 @@ public enum EnemyType implements Animatable {
     ZOMBIE("animations/zombie.atlas", 1f, 0.0625f*2),
     SKELETON("animations/skeleton.atlas", 1f, 0.0625f*2),
     WATERMELON("animations/watermelon.atlas", 1f, 0.0625f*2),
-    MUMMY("animations/mummy.atlas", 1f, 0.0625f*2);
+    MUMMY("animations/mummy.atlas", 1f, 0.0625f*2),
+    ANGEL("animations/angel.atlas", 1f, 1f),
+    DEMON("animations/demon.atlas", 1f, 1f);
     //0.0625 це висота ступнів поділена на два
-
 
     private final String path;
     private final float w, h;

@@ -33,7 +33,7 @@ public class RenderSystem extends EntitySystem {
     }
 
     @Override
-    public void addedToEngine(Engine engine){
+    public void addedToEngine(Engine engine) {
         entities = engine.getEntitiesFor(Family.all(BodyComponent.class, LevelComponent.class).get());
 
     }
@@ -80,22 +80,22 @@ public class RenderSystem extends EntitySystem {
         });
     }
 
-    private void renderEntities(){
+    private void renderEntities() {
         for (Entity entity : sortedEntities) {
 
-          if (ac.has(entity)) {
+            if (ac.has(entity)) {
                 AnimationComponent anim = ac.get(entity);
                 BodyComponent body = bc.get(entity);
 
                 TextureAtlas.AtlasRegion frame = anim.currentFrame;
-                //      if (frame == null) continue; // ще не оновлено
+                if (frame == null) continue; // ще не оновлено
 
                 float scale = 0.25f;
                 float width = frame.getRegionWidth() * scale;
                 float height = frame.getRegionHeight() * scale;
 
                 Vector2 pos = body.getPosition().scl(PPM);
-                batch.draw(frame, pos.x- width / 2f, pos.y, width, height);
+                batch.draw(frame, pos.x - width / 2f, pos.y, width, height);
             } else if (tc.has(entity)) {
                 BodyComponent bodyC = bc.get(entity);
                 TileComponent tileC = tc.get(entity);
@@ -105,7 +105,7 @@ public class RenderSystem extends EntitySystem {
                 TextureRegion region = tile.getTextureRegion();
 
                 batch.draw(region, pos.x, pos.y,
-                    TILE_SIZE, tileC.renderOffsetY + TILE_SIZE);
+                        TILE_SIZE, tileC.renderOffsetY + TILE_SIZE);
             }
 
         }

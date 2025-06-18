@@ -73,9 +73,11 @@ public class AnimationSystem extends EntitySystem {
                     frame.flip(true, false);
                 }
                 anim.currentFrame = frame;
-            } else if(entity.getComponent(EnemyComponent.class) != null){
+            } else if (entity.getComponent(EnemyComponent.class) != null) {
                 Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
+                if (currentAnim == null) continue;
                 TextureAtlas.AtlasRegion frame = currentAnim.getKeyFrame(anim.stateTime, true);
+
 
                 if (facing != null && !facing.facingRight && !frame.isFlipX()) {
                     frame.flip(true, false);
