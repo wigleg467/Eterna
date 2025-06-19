@@ -78,7 +78,7 @@ public class GameScreen implements Screen {
                 engine.addSystem(new CameraFollowSystem());
                 engine.addSystem(new AnimationSystem());
                 engine.addSystem(new AISystem());
-                engine.addSystem(new EnemyPathfindingSystem(new NavigationMap(map).getGrid()));
+                engine.addSystem(new EnemyPathfindingSystem(new NavigationMap(realWorld).getGrid()));
                 engine.addSystem(new RenderSystem(batch));
 
                 factory = new EntityFactory(engine, world);

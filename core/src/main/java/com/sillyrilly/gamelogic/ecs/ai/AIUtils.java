@@ -19,6 +19,6 @@ public class AIUtils {
         Vector2 enemyPos = enemy.getComponent(BodyComponent.class).body.getPosition();
         Vector2 playerPos = getPlayerPosition();
         float dst = enemyPos.dst2(playerPos);
-        return dst < 1f; // В тайлах
+        return dst < 30*32f; // хз що це за число насправді
     }
 }

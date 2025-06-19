@@ -26,7 +26,7 @@ public class NavigationMap {
 
         grid = new int[mapWidth][mapHeight];
 
-        MapLayer collisionLayer = map.getLayers().get("Collosion_lvl_1"); // <- твій Object Layer
+        MapLayer collisionLayer = map.getLayers().get("Collision_lvl_1"); // <- твій Object Layer
         for (MapObject object : collisionLayer.getObjects()) {
             if (object instanceof RectangleMapObject rectObj) {
                 Rectangle rect = rectObj.getRectangle();
