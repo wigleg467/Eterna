@@ -19,8 +19,6 @@ public class AnimationSystem extends EntitySystem {
     private ImmutableArray<Entity> entities;
 
     public AnimationSystem() {
-//        this.inputManager = InputManager.getInstance();
-
     }
 
     @Override
@@ -54,6 +52,7 @@ public class AnimationSystem extends EntitySystem {
                         // Атака завершена — повертаємось до поточного введеного стану (наприклад, WALK або IDLE)
                         anim.currentState = inputState;
                         anim.stateTime = 0f;
+                        InputManager.getInstance().setCanAttack(true);
                     }
                 } else {
                     // Якщо не атака — просто оновлюємо стан і таймер

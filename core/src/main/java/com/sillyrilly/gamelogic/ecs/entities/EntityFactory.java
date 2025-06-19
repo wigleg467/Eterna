@@ -3,6 +3,7 @@ package com.sillyrilly.gamelogic.ecs.entities;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -13,8 +14,9 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.*;
 import com.sillyrilly.gamelogic.ecs.components.*;
-import com.sillyrilly.gamelogic.ecs.types.EnemyType;
-import com.sillyrilly.gamelogic.ecs.types.EntityType;
+import com.sillyrilly.gamelogic.ecs.ai.EnemyState;
+import com.sillyrilly.gamelogic.ecs.utils.EnemyType;
+import com.sillyrilly.gamelogic.ecs.utils.EntityType;
 
 public class EntityFactory {
     public final static float PPM = 32f;
@@ -41,24 +43,26 @@ public class EntityFactory {
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(0.5f, 0.0625f); // треба потикати
 
-          FixtureDef fixtureDef = new FixtureDef();
+        FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-     //   fixtureDef.density = 0f;  // вага тіла
-     //   fixtureDef.friction = 0f;  // тертя із землею (max 1f)
-     //   fixtureDef.restitution = 0f; // пружність (відскок)
+        //   fixtureDef.density = 0f;  // вага тіла
+        //   fixtureDef.friction = 0f;  // тертя із землею (max 1f)
+        //   fixtureDef.restitution = 0f; // пружність (відскок)
 
         body.createFixture(fixtureDef);
         shape.dispose();
 
         Entity entity = new Entity();
 
+
+        BodyComponent bc = new BodyComponent(body);
         entity.add(new AnimationComponent(EntityType.PLAYER, "idle", "walk_right", "attack"));
-        entity.add(new BodyComponent(body));
+        entity.add(bc);
         entity.add(new FacingComponent());
         entity.add(new CameraFollowableComponent());
         entity.add(new CameraTargetComponent());
         entity.add(new LevelComponent(lvl));
-        entity.add(new PlayerComponent());
+        entity.add(new PlayerComponent(bc));
 
         engine.addEntity(entity);
 
@@ -79,9 +83,9 @@ public class EntityFactory {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-     //   fixtureDef.density = 1f;
-     //   fixtureDef.friction = 0.5f;
-     //   fixtureDef.restitution = 0f;
+        //   fixtureDef.density = 1f;
+        //   fixtureDef.friction = 0.5f;
+        //   fixtureDef.restitution = 0f;
 
         body.createFixture(fixtureDef);
         shape.dispose();
@@ -92,7 +96,11 @@ public class EntityFactory {
         entity.add(new EnemyComponent(type));
         entity.add(new FacingComponent());
         entity.add(new LevelComponent(lvl));
-        entity.add(new ClassificationComponent(EntityType.ENEMY));
+      //  entity.add(new ClassificationComponent(EntityType.ENEMY));
+
+        AIComponent ai = new AIComponent();
+        ai.stateMachine = new DefaultStateMachine<>(entity, EnemyState.IDLE);
+        entity.add(ai);
 
         engine.addEntity(entity);
     }

@@ -18,7 +18,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.sillyrilly.gamelogic.ecs.entities.EntityFactory;
 import com.sillyrilly.gamelogic.ecs.systems.*;
-import com.sillyrilly.gamelogic.ecs.types.EnemyType;
+import com.sillyrilly.gamelogic.ecs.utils.EnemyType;
+import com.sillyrilly.gamelogic.ecs.ai.NavigationMap;
 import com.sillyrilly.managers.CameraManager;
 import com.sillyrilly.managers.InputManager;
 import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
@@ -68,7 +69,8 @@ public class GameScreen implements Screen {
                 engine.addSystem(new MovementSystem());
                 engine.addSystem(new CameraFollowSystem());
                 engine.addSystem(new AnimationSystem());
-                engine.addSystem(new EnemyAISystem());
+                engine.addSystem(new AISystem());
+                engine.addSystem(new EnemyPathfindingSystem(new NavigationMap(map).getGrid()));
                 engine.addSystem(new RenderSystem(batch));
 
                 factory = new EntityFactory(engine, world);
@@ -87,7 +89,7 @@ public class GameScreen implements Screen {
                 Rectangle rect = ((RectangleMapObject) object).getRectangle();
                 String typeStr = object.getProperties().get("type", String.class);
                 EnemyType type = EnemyType.valueOf(typeStr.toUpperCase());
-                factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 1);
+                factory.createEnemy(rect.x  + rect.width / 2, rect.y - 300f + rect.height / 2, type, 1);
             }
             initialized = true;
         }

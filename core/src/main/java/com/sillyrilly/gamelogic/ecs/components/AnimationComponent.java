@@ -5,7 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
-import com.sillyrilly.gamelogic.ecs.types.Animatable;
+import com.sillyrilly.gamelogic.ecs.utils.Animatable;
 
 import java.util.EnumMap;
 import java.util.Map;

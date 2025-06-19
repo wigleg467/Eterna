@@ -5,98 +5,69 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.sillyrilly.managers.AudioManager;
+import com.sillyrilly.util.d2.ASCIIConfig;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Random;
 
-import static com.sillyrilly.util.d2.ASCIITexture.CHARACTER_LIST;
+import static com.sillyrilly.util.d2.ASCIIConfig.*;
+import static com.sillyrilly.util.d2.ASCIITexture.*;
 
 public class ASCIIScreen implements Screen {
 
     private SpriteBatch batch;
-    private FreeTypeFontGenerator generator;
-    private FreeTypeFontGenerator.FreeTypeFontParameter parameter;
     private BitmapFont renderFont;
     private BitmapFont miniMapFont;
+    private BitmapFont.Glyph glyph;
+    private TextureRegion region;
+    private final Random rand = new Random();
+    private final AudioManager audioManager = AudioManager.getInstance();
 
     private final InputHandler inputHandler = new InputHandler();
 
-    private List<SpriteEntity> sprites = new ArrayList<>();
-
-    private final static int[][] MAP = {
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 2, 1, 1, 1, 0, 1, 0, 1, 1, 1, 2, 1, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1},
-        {1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1},
-        {1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1},
-        {1, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 2, 0, 2, 0, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-    };
-
-    private final static int EMPTY = 0;
-    private final static int WALL = 1;
-    private final static int DOOR = 2;
-    private final int mapWidth = MAP[0].length;
-    private final int mapHeight = MAP.length;
-
-    private final static int antiAliasing = 1;
-
-    private final static int CELL_W = 8 / antiAliasing;   // ширина символу у пікселях
-    private final static int CELL_H = 16 / antiAliasing;  // висота символу у пікселях
-
-    private final static float FOV = (float) Math.PI / 9 * 5;
-    private final static float ROT_SPEED = 1.5f;  // radians per second
-    private final static float MAX_DEPTH = 8f;
-
     private float playerX = 1.5f, playerY = 1.5f;
     private float angle = 0.0f;
-    private float moveSpeed = 2.0f; // tiles per second
 
-    private float scale = 1f * antiAliasing;
+    private float scale = 1f * ANTI_ALIASING;
 
-    private int screenWidth = 160 * antiAliasing;
-    private int screenHeight = 45 * antiAliasing;
-
-    private boolean isCursorCatched = true;
+    private boolean isCursorCaught = true;
     private boolean isMapOn = false;
+    private int hud = 0;
 
+    private boolean isInitialized = false;
 
     /**
      * Called when this screen becomes the current screen for a {@link Game}.
      */
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(inputHandler);
-        Gdx.input.setCursorCatched(isCursorCatched);
-        {
-            generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/CascadiaMono-Regular.ttf"));
-            parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        if (!isInitialized) {
+            Gdx.input.setInputProcessor(inputHandler);
+            Gdx.input.setCursorCatched(isCursorCaught);
+
+            FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/CascadiaMono-Regular.ttf"));
+            FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+
             parameter.characters = CHARACTER_LIST;
-            int size = (int) (scale * 16);
-            if (size < 4) size = 4;
-            else if (size > 16) size = 16;
-            size = 16;
-            parameter.size = size;
-
+            parameter.size = 14;
             renderFont = generator.generateFont(parameter);
-
             parameter.size = 16;
             miniMapFont = generator.generateFont(parameter);
-        }
-        batch = new SpriteBatch();
 
-        sprites.add(new SpriteEntity(5.5f, 4.5f, '☼'));
-        sprites.add(new SpriteEntity(2.5f, 2.5f, '&'));
-        sprites.add(new SpriteEntity(4.5f, 6.5f, '$'));
+            generator.dispose();
+
+            glyph = miniMapFont.getData().getGlyph('>');
+            region = new TextureRegion(miniMapFont.getRegion().getTexture(),
+                glyph.srcX, glyph.srcY, glyph.width, glyph.height);
+
+            batch = new SpriteBatch();
+
+            isInitialized = true;
+        }
+
+        audioManager.playBasementMusic(true, 1f);
     }
 
     /**
@@ -111,71 +82,78 @@ public class ASCIIScreen implements Screen {
 
         handleInput(delta);
 
+        if (hud == 0) maxDepth = 1.3f;
+        else if (hud == 1) maxDepth = 1.5f;
+        else maxDepth = 4f;
+
         batch.begin();
 
-        for (float x = 0; x < screenWidth; x += scale) {
-            Hit hit = castRay(angle - FOV / 2 + FOV * x / screenWidth);
-            char symbol = getSymbol(hit);
+        float distToUnderWorld = distanceToValue(playerX, playerY);
 
-            float dist = hit.dist;
+        float correctedDistanceToExit = (float) Math.exp((-distToUnderWorld + 2f) * 0.5f);
+        if (correctedDistanceToExit < 0f) correctedDistanceToExit = 0.01f;
+        if (correctedDistanceToExit > 1f) correctedDistanceToExit = 0.999f;
 
+        for (float x = 0; x < SCREEN_WIDTH; x += scale) {
+            float rayAngle = angle - FOV / 2 + FOV * x / SCREEN_WIDTH;
+            Hit hit = castRay(rayAngle);
+            float correctedDist = hit.dist * (float) Math.cos(rayAngle - angle);
 
-            int wallHeight = (int) (screenHeight / (hit.dist + 0.1f));
-            int wallStart = Math.max(0, (screenHeight - wallHeight) / 2);
-            int wallEnd = Math.min(screenHeight - 1, wallStart + wallHeight);
-            for (float y = 0; y < screenHeight; y += scale) {
-                char ch = y < wallStart ? ' ' : (y > wallEnd ? '—' : symbol);
-                if (ch != '—') {
-                    if (ch == '/') {
-                        renderFont.setColor(Color.RED);
-                    } else {
-                        renderFont.setColor(Color.GRAY);
+            int wallHeight = (int) (SCREEN_HEIGHT / correctedDist);
+            int wallStart = Math.max(0, (SCREEN_HEIGHT - wallHeight) / 2);
+            int wallEnd = Math.min(SCREEN_HEIGHT - 1, wallStart + wallHeight);
+
+            for (float y = 0; y < SCREEN_HEIGHT; y += scale) {
+                char ch = y < wallStart ? ' ' : (y > wallEnd ? new Random().nextBoolean() ? '—' : '-' : getSymbol(hit));
+
+                boolean result = rand.nextDouble() < correctedDistanceToExit;
+                audioManager.setVolume(correctedDistanceToExit, 2);
+                audioManager.setVolume(1 - correctedDistanceToExit, 1);
+                if (result) renderFont.setColor(Color.RED);
+                else if (hud == 2)
+                    switch (ch) {
+                        case '—', '/', '⁄' -> renderFont.setColor(Color.BROWN);
+                        case '-' -> renderFont.setColor(new Color(0x8b3313ff));
+                        default -> renderFont.setColor(Color.GRAY);
                     }
-                } else {
-                    renderFont.setColor(Color.BROWN);
-                }
+                else renderFont.setColor(Color.GRAY);
+
+
                 renderFont.draw(batch, String.valueOf(ch),
-                    x * CELL_W, (screenHeight - y) * CELL_H);
+                    x * CELL_W, (SCREEN_HEIGHT - y) * CELL_H);
             }
         }
-        renderSprites();
+
+        renderFont.setColor(Color.WHITE);
+        switch (hud) {
+            case 1 -> renderFont.draw(batch, SWORD, 0, 1500);
+            case 2 -> renderFont.draw(batch, LAMP, 0, 800);
+            case 3 -> renderFont.draw(batch, SKULL, 0, 800);
+            case 4 -> renderFont.draw(batch, PISTOL, 400, 300);
+            case 5 -> renderFont.draw(batch, KNIFE, 0, 880);
+        }
+
+
         if (isMapOn) drawMiniMap();
 
         batch.end();
     }
 
-    /**
-     * @param width  - ширина
-     * @param height - висота
-     * @see ApplicationListener#resize(int, int)
-     */
     @Override
     public void resize(int width, int height) {
-
     }
 
-    /**
-     * @see ApplicationListener#pause()
-     */
+
     @Override
     public void pause() {
-
     }
 
-    /**
-     * @see ApplicationListener#resume()
-     */
     @Override
     public void resume() {
-
     }
 
-    /**
-     * Called when this screen is no longer the current screen for a {@link Game}.
-     */
     @Override
     public void hide() {
-
     }
 
     /**
@@ -184,47 +162,50 @@ public class ASCIIScreen implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
-        generator.dispose();
         renderFont.dispose();
         miniMapFont.dispose();
     }
 
     private void drawMiniMap() {
-        int miniSizeX = 8;
-        int miniSizeY = 10;
-        int offsetX = 10;
-        int offsetY = 10;
+        int sizeX = 8, sizeY = 10;
+        int offsetX = 10, offsetY = 10;
 
         miniMapFont.setColor(Color.BLACK);
-        for (int y = 0; y < mapHeight; y++) {
-            for (int x = 0; x < mapWidth; x++) {
+        for (int y = 0; y < MAP_HEIGHT; y++) {
+            for (int x = 0; x < MAP_WIDTH; x++) {
                 char ch = '█';
                 miniMapFont.draw(batch, String.valueOf(ch),
-                    offsetX + x * miniSizeX,
-                    screenHeight * 16 - offsetY - y * miniSizeY
+                    offsetX + x * sizeX,
+                    SCREEN_HEIGHT * 16 - offsetY - y * sizeY
                 );
             }
         }
         miniMapFont.setColor(Color.WHITE);
-        for (int y = 0; y < mapHeight; y++) {
-            for (int x = 0; x < mapWidth; x++) {
+        for (int y = 0; y < MAP_HEIGHT; y++) {
+            for (int x = 0; x < MAP_WIDTH; x++) {
                 char ch = switch (MAP[y][x]) {
                     case WALL -> '#';
                     case DOOR -> 'D';
                     default -> ' ';
                 };
                 miniMapFont.draw(batch, String.valueOf(ch),
-                    offsetX + x * miniSizeX,
-                    screenHeight * 16 - offsetY - y * miniSizeY
+                    offsetX + x * sizeX,
+                    SCREEN_HEIGHT * 16 - offsetY - y * sizeY
                 );
             }
         }
 
-        // Малюємо гравця
-        miniMapFont.draw(batch, "P",
-            offsetX + (int) (playerX * miniSizeX),
-            screenHeight * 16 - (float) offsetY * 2 / 3 - (int) (playerY * miniSizeY)
-        );
+        batch.draw(region, offsetX - 4 + (int) (playerX * sizeX),
+            SCREEN_HEIGHT * 16 - (float) offsetY * 2 / 3 - (int) (playerY * sizeY) - 9,
+            glyph.width / 2f, glyph.height / 2f,
+            glyph.width, glyph.height, 1, 1, (float) -Math.toDegrees(angle));
+
+        //        miniMapFont.draw(batch, "^",
+//            offsetX + (int) (playerX * sizeX),
+//            SCREEN_HEIGHT * 16 - (float) offsetY * 2 / 3 - (int) (playerY * sizeY)
+//        );
+
+        // miniMapFont.draw(batch, "*", offsetX + (int) (lampX * sizeX), SCREEN_HEIGHT * 15 - offsetY - (int) (lampY * sizeY));
     }
 
     private Hit castRay(float rayAngle) {
@@ -232,12 +213,12 @@ public class ASCIIScreen implements Screen {
         float eyeY = (float) Math.sin(rayAngle);
         float dist = 0f;
 
-        while (dist < MAX_DEPTH) {
+        while (dist < maxDepth) {
             int testX = (int) (playerX + eyeX * dist);
             int testY = (int) (playerY + eyeY * dist);
 
-            if (testX < 0 || testX >= mapWidth || testY < 0 || testY >= mapHeight)
-                return new Hit(MAX_DEPTH, WALL);
+            if (testX < 0 || testX >= MAP_WIDTH || testY < 0 || testY >= MAP_HEIGHT)
+                return new Hit(maxDepth, WALL);
 
             int cell = MAP[testY][testX];
             if (cell == WALL || cell == DOOR)
@@ -246,29 +227,32 @@ public class ASCIIScreen implements Screen {
             dist += 0.05f;
         }
 
-        return new Hit(MAX_DEPTH, EMPTY);
+        return new Hit(maxDepth, EMPTY);
     }
 
     private char getSymbol(Hit hit) {
-        if (hit.cell == DOOR) return '/';          // двері
-
+        int cell = hit.cell;
         float d = hit.dist;
-        if (d < 2f) return '|';
-        if (d < 4f) return '!';
-        if (d < 6f) return ':';
-        if (d < 8f) return '.';
-        return ' ';
 
-//        if (dist < 1.5f) return '=';
-//        if (dist < 3f) return '—';
-//        if (dist < 5f) return '-';
-//        if (dist < 7f) return '.';
-//        return ' ';
-//        //   if (dist < maxDepth / 8f) return '█';
-//        if (dist < maxDepth / 6f) return '▓';
-//        else if (dist < maxDepth / 4f) return '▒';
-//            //  else if (dist < maxDepth / 2f) return '░';
-//        else return '░';
+        //   █▓▒░░=—-.
+
+        boolean result = rand.nextBoolean();
+        if (hud == 2) {
+            result = rand.nextFloat() < 0.95f;
+            return
+                cell == DOOR ? result ? '/' : '⁄' :
+                    d < 0.9f ? result ? '|' : '!' :
+                        d < 1.05f ? rand.nextBoolean() ? '|' : '!' :
+                            d < 1.9f ? result ? '!' : ':' :
+                                d < 2.05f ? rand.nextBoolean() ? '!' : ':' :
+                                    d < 2.9f ? result ? ':' : '.' :
+                                        d < 3.05f ? rand.nextBoolean() ? ':' : '.' :
+                                            d < 4f ? result ? '.' : '·' : ' ';
+        } else if (hud == 1) {
+            return d < 1.5f ? cell == DOOR ? result ? '/' : '⁄' : result ? '.' : '·' : ' ';
+        } else {
+            return d < 1.3f ? cell == DOOR ? result ? '/' : '⁄' : result ? '.' : '·' : ' ';
+        }
     }
 
     private void toggleDoor() {
@@ -277,86 +261,120 @@ public class ASCIIScreen implements Screen {
             for (int dx = -1; dx <= 1; dx++) {
                 int tx = (int) playerX + dx;
                 int ty = (int) playerY + dy;
-                if (tx < 0 || ty < 0 || tx >= mapWidth || ty >= mapHeight) continue;
+                if (tx < 0 || ty < 0 || tx >= MAP_WIDTH || ty >= MAP_HEIGHT) continue;
                 if (MAP[ty][tx] == DOOR) {
                     MAP[ty][tx] = EMPTY;            // відчинили
                     return;
+                }
+                if (MAP[ty][tx] == DOOR_BACK) {
+                    //   audioManager.
+                    //  ScreenManager.getInstance().setScreen();
+                }
+                if (MAP[ty][tx] == DOOR_FORWARD) {
+                    //  ScreenManager.getInstance().setScreen();
                 }
             }
         }
     }
 
-//    private void updateDoors(float delta) {
-//        // Оновлюємо таймери відкритих дверей
-//        Iterator<Map.Entry<Integer, Float>> it = doorOpenTimers.entrySet().iterator();
-//        while (it.hasNext()) {
-//            Map.Entry<Integer, Float> entry = it.next();
-//            float newTime = entry.getValue() - delta;
-//            if (newTime <= 0f) {
-//                // Час минув - зачиняємо двері
-//                int pos = entry.getKey();
-//                int x = pos >> 16;
-//                int y = pos & 0xFFFF;
-//                map[y][x] = DOOR;
-//                it.remove();
-//            } else {
-//                entry.setValue(newTime);
-//            }
-//        }
-//    }
+    private float distanceToValue(float playerX, float playerY) {
+        for (int y = 0; y < ASCIIConfig.MAP_HEIGHT; y++) {
+            for (int x = 0; x < ASCIIConfig.MAP_WIDTH; x++) {
+                if (ASCIIConfig.MAP[y][x] == ASCIIConfig.DOOR_FORWARD) {
+                    float dx = (x + 0.5f) - playerX;
+                    float dy = (y + 0.5f) - playerY;
+                    return (float) Math.sqrt(dx * dx + dy * dy);
+                }
+            }
+        }
+        return 1; // not found
+    }
 
     private void handleInput(float delta) {
         // Рух вперед/назад
+        // tiles per second
+        float moveSpeed;
+
         if (inputHandler.isRunning) {
-            moveSpeed = 3f;
+            moveSpeed = 1.5f;
+            footstepCooldown = 0.5f;
         } else {
             moveSpeed = 1f;
+            footstepCooldown = 0.9f;
         }
 
+        footstepTimer -= delta; // зменшуємо таймер
+
+        boolean isMoving = false;
+        float dx = 0, dy = 0;
+
+// Збір напрямку руху
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            float newX = playerX + (float) Math.cos(angle) * moveSpeed * delta;
-            float newY = playerY + (float) Math.sin(angle) * moveSpeed * delta;
-            if (MAP[(int) newY][(int) newX] == 0) {
-                playerX = newX;
-                playerY = newY;
-            }
+            dx += (float) Math.cos(angle);
+            dy += (float) Math.sin(angle);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            float newX = playerX - (float) Math.cos(angle) * moveSpeed * delta;
-            float newY = playerY - (float) Math.sin(angle) * moveSpeed * delta;
-            if (MAP[(int) newY][(int) newX] == 0) {
+            dx -= (float) Math.cos(angle);
+            dy -= (float) Math.sin(angle);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            dx += (float) Math.sin(angle);
+            dy -= (float) Math.cos(angle);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            dx -= (float) Math.sin(angle);
+            dy += (float) Math.cos(angle);
+        }
+
+        if (dx != 0 || dy != 0) {
+            isMoving = true;
+        }
+
+        if (isMoving && footstepTimer <= 0f) {
+            AudioManager.getInstance().playStep(1f);  // 0.3 — гучність, можеш змінити
+            footstepTimer = footstepCooldown;
+        }
+
+        if (dx != 0 || dy != 0) {
+            // Нормалізація
+            float length = (float) Math.sqrt(dx * dx + dy * dy);
+            dx /= length;
+            dy /= length;
+
+            // Потенційна нова позиція
+            float newX = playerX + dx * moveSpeed * delta;
+            float newY = playerY + dy * moveSpeed * delta;
+
+            boolean canMoveX = MAP[(int) playerY][(int) newX] == 0;
+            boolean canMoveY = MAP[(int) newY][(int) playerX] == 0;
+
+            // Перевірка повного проходу
+            if (canMoveX && canMoveY) {
                 playerX = newX;
+                playerY = newY;
+            }
+            // Якщо повністю не можна — пробуємо ковзнути
+            else if (canMoveX) {
+                playerX = newX;
+            } else if (canMoveY) {
                 playerY = newY;
             }
         }
 
-        // Рух вбік
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            float newX = playerX + (float) Math.sin(angle) * moveSpeed * delta;
-            float newY = playerY - (float) Math.cos(angle) * moveSpeed * delta;
-            if (MAP[(int) newY][(int) newX] == 0) {
-                playerX = newX;
-                playerY = newY;
-            }
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            float newX = playerX - (float) Math.sin(angle) * moveSpeed * delta;
-            float newY = playerY + (float) Math.cos(angle) * moveSpeed * delta;
-            if (MAP[(int) newY][(int) newX] == 0) {
-                playerX = newX;
-                playerY = newY;
-            }
-        }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.F) || Gdx.input.isKeyJustPressed(Input.Keys.E)) toggleDoor();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) isMapOn = !isMapOn;
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            isCursorCatched = !isCursorCatched;
-            Gdx.input.setCursorCatched(isCursorCatched);
+            isCursorCaught = !isCursorCaught;
+            Gdx.input.setCursorCatched(isCursorCaught);
         }
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
+            if (hud + 1 < 6) hud++;
+            else hud = 0;
+        }
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             angle -= ROT_SPEED * delta;
@@ -365,17 +383,26 @@ public class ASCIIScreen implements Screen {
             angle += ROT_SPEED * delta;
         }
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.EQUALS)) {
+            scale -= 0.1f;
+            if (scale < 0.1f) scale = 0.1f;
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.MINUS)) {
+            scale += 0.1f;
+            if (scale > 8f) scale = 8f;
+        }
+
         if (inputHandler.X != inputHandler.newX) {
             angle += inputHandler.getX() / 3 * delta;
         }
 
         if (inputHandler.scroll != 0) {
             if (inputHandler.scroll > 0) {
-                scale += 0.1f;
-                if (scale > 8f) scale = 8f;
+                hud--;
+                if (hud < 0) hud = 2;
             } else {
-                scale -= 0.1f;
-                if (scale < 0.1f) scale = 0.1f;
+                hud++;
+                if (hud > 2) hud = 0;
             }
 
 //            renderFont.dispose();
@@ -391,42 +418,6 @@ public class ASCIIScreen implements Screen {
             inputHandler.scroll = 0;
         }
     }
-
-    void renderSprites() {
-        for (SpriteEntity sprite : sprites) {
-            // Вектор до спрайта
-            float dx = sprite.x - playerX;
-            float dy = sprite.y - playerY;
-            float distance = (float)Math.sqrt(dx * dx + dy * dy);
-
-            // Кут між гравцем і спрайтом
-            float spriteAngle = (float)Math.atan2(dy, dx);
-            float angleDiff = spriteAngle - angle;
-
-            // Нормалізація кута
-            while (angleDiff > Math.PI) angleDiff -= (float) (2 * Math.PI);
-            while (angleDiff < -Math.PI) angleDiff += (float) (2 * Math.PI);
-
-            // Якщо поза полем зору — ігнор
-            if (Math.abs(angleDiff) > FOV / 2f) continue;
-
-            // Знаходимо колонку на екрані, де малювати
-            int screenX = (int)((angleDiff + FOV / 2f) / FOV * screenWidth);
-
-            // Висота "спрайта" залежить від дистанції
-            float correctedDist = distance * (float)Math.cos(angleDiff);
-            int spriteHeight = (int)(screenHeight / correctedDist);
-            int spriteY = (screenHeight - spriteHeight) / 2;
-
-            // Малюємо символ спрайта
-            renderFont.draw(batch,
-                String.valueOf(sprite.symbol),
-                screenX * CELL_W,
-                (screenHeight - spriteY) * CELL_H
-            );
-        }
-    }
-
 
     private static class InputHandler extends InputAdapter {
         float X = 0;
@@ -489,17 +480,6 @@ public class ASCIIScreen implements Screen {
         public Hit(float dist, int cell) {
             this.dist = dist;
             this.cell = cell;
-        }
-    }
-
-    private static class SpriteEntity {
-        float x, y;
-        char symbol;
-
-        SpriteEntity(float x, float y, char symbol) {
-            this.x = x;
-            this.y = y;
-            this.symbol = symbol;
         }
     }
 }

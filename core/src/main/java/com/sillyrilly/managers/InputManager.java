@@ -16,6 +16,8 @@ public class InputManager extends InputAdapter {
     private final Vector2 movement = new Vector2();
     private AnimationComponent.State state;
     private boolean changeCamera = false;
+    private boolean canAttack = true;
+    private boolean debug = false;
 
     private InputManager() {
         this.multiplexer = new InputMultiplexer();
@@ -35,7 +37,6 @@ public class InputManager extends InputAdapter {
         movement.set(0, 0);
 
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            // ### Удар ###
             if (state != AnimationComponent.State.ATTACK) {
                 state = AnimationComponent.State.ATTACK;
             }
@@ -65,6 +66,10 @@ public class InputManager extends InputAdapter {
             }
         }
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) {
+            debug = !debug;
+        }
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             // ### Перемикання згладження камери ###
             CameraFollowSystem.changeCameraSmoothing();
@@ -89,6 +94,10 @@ public class InputManager extends InputAdapter {
         }
     }
 
+    public boolean isDebug() {
+        return debug;
+    }
+
     public void setChangeCamera(boolean changeCamera) {
         this.changeCamera = changeCamera;
     }
@@ -107,5 +116,13 @@ public class InputManager extends InputAdapter {
 
     public boolean isChangeCamera() {
         return changeCamera;
+    }
+
+    public boolean canAttack() {
+        return canAttack;
+    }
+
+    public void setCanAttack(boolean canAttack) {
+        this.canAttack = canAttack;
     }
 }
