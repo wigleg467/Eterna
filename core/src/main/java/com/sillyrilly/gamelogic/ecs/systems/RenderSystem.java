@@ -155,7 +155,7 @@ public class RenderSystem extends EntitySystem {
                 BodyComponent body = bc.get(entity);
 
                 TextureAtlas.AtlasRegion frame = anim.currentFrame;
-                //      if (frame == null) continue; // ще не оновлено
+                if (frame == null) continue; // ще не оновлено
 
                 float scale = 0.25f;
                 float width = frame.getRegionWidth() * scale;

@@ -5,9 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
@@ -19,7 +17,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kotcrab.vis.ui.VisUI;
@@ -59,9 +59,12 @@ public class MenuScreen implements Screen {
     private VisSlider volumeSlider;
     private VisTable settingsTable;
     private VisWindow settingsWindow;
+    private BestiaryWindow bestiaryWindow;
     private BitmapFont customFont, hoverFont;
     private String hoveredHint;
     private Skin skin;
+    Window.WindowStyle style;
+
 
     private boolean initialized = false;
 
@@ -77,6 +80,7 @@ public class MenuScreen implements Screen {
             createSprites();
             initFonts();
             initSettingWindow();
+            initBestiaryWindow();
             initialized = true;
         }
     }
@@ -241,7 +245,7 @@ public class MenuScreen implements Screen {
         VisUI.load();
         //##################### Стиль для вікна #####################
         skin = new Skin(Gdx.files.internal("uiskin.json"));
-        Window.WindowStyle style = new Window.WindowStyle(skin.get("default", Window.WindowStyle.class));
+        style = new Window.WindowStyle(skin.get("default", Window.WindowStyle.class));
         style.background = skin.newDrawable("white", DARK_RED);
         style.titleFont = customFont;
 
@@ -284,6 +288,31 @@ public class MenuScreen implements Screen {
         settingsWindow.setVisible(false);
 
         functionalSettings();
+    }
+
+    private void initBestiaryWindow(){
+        Array<EnemyInfo> enemies = new Array<>();
+
+        TextureAtlas watermelonAtlas = new TextureAtlas(Gdx.files.internal("animations/watermelon.atlas"));
+        TextureAtlas angelAtlas = new TextureAtlas(Gdx.files.internal("animations/angel.atlas"));
+        TextureAtlas mummyAtlas = new TextureAtlas(Gdx.files.internal("animations/mummy.atlas"));
+        TextureAtlas skeletonAtlas = new TextureAtlas(Gdx.files.internal("animations/skeleton.atlas"));
+        TextureAtlas zombieAtlas = new TextureAtlas(Gdx.files.internal("animations/zombie.atlas"));
+        TextureAtlas guardAtlas = new TextureAtlas(Gdx.files.internal("animations/guard.atlas"));
+        TextureAtlas demonAtlas = new TextureAtlas(Gdx.files.internal("animations/demon.atlas"));
+
+        enemies.add(new EnemyInfo("Кавуняра", "     Нехай вас не обманює назва цього овоча-нападника. Замiсть бази вiн видає лиш влучнi удари", watermelonAtlas, 0.5f));
+        enemies.add(new EnemyInfo("Янголятко", "        Це не дитинка з крилами, яку ви звикли бачити в картинах часiв рококо. Цей янгол дасть зрозумiти, чому у канонiчному письмi, вони говорять Do not fear", angelAtlas, 0.5f));
+        enemies.add(new EnemyInfo("Мумiя", "        Лiто, спека, море, Египет-... МУМIЯ?!.", mummyAtlas, 0.5f));
+        enemies.add(new EnemyInfo("Скелет", "       Можете спитати пораду про дiету, але ви певно не встигнете", skeletonAtlas, 0.5f));
+        enemies.add(new EnemyInfo("Зомбі", "       Колись був такий самий як ми... Хто знае, може він теж намагався врятувати свою кохану", zombieAtlas, 0.9f));
+        enemies.add(new EnemyInfo("Охоронець пекла", "       Охороняe вхiд до пекла i сумлінно виконує своi обов'язки. Все ж так просто у iнший свiт не можна пройти.", guardAtlas, 0.3f));
+        enemies.add(new EnemyInfo("Диявол", "       Першим зустрiчае у пеклi... Очевидно, що не з теплими обiймами....", demonAtlas, 0.6f));
+
+
+         bestiaryWindow = new BestiaryWindow(enemies, style);
+        bestiaryWindow.setVisible(false);
+        stage.addActor(bestiaryWindow);
     }
 
     private void functionalSettings() {
@@ -346,6 +375,7 @@ public class MenuScreen implements Screen {
 
         hoveredHint();
 
+        bestiaryWindow.act(delta);
         stage.act(delta);
         stage.draw();
 
@@ -429,6 +459,9 @@ public class MenuScreen implements Screen {
             else if (settingsBtn.getBoundingRectangle().contains(mouse.x, mouse.y)) {
                 settingsWindow.setVisible(true);
             }
+            else if(bestiaryBtn.getBoundingRectangle().contains(mouse.x, mouse.y)) {
+                bestiaryWindow.setVisible(true);
+            }
         }
         if (Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
             ScreenManager.getInstance().setScreen(ScreenManager.ScreenType.GAME);
@@ -463,6 +496,129 @@ public class MenuScreen implements Screen {
             settingsTable.row().padTop(rowSpacing);
             settingsTable.add(settingsLabel).width(labelColumnWidth).padLeft(30).left();
             settingsTable.add(actor).expandX().fillX().padRight(30).left();
+        }
+    }
+    public class EnemyInfo {
+        public final String name;
+        public final String description;
+        public final Animation<TextureAtlas.AtlasRegion> animation;
+        public final float frameDuration;
+
+        public EnemyInfo(String name, String description, TextureAtlas atlas, float frameDuration) {
+            this.name = name;
+            this.description = description;
+            this.frameDuration = frameDuration;
+            this.animation = new Animation<>(frameDuration, atlas.findRegions("walk_right"), Animation.PlayMode.LOOP);
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    public class BestiaryWindow extends VisWindow {
+        private final VisList<EnemyInfo> enemyList;
+        private final VisImage image;
+        private final VisLabel descriptionLabel;
+        private final Array<EnemyInfo> enemyInfos;
+        private float animTime = 0f;
+
+        public BestiaryWindow(Array<EnemyInfo> enemies, WindowStyle style) {
+            super("", style);
+            this.enemyInfos = enemies;
+
+            this.setSize(600, 400);
+            this.setPosition(Gdx.graphics.getWidth() / 2f - getWidth() / 2f,
+                    Gdx.graphics.getHeight() / 2f - getHeight() / 2f);
+
+            // Список ворогів
+            enemyList = new VisList<>();
+            enemyList.setItems(enemies);
+
+            // Зображення і опис
+            descriptionLabel = new VisLabel("");
+            descriptionLabel.setWrap(true);
+            descriptionLabel.setAlignment(Align.topLeft);
+
+            image = new VisImage();
+
+            VisTable rightPanel = new VisTable(true);
+            rightPanel.add(image).size(240, 128).center().row();
+            rightPanel.add(descriptionLabel).width(300).padTop(10).top().left();
+
+            VisSplitPane splitPane = new VisSplitPane(enemyList, rightPanel, false);
+            splitPane.setSplitAmount(0.3f);
+
+
+//            VisTable header = new VisTable();
+//            header.add().expandX();
+//            header.add(close).top().right().pad(5);
+//            header.row();
+//            header.add(new VisLabel(" ")).colspan(2).padBottom(5); // для відступу
+//            this.add(header).expandX().fillX().row();
+
+            VisLabel title = new VisLabel("Bestiary", new Label.LabelStyle(customFont, Color.WHITE));
+            title.setAlignment(Align.center);
+            title.setFontScale(1.2f);
+
+            VisTable header = new VisTable();
+            settingsTable = new VisTable();
+            close = new VisTextButton("x");
+
+            header.add().expandX();
+            header.add(close).right();
+            header.row();
+            header.add(title).colspan(2).center().padTop(10);
+            header.row();
+
+            this.add(header).colspan(2).expandX().fillX().row();
+
+            this.add(splitPane).expand().fill().row();
+
+            // Обробник закриття
+            close.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    setVisible(false);
+                }
+            });
+
+            // Встановити стартовий ворог
+            enemyList.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    updatePreview(enemyList.getSelected());
+                }
+            });
+
+            if (enemyList.getItems().size > 0) {
+                updatePreview(enemyList.getItems().first());
+            }
+        }
+
+
+        private void updatePreview(EnemyInfo info) {
+            descriptionLabel.setText(info.description);
+            animTime = 0f;
+
+            float scale_width=10f;
+            float scale_height=1.5f;
+
+            // якщо потрібно малювати кастомно — треба буде віддати Animation або кадр
+            TextureRegion frame = info.animation.getKeyFrame(0);
+            image.setDrawable(new TextureRegionDrawable(frame));
+            //   image.setSize(frame.getRegionWidth() * 0.5f, frame.getRegionHeight() * 0.5f);
+        }
+
+        public void act(float delta) {
+            super.act(delta);
+            animTime += delta;
+
+            if (enemyList.getSelected() != null) {
+                TextureRegion frame = enemyList.getSelected().animation.getKeyFrame(animTime, true);
+                image.setDrawable(new TextureRegionDrawable(frame));
+            }
         }
     }
 }

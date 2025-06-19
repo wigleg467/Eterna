@@ -5,10 +5,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
-import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
-import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
-import com.sillyrilly.gamelogic.ecs.components.FacingComponent;
-import com.sillyrilly.gamelogic.ecs.components.PlayerComponent;
+import com.sillyrilly.gamelogic.ecs.components.*;
 import com.sillyrilly.managers.InputManager;
 
 public class AnimationSystem extends EntitySystem {
@@ -17,6 +14,7 @@ public class AnimationSystem extends EntitySystem {
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
 
     private ImmutableArray<Entity> entities;
+    private InputManager inputManager;
 
     public AnimationSystem() {
     }
@@ -24,6 +22,7 @@ public class AnimationSystem extends EntitySystem {
     @Override
     public void addedToEngine(Engine engine) {
         entities = engine.getEntitiesFor(Family.all(AnimationComponent.class, FacingComponent.class).get());
+        this.inputManager = InputManager.getInstance();
     }
 
     @Override
@@ -73,9 +72,11 @@ public class AnimationSystem extends EntitySystem {
                     frame.flip(true, false);
                 }
                 anim.currentFrame = frame;
-            } else {
+            } else if (entity.getComponent(EnemyComponent.class) != null) {
                 Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
+                if (currentAnim == null) continue;
                 TextureAtlas.AtlasRegion frame = currentAnim.getKeyFrame(anim.stateTime, true);
+
 
                 if (facing != null && !facing.facingRight && !frame.isFlipX()) {
                     frame.flip(true, false);

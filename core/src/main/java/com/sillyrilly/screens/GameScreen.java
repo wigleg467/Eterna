@@ -33,7 +33,9 @@ public class GameScreen implements Screen {
     private EntityFactory factory;
     public static OrthogonalTiledMapRenderer renderer;
     private SpriteBatch batch;
-    private TiledMap map;
+    private TiledMap realWorld;
+    private TiledMap  hell;
+    private TiledMap heaven;
     private World world;
 
     private float zoom = 0.6f;
@@ -45,19 +47,24 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         if (!initialized) {
-            map = new TmxMapLoader().load("maps/firstlevel.tmx");
-            //   renderer = new OrthogonalTiledMapRenderer(map);
+
+            realWorld = new TmxMapLoader().load("maps/firstlevel.tmx");
+            hell = new TmxMapLoader().load("maps/secondlevel.tmx");
+            heaven = new TmxMapLoader().load("maps/third_level.tmx");
+            //   renderer = new OrthogonalTiledMapRenderer(heaven);
             //   renderer.setView(cameraManager.getCamera());
 
             world = new World(new Vector2(0, 0), true);
             parser = new Box2DMapObjectParser(tileScale);
-            parser.load(world, map);
+            parser.load(world, realWorld);
+            parser.load(world, heaven);
+            parser.load(world, hell);
 
             {
-                //     float mapWidth = map.getProperties().get("width", Integer.class);
-                //     float mapHeight = map.getProperties().get("height", Integer.class);
-                //     float tileWidth = map.getProperties().get("tilewidth", Integer.class);
-                //     float tileHeight = map.getProperties().get("tileheight", Integer.class);
+                //     float mapWidth = heaven.getProperties().get("width", Integer.class);
+                //     float mapHeight = heaven.getProperties().get("height", Integer.class);
+                //     float tileWidth = heaven.getProperties().get("tilewidth", Integer.class);
+                //     float tileHeight = heaven.getProperties().get("tileheight", Integer.class);
 
                 //     float centerX = mapWidth * tileWidth / 2f;
                 //     float centerY = mapHeight * tileHeight / 2f;
@@ -67,6 +74,7 @@ public class GameScreen implements Screen {
                 engine = new Engine();
                 engine.addSystem(new InputSystem());
                 engine.addSystem(new MovementSystem());
+                engine.addSystem(new EnemyAISystem());
                 engine.addSystem(new CameraFollowSystem());
                 engine.addSystem(new AnimationSystem());
                 engine.addSystem(new AISystem());
@@ -76,21 +84,70 @@ public class GameScreen implements Screen {
                 factory = new EntityFactory(engine, world);
             }
 
-            factory.createPlayer(300f, 300f, 1);
-            factory.createTileLayer(map, "base", 0);
-            factory.createTileLayer(map, "landscape", 0);
-            factory.createTileLayer(map, "base2", 0);
-            factory.createTileLayer(map, "house", 1);
-            factory.createObjectLayer(map, "Collosion_lvl_1", 1, 1, 0.01f, 0.01f);
-            factory.createTileLayer(map, "props", 1);
+            factory.createPlayer(300f, 300f, 3);
+            factory.createTileLayer(realWorld, "props", 3, 0, 0);
+            factory.createTileLayer(realWorld, "base", 0, 0, 0);
+            factory.createTileLayer(realWorld, "base2", 1, 0, 0);
+            factory.createTileLayer(realWorld, "landscape", 2, 0, 0);
+            factory.createTileLayer(realWorld, "house", 3, 0, 0);
+            factory.createObjectLayer(realWorld, "Collision_lvl_1", 1, 1, 0.01f, 0.01f, 0, 0);
 
-            MapObjects objects = map.getLayers().get("Enemies").getObjects();
+
+            factory.createTileLayer(hell, "props", 3, 0, -1);
+            factory.createTileLayer(hell, "base", 0, 0, -1);
+            factory.createTileLayer(hell, "lava", 1, 0, -1);
+            factory.createTileLayer(hell, "path", 2, 0, -1);
+            factory.createTileLayer(hell, "base2", 2, 0, -1);
+            factory.createTileLayer(hell, "web", 4, 0, -1);
+            factory.createObjectLayer(hell, "Collision_lvl_2", 1, 1, 0.01f, 0.01f, 0, -1);
+            factory.createObjectLayer(hell, "Enemies", 1, 1, 0.01f, 0.01f, 0, -1);
+
+            factory.createTileLayer(heaven, "props", 3, 0, 1);
+            factory.createTileLayer(heaven, "base", 0, 0, 1);
+            factory.createTileLayer(heaven, "base2", 1, 0, 1);
+            factory.createTileLayer(heaven, "base3", 2, 0, 1);
+            factory.createTileLayer(heaven, "base4", 2, 0, 1);
+            factory.createTileLayer(heaven, "castle", 5, 0, 1);
+            factory.createTileLayer(heaven, "clouds", 4, 0, 1);
+            factory.createObjectLayer(heaven, "Collision_lvl_3", 1, 1, 0.01f, 0.01f, 0, 1);
+            factory.createObjectLayer(heaven, "Enemies", 1, 1, 0.01f, 0.01f, 0, 1);
+
+
+
+
+            MapObjects objects = realWorld.getLayers().get("Enemies").getObjects();
             for (MapObject object : objects) {
+                Gdx.app.log("GameScreen", object.toString());
                 Rectangle rect = ((RectangleMapObject) object).getRectangle();
                 String typeStr = object.getProperties().get("type", String.class);
+                if (typeStr == null) continue;
                 EnemyType type = EnemyType.valueOf(typeStr.toUpperCase());
-                factory.createEnemy(rect.x  + rect.width / 2, rect.y - 300f + rect.height / 2, type, 1);
+                factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 1, 0, 0);
             }
+
+
+             objects = heaven.getLayers().get("Enemies").getObjects();
+            for (MapObject object : objects) {
+                Gdx.app.log("GameScreen", object.toString());
+                Rectangle rect = ((RectangleMapObject) object).getRectangle();
+                String typeStr = object.getProperties().get("type", String.class);
+                if (typeStr == null) continue;
+                EnemyType type = EnemyType.valueOf(typeStr.toUpperCase());
+                factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 1, 0, 1);
+            }
+
+            objects = hell.getLayers().get("Enemies").getObjects();
+            for (MapObject object : objects) {
+                Gdx.app.log("GameScreen", object.toString());
+                Rectangle rect = ((RectangleMapObject) object).getRectangle();
+                String typeStr = object.getProperties().get("type", String.class);
+                if (typeStr == null) continue;
+                EnemyType type = EnemyType.valueOf(typeStr.toUpperCase());
+                factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 1, 0, -1);
+            }
+
+
+
             initialized = true;
         }
 
@@ -153,7 +210,7 @@ public class GameScreen implements Screen {
      */
     @Override
     public void dispose() {
-        map.dispose();
+        heaven.dispose();
         //   renderer.dispose();
         batch.dispose();
         world.dispose();
