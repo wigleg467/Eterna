@@ -1,0 +1,82 @@
+lumberjack.png
+size: 1952, 1374
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+bottom_idle
+  rotate: false
+  xy: 0, 0
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 0
+bottom_walk_right
+  rotate: false
+  xy: 480, 0
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 0
+bottom_walk_right
+  rotate: false
+  xy: 960, 0
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 1
+default
+  rotate: false
+  xy: 1440, 350
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: 1
+idle
+  rotate: false
+  xy: 0, 862
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: 1
+idle
+  rotate: false
+  xy: 512, 862
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: 2
+idle
+  rotate: false
+  xy: 1024, 862
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: 3
+top_attack
+  rotate: false
+  xy: 1440, 0
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 0
+top_attack
+  rotate: false
+  xy: 0, 350
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 1
+top_attack
+  rotate: false
+  xy: 480, 350
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 3
+top_idle
+  rotate: false
+  xy: 960, 350
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 0

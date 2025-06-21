@@ -3,14 +3,11 @@ package com.sillyrilly.gamelogic.ecs.systems;
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
-import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
-import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
-import com.sillyrilly.gamelogic.ecs.components.CameraTargetComponent;
-import com.sillyrilly.gamelogic.ecs.components.PlayerComponent;
+import com.sillyrilly.gamelogic.ecs.components.*;
 import com.sillyrilly.managers.InputManager;
 
 public class MovementSystem extends EntitySystem {
-    private final ComponentMapper<AnimationComponent> ac = ComponentMapper.getFor(AnimationComponent.class);
+    private final ComponentMapper<AnimationTopComponent> ac = ComponentMapper.getFor(AnimationTopComponent.class);
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<CameraTargetComponent> ctc = ComponentMapper.getFor(CameraTargetComponent.class);
 
@@ -31,7 +28,7 @@ public class MovementSystem extends EntitySystem {
         for (Entity entity : controlledEntities) {
             if (ctc.has(entity)) {
                 BodyComponent body = bc.get(entity);
-                if (ac.get(entity).currentState != AnimationComponent.State.ATTACK)
+                if (ac.get(entity).currentState != AnimationTopComponent.TopState.ATTACK)
                     body.getBody().setLinearVelocity(movement);
                 break;
             }

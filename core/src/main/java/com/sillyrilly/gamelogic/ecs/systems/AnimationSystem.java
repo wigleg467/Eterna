@@ -2,6 +2,7 @@ package com.sillyrilly.gamelogic.ecs.systems;
 
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
@@ -12,6 +13,8 @@ public class AnimationSystem extends EntitySystem {
     private final ComponentMapper<AnimationComponent> am = ComponentMapper.getFor(AnimationComponent.class);
     private final ComponentMapper<FacingComponent> fm = ComponentMapper.getFor(FacingComponent.class);
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<AnimationButtomComponent> abc = ComponentMapper.getFor(AnimationButtomComponent.class);
+    private final ComponentMapper<AnimationTopComponent> atc = ComponentMapper.getFor(AnimationTopComponent.class);
 
     private ImmutableArray<Entity> entities;
     private InputManager inputManager;
@@ -21,16 +24,16 @@ public class AnimationSystem extends EntitySystem {
 
     @Override
     public void addedToEngine(Engine engine) {
-        entities = engine.getEntitiesFor(Family.all(AnimationComponent.class, FacingComponent.class).get());
+        entities = engine.getEntitiesFor(Family.all(FacingComponent.class, BodyComponent.class)
+                .one(AnimationComponent.class, AnimationTopComponent.class, AnimationButtomComponent.class)
+                .get());
         this.inputManager = InputManager.getInstance();
     }
 
     @Override
     public void update(float deltaTime) {
         for (Entity entity : entities) {
-            AnimationComponent anim = am.get(entity);
             FacingComponent facing = fm.get(entity);
-
             BodyComponent body = bc.get(entity);
             Vector2 movement = body.body.getLinearVelocity();
 
@@ -39,52 +42,87 @@ public class AnimationSystem extends EntitySystem {
             else if (movement.x < -0.1f)
                 facing.facingRight = false;
 
+
+
+            // --------- PLAYER ---------
             if (entity.getComponent(PlayerComponent.class) != null) {
-                AnimationComponent.State inputState = InputManager.getInstance().getState();
+                AnimationButtomComponent bottom = abc.get(entity);
+                AnimationTopComponent top = atc.get(entity);
+                AnimationTopComponent.TopState topInputState = InputManager.getInstance().getTopState();
+                AnimationButtomComponent.BottomState bottomInputState = InputManager.getInstance().getBottomState();
 
-                // Якщо анімація атаки ще не завершена — не змінюємо стан
-                if (anim.currentState == AnimationComponent.State.ATTACK) {
-                    anim.stateTime += deltaTime;
+                // --- TOP STATE ---
 
-                    Animation<TextureAtlas.AtlasRegion> attackAnim = anim.animations.get(AnimationComponent.State.ATTACK);
-                    if (attackAnim.isAnimationFinished(anim.stateTime)) {
+                if (top.currentState == AnimationTopComponent.TopState.ATTACK) {
+                    top.stateTime += deltaTime;
+                    bottom.stateTime += deltaTime;
+                    Animation<TextureAtlas.AtlasRegion> attackAnim = top.animations.get(AnimationTopComponent.TopState.ATTACK);
+                    if (attackAnim.isAnimationFinished(top.stateTime)) {
                         // Атака завершена — повертаємось до поточного введеного стану (наприклад, WALK або IDLE)
-                        anim.currentState = inputState;
-                        anim.stateTime = 0f;
+                        top.currentState = topInputState;
+                        top.stateTime = 0f;
                         InputManager.getInstance().setCanAttack(true);
                     }
                 } else {
                     // Якщо не атака — просто оновлюємо стан і таймер
-                    if (anim.currentState != inputState) {
-                        anim.currentState = inputState;
-                        anim.stateTime = 0f;
+                    if (top.currentState != topInputState) {
+                        top.currentState = topInputState;
+                        top.stateTime = 0f;
                     } else {
-                        anim.stateTime += deltaTime;
+                        top.stateTime += deltaTime;
+                    }
+                    if (bottom.currentState != bottomInputState) {
+                        bottom.currentState = bottomInputState;
+                        bottom.stateTime = 0f;
+                    } else {
+                        bottom.stateTime += deltaTime;
                     }
                 }
 
-                Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
-                TextureAtlas.AtlasRegion frame = currentAnim.getKeyFrame(anim.stateTime, true);
+                // --- UPDATE FRAMES ---
 
-                if (facing != null && !facing.facingRight && !frame.isFlipX()) {
-                    frame.flip(true, false);
-                } else if (facing != null && facing.facingRight && frame.isFlipX()) {
-                    frame.flip(true, false);
+                Animation<TextureAtlas.AtlasRegion> currentTopAnim = top.animations.get(top.currentState);
+                TextureAtlas.AtlasRegion topCurrentFrame = currentTopAnim.getKeyFrame(top.stateTime, true);
+
+                Animation<TextureAtlas.AtlasRegion> currentBottomAnim = bottom.animations.get(bottom.currentState);
+                TextureAtlas.AtlasRegion bottomCurrentFrame = currentBottomAnim.getKeyFrame(bottom.stateTime, true);
+
+
+                // --- FLIPPING ---
+                if (!facing.facingRight) {
+                    if (!topCurrentFrame.isFlipX()) topCurrentFrame.flip(true, false);
+                    if (!bottomCurrentFrame.isFlipX()) bottomCurrentFrame.flip(true, false);
+                } else {
+                    if (topCurrentFrame.isFlipX()) topCurrentFrame.flip(true, false);
+                    if (bottomCurrentFrame.isFlipX()) bottomCurrentFrame.flip(true, false);
                 }
-                anim.currentFrame = frame;
-            } else if (entity.getComponent(EnemyComponent.class) != null) {
+                Gdx.app.log("ANIM", "Top state: " + top.currentState + ", frames: " + top.animations.get(top.currentState).getKeyFrames().length);
+
+                top.currentFrame = currentTopAnim.getKeyFrame(top.stateTime, true);
+                bottom.currentFrame = currentBottomAnim.getKeyFrame(bottom.stateTime, true);}
+
+
+            // --------- ENEMY ---------
+            else if (entity.getComponent(EnemyComponent.class) != null) {
+                AnimationComponent anim = am.get(entity);
                 Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
                 if (currentAnim == null) continue;
+
                 TextureAtlas.AtlasRegion frame = currentAnim.getKeyFrame(anim.stateTime, true);
+                anim.stateTime += deltaTime;
 
+                if (!facing.facingRight && !frame.isFlipX()) frame.flip(true, false);
+                if (facing.facingRight && frame.isFlipX()) frame.flip(true, false);
 
-                if (facing != null && !facing.facingRight && !frame.isFlipX()) {
-                    frame.flip(true, false);
-                } else if (facing != null && facing.facingRight && frame.isFlipX()) {
-                    frame.flip(true, false);
-                }
                 anim.currentFrame = frame;
-                // Якщо це не гравець — просто оновлюємо таймер
+            }
+            // --------- NPC ---------
+            else if (entity.getComponent(NPCComponent.class) != null) {
+                AnimationComponent anim = am.get(entity);
+                Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
+                if (currentAnim == null) continue;
+
+                anim.currentFrame = currentAnim.getKeyFrame(anim.stateTime, true);
                 anim.stateTime += deltaTime;
             }
         }

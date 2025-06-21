@@ -5,7 +5,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.math.Vector2;
-import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
+import com.sillyrilly.gamelogic.ecs.components.AnimationButtomComponent;
+import com.sillyrilly.gamelogic.ecs.components.AnimationTopComponent;
 import com.sillyrilly.gamelogic.ecs.systems.CameraFollowSystem;
 
 public class InputManager extends InputAdapter {
@@ -14,7 +15,8 @@ public class InputManager extends InputAdapter {
     private final InputMultiplexer multiplexer;
 
     private final Vector2 movement = new Vector2();
-    private AnimationComponent.State state;
+    private AnimationButtomComponent.BottomState bottomState;
+    private AnimationTopComponent.TopState topState;
     private boolean changeCamera = false;
     private boolean canAttack = true;
     private boolean debug = false;
@@ -32,40 +34,46 @@ public class InputManager extends InputAdapter {
     }
 
     public void update() {
-        state = AnimationComponent.State.IDLE;
+
+        topState = AnimationTopComponent.TopState.IDLE;
+        bottomState = AnimationButtomComponent.BottomState.IDLE;
+
+
 
         movement.set(0, 0);
 
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            if (state != AnimationComponent.State.ATTACK) {
-                state = AnimationComponent.State.ATTACK;
-            }
-        } else {
-            // ### Рух ###
-            if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-                movement.y += 1;
-                state = AnimationComponent.State.WALK;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-                movement.y -= 1;
-                state = AnimationComponent.State.WALK;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-                movement.x -= 1;
-                state = AnimationComponent.State.WALK;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-                movement.x += 1;
-                state = AnimationComponent.State.WALK;
-            }
+        boolean isAttacking = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
+        boolean isMoving = false;
 
-            if (movement.len2() > 0) {
-                movement.nor();
-            } else {
-                state = AnimationComponent.State.IDLE;
-            }
+// Спочатку перевіряємо рух — незалежно від атаки
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            movement.y += 1;
+            isMoving = true;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            movement.y -= 1;
+            isMoving = true;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            movement.x -= 1;
+            isMoving = true;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            movement.x += 1;
+            isMoving = true;
         }
 
+        if (movement.len2() > 0) {
+            movement.nor();
+        }
+
+        if (isAttacking) {
+            topState = AnimationTopComponent.TopState.ATTACK;
+        }
+
+        bottomState = isMoving
+                ? AnimationButtomComponent.BottomState.WALK
+                : AnimationButtomComponent.BottomState.IDLE;
         if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) {
             debug = !debug;
         }
@@ -106,9 +114,13 @@ public class InputManager extends InputAdapter {
         return multiplexer;
     }
 
-    public AnimationComponent.State getState() {
-        return state;
+    public AnimationTopComponent.TopState getTopState() {
+        return topState;
     }
+    public AnimationButtomComponent.BottomState getBottomState() {
+        return bottomState;
+    }
+
 
     public Vector2 getMovement() {
         return movement;
@@ -126,3 +138,4 @@ public class InputManager extends InputAdapter {
         this.canAttack = canAttack;
     }
 }
+

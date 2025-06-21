@@ -10,26 +10,27 @@ import com.sillyrilly.gamelogic.ecs.utils.Animatable;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class AnimationComponent implements Component {
-    public enum State {
-        IDLE, WALK, ATTACK, DEFAULT;
+public class AnimationTopComponent implements Component {
+    public enum TopState { IDLE, ATTACK;
 
-        private static State get(int i) {
-            return State.values()[i];
+        public static AnimationTopComponent.TopState get(int i) {
+            return AnimationTopComponent.TopState.values()[i];
         }
+
     }
 
-    public Map<State, Animation<TextureAtlas.AtlasRegion>> animations = new EnumMap<>(State.class);
+    public Map<TopState, Animation<TextureAtlas.AtlasRegion>> animations = new EnumMap<>(TopState.class);
     public TextureAtlas.AtlasRegion currentFrame;
-    public State currentState = State.IDLE;
+    public TopState currentState = TopState.IDLE;
     public float stateTime = 0f;
 
-    public AnimationComponent(Animatable animatable, String... animationNames) {
+
+    public AnimationTopComponent(Animatable animatable, String... animationNames) {
         if (animationNames.length > 0) {
             for (int i = 0; i < animationNames.length; i++) {
                 if (!animationNames[i].isEmpty()) {
-                    animations.put(State.get(i), createAnimation(animatable.getAnimationPath(), animationNames[i]));
-                    Gdx.app.log("AnimationComponent", animationNames[i]);
+                    animations.put(AnimationTopComponent.TopState.get(i), createAnimation(animatable.getAnimationPath(), animationNames[i]));
+                    Gdx.app.log("AnimationTopComponent", animationNames[i]);
                 }
             }
         }

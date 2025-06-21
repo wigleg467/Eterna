@@ -13,10 +13,11 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.*;
-import com.sillyrilly.gamelogic.ecs.components.*;
 import com.sillyrilly.gamelogic.ecs.ai.EnemyState;
+import com.sillyrilly.gamelogic.ecs.components.*;
 import com.sillyrilly.gamelogic.ecs.utils.EnemyType;
 import com.sillyrilly.gamelogic.ecs.utils.EntityType;
+import com.sillyrilly.gamelogic.ecs.utils.NPCType;
 
 public class EntityFactory {
     public final static float PPM = 32f;
@@ -56,14 +57,14 @@ public class EntityFactory {
 
 
         BodyComponent bc = new BodyComponent(body);
-        entity.add(new AnimationComponent(EntityType.PLAYER, "idle", "walk_right", "attack"));
         entity.add(bc);
         entity.add(new FacingComponent());
         entity.add(new CameraFollowableComponent());
         entity.add(new CameraTargetComponent());
         entity.add(new LevelComponent(lvl));
         entity.add(new PlayerComponent(bc));
-
+        entity.add(new AnimationButtomComponent(EntityType.PLAYER,  "bottom_idle", "bottom_walk_right"));
+        entity.add(new AnimationTopComponent(EntityType.PLAYER,  "top_idle", "top_attack"));
         engine.addEntity(entity);
 
         Gdx.app.log("Create", "Player");
@@ -97,11 +98,42 @@ public class EntityFactory {
         entity.add(new EnemyComponent(type));
         entity.add(new FacingComponent());
         entity.add(new LevelComponent(lvl));
-        entity.add(new EnemyComponent(type));
 
         AIComponent ai = new AIComponent();
         ai.stateMachine = new DefaultStateMachine<>(entity, EnemyState.IDLE);
         entity.add(ai);
+
+        engine.addEntity(entity);
+    }
+
+    public void createNPC(float x, float y, NPCType type, int lvl, float offsetX, float offsetY) {
+        offsetY*=1216;
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set((x + offsetX) / PPM, (y + offsetY) / PPM);
+        bodyDef.fixedRotation = true;
+
+        Body body = world.createBody(bodyDef);
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(type.getWidth() / 2f, type.getHeight() / 2f);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        //   fixtureDef.density = 1f;
+        //   fixtureDef.friction = 0.5f;
+        //   fixtureDef.restitution = 0f;
+
+        body.createFixture(fixtureDef);
+        shape.dispose();
+
+        Entity entity = new Entity();
+        entity.add(new AnimationComponent(type, "idle", "", "", "default"));
+        entity.add(new BodyComponent(body));
+        entity.add(new NPCComponent(type));
+        entity.add(new InteractableComponent());
+        entity.add(new FacingComponent());
+        entity.add(new LevelComponent(lvl));
 
         engine.addEntity(entity);
     }

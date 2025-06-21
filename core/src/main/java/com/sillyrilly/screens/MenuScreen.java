@@ -33,7 +33,10 @@ import java.util.ArrayList;
 
 public class MenuScreen implements Screen {
     private static final Color DARK_RED = new Color(111 / 255f, 54 / 255f, 54 / 255f, 1f);
-    private static final float WIDTH = 1280, HEIGHT = 720, CENTRE_X = WIDTH / 2, CENTRE_Y = HEIGHT / 2;
+    private static final float WIDTH = 1280;
+    private static final float HEIGHT = 720;
+    static final float CENTRE_X = WIDTH / 2;
+    private static final float CENTRE_Y = HEIGHT / 2;
     private static final int PADDING = 30;
     private static final float MAX_ANGLE = 4f;
     private static final float SPEED = 2f;
@@ -299,7 +302,7 @@ public class MenuScreen implements Screen {
         TextureAtlas skeletonAtlas = new TextureAtlas(Gdx.files.internal("animations/skeleton.atlas"));
         TextureAtlas zombieAtlas = new TextureAtlas(Gdx.files.internal("animations/zombie.atlas"));
         TextureAtlas guardAtlas = new TextureAtlas(Gdx.files.internal("animations/guard.atlas"));
-        TextureAtlas demonAtlas = new TextureAtlas(Gdx.files.internal("animations/demon.atlas"));
+
 
         enemies.add(new EnemyInfo("Кавуняра", "     Нехай вас не обманює назва цього овоча-нападника. Замiсть бази вiн видає лиш влучнi удари", watermelonAtlas, 0.5f));
         enemies.add(new EnemyInfo("Янголятко", "        Це не дитинка з крилами, яку ви звикли бачити в картинах часiв рококо. Цей янгол дасть зрозумiти, чому у канонiчному письмi, вони говорять Do not fear", angelAtlas, 0.5f));
@@ -307,7 +310,6 @@ public class MenuScreen implements Screen {
         enemies.add(new EnemyInfo("Скелет", "       Можете спитати пораду про дiету, але ви певно не встигнете", skeletonAtlas, 0.5f));
         enemies.add(new EnemyInfo("Зомбі", "       Колись був такий самий як ми... Хто знае, може він теж намагався врятувати свою кохану", zombieAtlas, 0.9f));
         enemies.add(new EnemyInfo("Охоронець пекла", "       Охороняe вхiд до пекла i сумлінно виконує своi обов'язки. Все ж так просто у iнший свiт не можна пройти.", guardAtlas, 0.3f));
-        enemies.add(new EnemyInfo("Диявол", "       Першим зустрiчае у пеклi... Очевидно, що не з теплими обiймами....", demonAtlas, 0.6f));
 
 
          bestiaryWindow = new BestiaryWindow(enemies, style);

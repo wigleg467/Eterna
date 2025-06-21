@@ -6,7 +6,10 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -16,28 +19,41 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.sillyrilly.gamelogic.ecs.ai.NavigationMap;
 import com.sillyrilly.gamelogic.ecs.entities.EntityFactory;
 import com.sillyrilly.gamelogic.ecs.systems.*;
+import com.sillyrilly.gamelogic.ecs.utils.DialogueStorage;
+import com.sillyrilly.gamelogic.ecs.utils.DialogueWindow;
 import com.sillyrilly.gamelogic.ecs.utils.EnemyType;
-import com.sillyrilly.gamelogic.ecs.ai.NavigationMap;
+import com.sillyrilly.gamelogic.ecs.utils.NPCType;
 import com.sillyrilly.managers.CameraManager;
 import com.sillyrilly.managers.InputManager;
 import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
 
+import static squidpony.squidgrid.gui.gdx.SColor.DARK_RED;
+
 public class GameScreen implements Screen {
+    public static GameScreen instance;
+
     private static final float tileScale = 1f / 32f;
+
 
     private Box2DMapObjectParser parser;
     private CameraManager cameraManager = CameraManager.getInstance();
-    private Engine engine;
+    public Engine engine;
     private EntityFactory factory;
     public static OrthogonalTiledMapRenderer renderer;
     private SpriteBatch batch;
     private TiledMap realWorld;
-    private TiledMap  hell;
+    private TiledMap hell;
     private TiledMap heaven;
     private World world;
-
+    private Skin skin;
+    private Window.WindowStyle style;
+    public DialogueWindow dialogueWindow;
+    private BitmapFont customFont;
     private float zoom = 0.6f;
     private boolean initialized = false;
 
@@ -47,7 +63,21 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         if (!initialized) {
+instance = this;
+            FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/settings.ttf"));
+            FreeTypeFontGenerator.FreeTypeFontParameter paramCustom = new FreeTypeFontGenerator.FreeTypeFontParameter();
+            paramCustom.size = 20;
+            paramCustom.characters = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ" +
+                    "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя" +
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.,:;(){}[]«»–-";
 
+            customFont = generator.generateFont(paramCustom);
+            customFont.getData().markupEnabled = true;
+
+            generator.dispose();
+            skin = new Skin(Gdx.files.internal("uiskin.json"));
+            style = new Window.WindowStyle(skin.get("default", Window.WindowStyle.class));
+            style.background = skin.newDrawable("white", DARK_RED);
             realWorld = new TmxMapLoader().load("maps/firstlevel.tmx");
             hell = new TmxMapLoader().load("maps/secondlevel.tmx");
             heaven = new TmxMapLoader().load("maps/third_level.tmx");
@@ -76,15 +106,21 @@ public class GameScreen implements Screen {
                 engine.addSystem(new MovementSystem());
                 engine.addSystem(new EnemyAISystem());
                 engine.addSystem(new CameraFollowSystem());
-                engine.addSystem(new AnimationSystem());
                 engine.addSystem(new AISystem());
                 engine.addSystem(new EnemyPathfindingSystem(new NavigationMap(realWorld).getGrid()));
-                engine.addSystem(new RenderSystem(batch));
-
                 factory = new EntityFactory(engine, world);
+                factory.createPlayer(300f, 300f, 3);
+                dialogueWindow = new DialogueWindow(new Texture("images/dialogue.png"), customFont);
+                engine.addSystem(new InteractionSystem(dialogueWindow));
+                engine.addSystem(new AnimationSystem());
+                engine.addSystem(new RenderSystem(batch));
+                DialogueStorage.init();
+
+
+
             }
 
-            factory.createPlayer(300f, 300f, 3);
+
             factory.createTileLayer(realWorld, "props", 3, 0, 0);
             factory.createTileLayer(realWorld, "base", 0, 0, 0);
             factory.createTileLayer(realWorld, "base2", 1, 0, 0);
@@ -113,8 +149,6 @@ public class GameScreen implements Screen {
             factory.createObjectLayer(heaven, "Enemies", 1, 1, 0.01f, 0.01f, 0, 1);
 
 
-
-
             MapObjects objects = realWorld.getLayers().get("Enemies").getObjects();
             for (MapObject object : objects) {
                 Gdx.app.log("GameScreen", object.toString());
@@ -122,11 +156,22 @@ public class GameScreen implements Screen {
                 String typeStr = object.getProperties().get("type", String.class);
                 if (typeStr == null) continue;
                 EnemyType type = EnemyType.valueOf(typeStr.toUpperCase());
-                factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 1, 0, 0);
+                factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 3, 0, 0);
             }
 
 
-             objects = heaven.getLayers().get("Enemies").getObjects();
+            objects = realWorld.getLayers().get("NPC").getObjects();
+            for (MapObject object : objects) {
+                Gdx.app.log("GameScreen", object.toString());
+                Rectangle rect = ((RectangleMapObject) object).getRectangle();
+                String typeStr = object.getProperties().get("type", String.class);
+                if (typeStr == null) continue;
+                NPCType type = NPCType.valueOf(typeStr.toUpperCase());
+                factory.createNPC(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 3, 0, 0);
+            }
+
+
+            objects = heaven.getLayers().get("Enemies").getObjects();
             for (MapObject object : objects) {
                 Gdx.app.log("GameScreen", object.toString());
                 Rectangle rect = ((RectangleMapObject) object).getRectangle();
@@ -145,7 +190,6 @@ public class GameScreen implements Screen {
                 EnemyType type = EnemyType.valueOf(typeStr.toUpperCase());
                 factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 1, 0, -1);
             }
-
 
 
             initialized = true;

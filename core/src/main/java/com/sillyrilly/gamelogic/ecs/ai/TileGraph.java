@@ -55,7 +55,9 @@ public class TileGraph implements IndexedGraph<TileNode> {
     }
 
     public TileNode getNode(int x, int y) {
-        return nodes[x][y];
+       // Gdx.app.log("Nodes length", nodes.length+","+ nodes[0].length);
+      if (x < 0 || y < 0 || x >= nodes.length || y >= nodes[0].length) return nodes[nodes.length-1][nodes[0].length-1];
+       return nodes[x][y];
     }
 
     public Array<TileNode> getNodes() {

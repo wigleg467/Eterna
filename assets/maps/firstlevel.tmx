@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="80" height="38" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="95">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="80" height="38" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="99">
  <tileset firstgid="1" source="tilesets/first_level_tiles.tsx"/>
  <tileset firstgid="65" source="tilesets/bridge.tsx"/>
  <tileset firstgid="129" source="tilesets/night_plantt.tsx"/>
@@ -249,6 +249,7 @@
   <object id="84" x="2026.26" y="146.227" width="16.1515" height="14.2122"/>
   <object id="85" x="2278.92" y="242.894" width="12.1515" height="12.8789"/>
   <object id="86" x="2458.92" y="176.227" width="14.1515" height="14.2122"/>
+  <object id="95" x="288.667" y="386" width="140.667" height="20.6667"/>
  </objectgroup>
  <layer id="2" name="props" width="80" height="38">
   <data encoding="csv">
@@ -296,6 +297,13 @@
   <object id="88" name="GUARD" type="GUARD" x="300" y="611" width="22" height="17">
    <properties>
     <property name="type" value="guard"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="9" name="NPC">
+  <object id="97" name="lumberjack" x="1942" y="688">
+   <properties>
+    <property name="type" value="lumberjack"/>
    </properties>
   </object>
  </objectgroup>
