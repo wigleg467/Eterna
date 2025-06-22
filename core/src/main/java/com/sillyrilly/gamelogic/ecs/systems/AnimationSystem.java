@@ -14,7 +14,6 @@ public class AnimationSystem extends EntitySystem {
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
 
     private ImmutableArray<Entity> entities;
-    private InputManager inputManager;
 
     public AnimationSystem() {
     }
@@ -22,7 +21,6 @@ public class AnimationSystem extends EntitySystem {
     @Override
     public void addedToEngine(Engine engine) {
         entities = engine.getEntitiesFor(Family.all(AnimationComponent.class, FacingComponent.class).get());
-        this.inputManager = InputManager.getInstance();
     }
 
     @Override
@@ -40,7 +38,7 @@ public class AnimationSystem extends EntitySystem {
                 facing.facingRight = false;
 
             if (entity.getComponent(PlayerComponent.class) != null) {
-                AnimationComponent.State inputState = InputManager.getInstance().getState();
+                AnimationComponent.State inputState = InputManager.instance.getState();
 
                 // Якщо анімація атаки ще не завершена — не змінюємо стан
                 if (anim.currentState == AnimationComponent.State.ATTACK) {
@@ -51,7 +49,7 @@ public class AnimationSystem extends EntitySystem {
                         // Атака завершена — повертаємось до поточного введеного стану (наприклад, WALK або IDLE)
                         anim.currentState = inputState;
                         anim.stateTime = 0f;
-                        InputManager.getInstance().setCanAttack(true);
+                        InputManager.instance.setCanAttack(true);
                     }
                 } else {
                     // Якщо не атака — просто оновлюємо стан і таймер

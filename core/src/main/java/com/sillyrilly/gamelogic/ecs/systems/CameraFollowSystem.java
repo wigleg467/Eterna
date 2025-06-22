@@ -8,42 +8,39 @@ import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
 import com.sillyrilly.gamelogic.ecs.components.CameraFollowableComponent;
 import com.sillyrilly.gamelogic.ecs.components.CameraTargetComponent;
 import com.sillyrilly.managers.CameraManager;
-import com.sillyrilly.managers.InputManager;
 
-import static com.sillyrilly.gamelogic.ecs.entities.EntityFactory.PPM;
+import static com.sillyrilly.util.Const.PPM;
+import static com.sillyrilly.util.Const.TILE_SIZE;
 
 public class CameraFollowSystem extends EntitySystem {
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<CameraFollowableComponent> cfc = ComponentMapper.getFor(CameraFollowableComponent.class);
     private final ComponentMapper<CameraTargetComponent> ctc = ComponentMapper.getFor(CameraTargetComponent.class);
-    private final CameraManager cameraManager;
-    private final InputManager inputManager;
+    private CameraManager cameraManager;
 
     private ImmutableArray<Entity> targets;
-    private static boolean cameraSmoothing = false;
 
-    public CameraFollowSystem() {
-        this.cameraManager = CameraManager.getInstance();
-        this.inputManager = InputManager.getInstance();
-    }
+    private static boolean cameraSmoothing = false;
 
     @Override
     public void addedToEngine(Engine engine) {
         targets = engine.getEntitiesFor(Family.all(CameraFollowableComponent.class).get());
+        cameraManager = CameraManager.instance;
     }
 
     @Override
     public void update(float deltaTime) {
         for (Entity entity : targets) {
-            if(ctc.has(entity)) {
-            //    if(){}
-
+            if (ctc.has(entity)) {
                 Vector2 pos = bc.get(entity).body.getPosition();
+
                 if (cameraSmoothing) {
-                    cameraManager.centerOnSmooth((pos.x) * PPM, (pos.y) * PPM + 32);
+                    cameraManager.centerOnSmooth((pos.x) * PPM, (pos.y) * PPM + TILE_SIZE);
+
                 } else {
-                    cameraManager.centerOn((pos.x) * PPM, (pos.y) * PPM + 32);
+                    cameraManager.centerOn((pos.x) * PPM, (pos.y) * PPM + TILE_SIZE);
                 }
+
                 break;
             }
         }

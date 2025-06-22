@@ -9,37 +9,33 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import static com.badlogic.gdx.math.MathUtils.round;
 
 public class CameraManager {
-    private static CameraManager instance;
+    public static CameraManager instance;
 
-    private OrthographicCamera camera;
-    private Viewport viewport;
+    public static OrthographicCamera camera;
+    public static Viewport viewport;
+
+    private static boolean isInitialized = false;
 
     private CameraManager() {
     }
 
-    public static CameraManager getInstance() {
-        if (instance == null) instance = new CameraManager();
-        return instance;
-    }
+    public static void initialize(float width, float height) {
+        if (!isInitialized) {
+            instance = new CameraManager();
 
-    public void initialize(float width, float height) {
-        camera = new OrthographicCamera();
-        viewport = new FitViewport(width, height, camera);
-        viewport.apply();
-        camera.position.set(width / 2f, height / 2f, 0);
-        camera.update();
+            camera = new OrthographicCamera();
+            camera.position.set(width / 2f, height / 2f, 0);
+            camera.update();
+
+            viewport = new FitViewport(width, height, camera);
+            viewport.apply();
+
+            isInitialized = true;
+        }
     }
 
     public void resize(int width, int height) {
         viewport.update(width, height);
-    }
-
-    public OrthographicCamera getCamera() {
-        return camera;
-    }
-
-    public Viewport getViewport() {
-        return viewport;
     }
 
     public void centerOn(float x, float y) {

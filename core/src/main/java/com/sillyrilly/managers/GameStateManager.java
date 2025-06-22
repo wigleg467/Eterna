@@ -1,11 +1,11 @@
 package com.sillyrilly.managers;
 
 public class GameStateManager {
+    public static GameStateManager instance;
+
     public enum GameState {
         RUNNING, PAUSED, INVENTORY, DIALOG
     }
-
-    private static GameStateManager instance;
 
     private GameState currentState = GameState.RUNNING;
 

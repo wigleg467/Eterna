@@ -18,10 +18,10 @@ import com.sillyrilly.gamelogic.ecs.ai.EnemyState;
 import com.sillyrilly.gamelogic.ecs.utils.EnemyType;
 import com.sillyrilly.gamelogic.ecs.utils.EntityType;
 
-public class EntityFactory {
-    public final static float PPM = 32f;
-    public final static float TILE_SIZE = 32f;
+import static com.sillyrilly.util.Const.PPM;
+import static com.sillyrilly.util.Const.TILE_SIZE;
 
+public class EntityFactory {
     private final Engine engine;
     private final World world;
 
@@ -54,15 +54,13 @@ public class EntityFactory {
 
         Entity entity = new Entity();
 
-
-        BodyComponent bc = new BodyComponent(body);
         entity.add(new AnimationComponent(EntityType.PLAYER, "idle", "walk_right", "attack"));
-        entity.add(bc);
+        entity.add(new BodyComponent(body));
         entity.add(new FacingComponent());
         entity.add(new CameraFollowableComponent());
         entity.add(new CameraTargetComponent());
         entity.add(new LevelComponent(lvl));
-        entity.add(new PlayerComponent(bc));
+        entity.add(new PlayerComponent());
 
         engine.addEntity(entity);
 
@@ -71,7 +69,7 @@ public class EntityFactory {
     }
 
     public void createEnemy(float x, float y, EnemyType type, int lvl, float offsetX, float offsetY) {
-        offsetY*=1216;
+        offsetY *= 1216;
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set((x + offsetX) / PPM, (y + offsetY) / PPM);
@@ -96,6 +94,7 @@ public class EntityFactory {
         entity.add(new BodyComponent(body));
         entity.add(new EnemyComponent(type));
         entity.add(new FacingComponent());
+        entity.add(new PathComponent());
         entity.add(new LevelComponent(lvl));
         entity.add(new EnemyComponent(type));
 
@@ -110,7 +109,8 @@ public class EntityFactory {
         createTileLayer(map, layerName, lvl, 0f, 0f, 0f, 0, 0);
     }
 
-    public void createTileLayer(TiledMap map, String layerName, int level, float offsetXTiles, float offsetYTiles) {
+    public void createTileLayer(TiledMap map, String layerName, int level,
+                                float offsetXTiles, float offsetYTiles) {
         createTileLayer(map, layerName, level, 0f, 0f, 0f, offsetXTiles, offsetYTiles);
     }
 
@@ -122,8 +122,8 @@ public class EntityFactory {
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(layerName);
         if (layer == null) return;
 
-        float offsetX = offsetXTiles * layer.getTileWidth() / EntityFactory.PPM;
-        float offsetY = offsetYTiles * layer.getTileHeight() * layer.getHeight() / EntityFactory.PPM;
+        float offsetX = offsetXTiles * layer.getTileWidth() / PPM;
+        float offsetY = offsetYTiles * layer.getTileHeight() * layer.getHeight() / PPM;
 
         for (int x = 0; x < layer.getWidth(); x++) {
             for (int y = 0; y < layer.getHeight(); y++) {
@@ -133,11 +133,11 @@ public class EntityFactory {
                 TiledMapTile tile = cell.getTile();
                 TextureRegion region = tile.getTextureRegion();
 
-                float tileWidth = region.getRegionWidth() / EntityFactory.PPM;
-                float tileHeight = region.getRegionHeight() / EntityFactory.PPM;
+                float tileWidth = region.getRegionWidth() / PPM;
+                float tileHeight = region.getRegionHeight() / PPM;
 
-                float posX = (x + 0.5f) * tileWidth + offsetX;
-                float posY = (y + 0.5f) * tileHeight + offsetY;
+                float posX = (x) * tileWidth + offsetX;
+                float posY = (y) * tileHeight + offsetY;
 
                 BodyDef bodyDef = new BodyDef();
                 bodyDef.type = BodyDef.BodyType.StaticBody;
@@ -175,6 +175,7 @@ public class EntityFactory {
     public void createObjectLayer(TiledMap map, String layerName, int level,
                                   float density, float friction, float restitution,
                                   float offsetXTiles, float offsetYTiles) {
+
         MapLayer layer = map.getLayers().get(layerName);
         if (layer == null) return;
 

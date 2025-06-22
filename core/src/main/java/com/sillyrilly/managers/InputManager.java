@@ -9,26 +9,27 @@ import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
 import com.sillyrilly.gamelogic.ecs.systems.CameraFollowSystem;
 
 public class InputManager extends InputAdapter {
-    private static InputManager instance;
-
-    private final InputMultiplexer multiplexer;
+    public static InputManager instance;
+    public static InputMultiplexer multiplexer;
 
     private final Vector2 movement = new Vector2();
     private AnimationComponent.State state;
-    private boolean changeCamera = false;
+
     private boolean canAttack = true;
     private boolean debug = false;
 
-    private InputManager() {
-        this.multiplexer = new InputMultiplexer();
+    private static boolean isInitialized = false;
 
-        Gdx.input.setInputProcessor(multiplexer);
+    private InputManager() {
     }
 
-    public static InputManager getInstance() {
-        if (instance == null) instance = new InputManager();
+    public static void initialize() {
+        if (!isInitialized) {
+            instance = new InputManager();
+            multiplexer = new InputMultiplexer();
 
-        return instance;
+            Gdx.input.setInputProcessor(multiplexer);
+        }
     }
 
     public void update() {
@@ -77,33 +78,25 @@ public class InputManager extends InputAdapter {
 
         if (Gdx.input.isKeyPressed(Input.Keys.EQUALS) && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
             // ### Zoom in ###
-            CameraManager.getInstance().setZoom(0.02f);
+            CameraManager.instance.setZoom(0.02f);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.MINUS) && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
             // ### Zoom out ###
-            CameraManager.getInstance().setZoom(-0.02f);
+            CameraManager.instance.setZoom(-0.02f);
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
-            changeCamera = true;
+            //   changeCamera = true;
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            ScreenManager.getInstance().setScreen(ScreenManager.ScreenType.MENU);
+            ScreenManager.instance.setMenuScreen();
         }
     }
 
-    public boolean isDebug() {
+    public boolean isDebugMode() {
         return debug;
-    }
-
-    public void setChangeCamera(boolean changeCamera) {
-        this.changeCamera = changeCamera;
-    }
-
-    public InputMultiplexer getMultiplexer() {
-        return multiplexer;
     }
 
     public AnimationComponent.State getState() {
@@ -112,10 +105,6 @@ public class InputManager extends InputAdapter {
 
     public Vector2 getMovement() {
         return movement;
-    }
-
-    public boolean isChangeCamera() {
-        return changeCamera;
     }
 
     public boolean canAttack() {

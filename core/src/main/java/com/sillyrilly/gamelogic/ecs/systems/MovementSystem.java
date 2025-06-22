@@ -16,25 +16,21 @@ public class MovementSystem extends EntitySystem {
 
     private InputManager inputManager;
 
-    private ImmutableArray<Entity> controlledEntities;
+    private Entity player;
 
     @Override
     public void addedToEngine(Engine engine) {
-        controlledEntities = engine.getEntitiesFor(Family.all(BodyComponent.class, PlayerComponent.class).get());
-        inputManager = InputManager.getInstance();
+        player = engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
+        inputManager = InputManager.instance;
     }
 
     @Override
     public void update(float deltaTime) {
         Vector2 movement = new Vector2(inputManager.getMovement());// робимо копію
         movement.scl(7f);
-        for (Entity entity : controlledEntities) {
-            if (ctc.has(entity)) {
-                BodyComponent body = bc.get(entity);
-                if (ac.get(entity).currentState != AnimationComponent.State.ATTACK)
-                    body.getBody().setLinearVelocity(movement);
-                break;
-            }
-        }
+
+        BodyComponent body = bc.get(player);
+        if (ac.get(player).currentState != AnimationComponent.State.ATTACK)
+            body.body.setLinearVelocity(movement);
     }
 }

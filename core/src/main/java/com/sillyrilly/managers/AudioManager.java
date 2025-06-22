@@ -8,101 +8,143 @@ import com.badlogic.gdx.utils.Disposable;
 
 import java.util.Random;
 
+import static com.sillyrilly.util.Const.*;
+
 public class AudioManager implements Disposable {
-    private static AudioManager instance;
+    public static AudioManager instance;
 
-    private final Music mainTheme;
-    private final Music basementTheme;
-    private final Music hellTheme;
-    private static final Sound[] steps = new Sound[5];
-
-    public float globalVolume = 0.4f;
-
-    private AudioManager() {
-        mainTheme = Gdx.audio.newMusic(Gdx.files.internal("audio/music/The-Return-of-the-Obra-Dinn-OST.ogg"));
-        basementTheme = Gdx.audio.newMusic(Gdx.files.internal("audio/music/Cave-Ambience-ASMR-Loop.ogg"));
-        hellTheme = Gdx.audio.newMusic(Gdx.files.internal("audio/music/Hell.wav"));
-        for (int i = 0; i < steps.length; i++) {
-            steps[i] = Gdx.audio.newSound(
-                Gdx.files.internal("audio/sfx/footstep-" + (i + 1) + ".mp3"));
-        }
-        setVolume(globalVolume);
+    public enum MusicType {
+        MAIN_THEME, BASEMENT, HELL, HEAVEN, FORK
     }
 
-    public static AudioManager getInstance() {
-        if (instance == null) instance = new AudioManager();
+    public enum SoundType {
+        STEPS
+    }
+
+    private static final Music[] mainTheme = new Music[23];
+    private static Music basementTheme;
+    private static Music hellTheme;
+    private static Music forkTheme;
+
+    private static final Sound[] steps = new Sound[5];
+
+    private float globalVolume = AUDIO_VOLUME;
+
+    private static boolean isInitialized = false;
+
+    private AudioManager() {
+    }
+
+    public static AudioManager initialize() {
+        if (!isInitialized) {
+           instance = new AudioManager();
+
+            // Musics init
+            for (int i = 0; i < mainTheme.length; i++)
+                mainTheme[i] = Gdx.audio.newMusic(Gdx.files.internal
+                    (MUSIC_FOLDER_PATH + "main-" + (i + 1) + AUDIO_FORMAT));
+            basementTheme = Gdx.audio.newMusic(Gdx.files.internal
+                (MUSIC_FOLDER_PATH + "basement" + AUDIO_FORMAT));
+            hellTheme = Gdx.audio.newMusic(Gdx.files.internal
+                ("audio/music/hell.wav"));
+            forkTheme = Gdx.audio.newMusic(Gdx.files.internal
+                (MUSIC_FOLDER_PATH + "fork" + AUDIO_FORMAT));
+
+            // Sounds init
+            for (int i = 0; i < steps.length; i++)
+                steps[i] = Gdx.audio.newSound(Gdx.files.internal
+                    (SOUND_FOLDER_PATH + "footstep-" + (i + 1) + AUDIO_FORMAT));
+
+            isInitialized = true;
+        }
         return instance;
     }
 
-    public void playStep(float volume) {
+    public void playMusic(MusicType type) {
+        switch (type) {
+            case MAIN_THEME -> playMainMusic(globalVolume);
+            case BASEMENT -> playBasementMusic(globalVolume);
+            case HELL -> playHellThem(globalVolume);
+        }
+    }
+
+    public void playSound(SoundType type) {
+        switch (type) {
+            case STEPS -> playStep();
+        }
+    }
+
+    public void setVolume(float volume) {
+        globalVolume = volume;
+        for (Music m : mainTheme) m.setVolume(volume);
+        basementTheme.setVolume(volume);
+        hellTheme.setVolume(volume);
+    }
+
+    public void setVolume(float volume, MusicType type) {
+        volume = volume * globalVolume;
+        switch (type) {
+            case MAIN_THEME -> {
+                for (Music m : mainTheme) m.setVolume(volume);
+            }
+            case BASEMENT -> basementTheme.setVolume(volume);
+            case HELL -> hellTheme.setVolume(volume);
+        }
+    }
+
+    public void dispose() {
+        for (Music m : mainTheme) m.dispose();
+        basementTheme.dispose();
+        hellTheme.dispose();
+        forkTheme.dispose();
+
+        for (Sound s : steps) s.dispose();
+    }
+
+    private void pauseAll() {
+        for (Music m : mainTheme) m.pause();
+        basementTheme.pause();
+        hellTheme.pause();
+        for (Sound s : steps) s.stop();
+    }
+
+    private void playStep() {
+        float volume = 1f;
         if (globalVolume == 0) volume = 0f;
         steps[new Random().nextInt(steps.length)].play(volume);
     }
 
-    public void playMainMusic(boolean loop, float volume) {
+    private void playMainMusic(float volume) {
         if (mainTheme != null) {
             pauseAll();
-            mainTheme.play();
-            mainTheme.pause();
-            mainTheme.setLooping(loop);
-            setVolume(volume, 0);
+            int num = new Random().nextInt(mainTheme.length);
+            mainTheme[num].play();
+            setVolume(volume, MusicType.MAIN_THEME);
 
-            float[] jump = {0, 177, 198, 277, 343, 410, 475, 540, 602, 676, 737,
-                797, 858, 918, 987, 1048, 1092, 1137, 1179, 1220,
-                1284, 1350, 1417, 1472, 1480, 1502};
-
-            mainTheme.setPosition(jump[MathUtils.random(jump.length - 1)]);
-            mainTheme.play();
+            mainTheme[num].setOnCompletionListener(m ->
+                playMainMusic(mainTheme[num].getVolume())
+            );
         }
     }
 
-    public void playBasementMusic(boolean loop, float volume) {
+    private void playBasementMusic(float volume) {
         if (basementTheme != null) {
             pauseAll();
             basementTheme.play();
-            basementTheme.setLooping(loop);
-            setVolume(volume, 1);
+            basementTheme.setLooping(true);
+            setVolume(volume, MusicType.BASEMENT);
 
             hellTheme.play();
-            setVolume(0f, 2);
-            hellTheme.setLooping(loop);
+            setVolume(0f, MusicType.HELL);
+            hellTheme.setLooping(true);
         }
     }
 
-    public void playHellThem(boolean loop, float volume) {
+    private void playHellThem(float volume) {
         pauseAll();
         hellTheme.play();
-        hellTheme.setLooping(loop);
-        setVolume(volume, 2);
-    }
-
-    public void setVolume(float volume) {
-        mainTheme.setVolume(volume);
-        basementTheme.setVolume(volume);
-        hellTheme.setVolume(volume);
-        globalVolume = volume;
-    }
-
-    public void setVolume(float volume, int number) {
-        volume = volume * globalVolume;
-        switch (number) {
-            ///
-            case 0 -> mainTheme.setVolume(volume);
-            case 1 -> basementTheme.setVolume(volume);
-            case 2 -> hellTheme.setVolume(volume);
-        }
-    }
-
-    public void pauseAll() {
-        mainTheme.pause();
-        basementTheme.pause();
-        hellTheme.pause();
-    }
-
-    public void dispose() {
-        basementTheme.dispose();
-        mainTheme.dispose();
-        for (Sound s : steps) s.dispose();
+        hellTheme.setLooping(true);
+        setVolume(volume, MusicType.HELL);
     }
 }
 

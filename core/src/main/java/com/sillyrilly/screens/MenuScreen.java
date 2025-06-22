@@ -4,9 +4,7 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -20,69 +18,54 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.*;
-import com.sillyrilly.managers.AudioManager;
-import com.sillyrilly.managers.CameraManager;
-import com.sillyrilly.managers.InputManager;
-import com.sillyrilly.managers.ScreenManager;
+import com.sillyrilly.managers.*;
 
 import java.util.ArrayList;
 
+import static com.sillyrilly.managers.AssetsManager.*;
+import static com.sillyrilly.managers.FontManager.*;
+import static com.sillyrilly.util.MenuConfig.*;
+
 public class MenuScreen implements Screen {
-    private static final Color DARK_RED = new Color(111 / 255f, 54 / 255f, 54 / 255f, 1f);
-    private static final float WIDTH = 1280, HEIGHT = 720, CENTRE_X = WIDTH / 2, CENTRE_Y = HEIGHT / 2;
-    private static final int PADDING = 30;
-    private static final float MAX_ANGLE = 4f;
-    private static final float SPEED = 2f;
-    private static final float FLOAT = 0.1f;
-
-    private boolean fadingOut = true;
-    private float alpha = 1f;
-    private float time = 0;
-
     private OrthographicCamera camera;
-    private Viewport viewport;
     private SpriteBatch batch;
-    private Texture texHead, texSettings, texExit, texWings, texBook,
-        keyOutlineTexture, settingOutlineTexture,
-        bestiaryOutlineTexture, labelTexture,
-        backgroundTexture, continueTexture;
-    private Sprite head, leftWing,
-        rightWing, keyOutline, settingOutline,
-        bestiaryOutline, labelSprite,
-        settingsBtn, exitBtn, bestiaryBtn;
+
+    private BestiaryWindow bestiaryWindow;
+    private Skin skin;
     private Stage stage;
     private VisTextButton close;
     private VisSlider volumeSlider;
     private VisTable settingsTable;
     private VisWindow settingsWindow;
-    private BestiaryWindow bestiaryWindow;
-    private BitmapFont customFont, hoverFont;
+    private Window.WindowStyle style;
+
     private String hoveredHint;
-    private Skin skin;
-    Window.WindowStyle style;
 
+    private boolean fadingOut = true;
+    private float alpha = 1f;
+    private float time = 0;
 
-    private boolean initialized = false;
+    private boolean isInitialized = false;
 
     /**
      * Called when this screen becomes the current screen for a {@link Game}.
      */
     @Override
     public void show() {
-        initFOV();
+        if (!isInitialized) {
+            batch = ScreenManager.batch;
 
-        if (!initialized) {
-            loadTextures();
-            createSprites();
-            initFonts();
+            initStage();
             initSettingWindow();
             initBestiaryWindow();
-            initialized = true;
+
+            isInitialized = true;
         }
+
+        camera.zoom = 1f;
+        InputManager.multiplexer.addProcessor(stage);
     }
 
     /**
@@ -104,7 +87,7 @@ public class MenuScreen implements Screen {
      */
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height);
+        CameraManager.instance.resize(width, height);
     }
 
     /**
@@ -127,7 +110,8 @@ public class MenuScreen implements Screen {
      */
     @Override
     public void hide() {
-        InputManager.getInstance().getMultiplexer().removeProcessor(stage);
+        Gdx.input.setCursorCatched(true);
+        InputManager.multiplexer.removeProcessor(stage);
     }
 
     /**
@@ -135,20 +119,6 @@ public class MenuScreen implements Screen {
      */
     @Override
     public void dispose() {
-        batch.dispose();
-        texHead.dispose();
-        texWings.dispose();
-        texSettings.dispose();
-        texExit.dispose();
-        texBook.dispose();
-        keyOutlineTexture.dispose();
-        settingOutlineTexture.dispose();
-        bestiaryOutlineTexture.dispose();
-        labelTexture.dispose();
-        backgroundTexture.dispose();
-        continueTexture.dispose();
-        hoverFont.dispose();
-        customFont.dispose();
         stage.dispose();
         skin.dispose();
         VisUI.dispose();
@@ -156,89 +126,12 @@ public class MenuScreen implements Screen {
 
     //##################### Методи для show #####################
 
-    private void initFOV() {
-        viewport = CameraManager.getInstance().getViewport();
-        viewport.apply();
-
-        camera = CameraManager.getInstance().getCamera();
-        if (!initialized) camera.position.set(CENTRE_X, CENTRE_Y, 0);
-        camera.zoom = 1f;
+    private void initStage() {
+        camera = CameraManager.camera;
+        camera.position.set(CENTRE_X, CENTRE_Y, 0);
         camera.update();
 
-        if (!initialized) stage = new Stage(new ScreenViewport());
-        InputManager.getInstance().getMultiplexer().addProcessor(stage);
-    }
-
-    private void loadTextures() {
-        texHead = new Texture("images/angel_head.png");
-        texWings = new Texture("images/wing.png");
-        texSettings = new Texture("images/settings.png");
-        settingOutlineTexture = new Texture("images/settingsOutline.png");
-        texExit = new Texture("images/key-cut.png");
-        keyOutlineTexture = new Texture("images/keyOutline.png");
-        texBook = new Texture("images/bestiary.png");
-        bestiaryOutlineTexture = new Texture("images/bestiaryOutline.png");
-        labelTexture = new Texture("images/title.png");
-        backgroundTexture = new Texture("images/bg.jpg");
-        continueTexture = new Texture("images/continue.png");
-    }
-
-    private void createSprites() {
-        batch = new SpriteBatch();
-
-        head = new Sprite(texHead);
-        increaseSize(head);
-        head.setPosition(CENTRE_X - head.getWidth() / 2, CENTRE_Y - head.getHeight() / 2);
-
-        leftWing = new Sprite(texWings);
-        increaseSize(leftWing);
-        leftWing.setPosition(CENTRE_X - leftWing.getWidth(), CENTRE_Y - leftWing.getHeight() / 2 + 15);
-
-        rightWing = new Sprite(texWings);
-        rightWing.flip(true, false);
-        increaseSize(rightWing);
-        rightWing.setPosition(CENTRE_X, CENTRE_Y - rightWing.getHeight() / 2 + 15);
-
-        settingsBtn = new Sprite(texSettings);
-        settingOutline = new Sprite(settingOutlineTexture);
-        decreaseSize(settingsBtn);
-        decreaseSize(settingOutline);
-
-        settingsBtn.setPosition(WIDTH - settingsBtn.getWidth() - PADDING, PADDING);
-        settingOutline.setPosition(settingsBtn.getX(), settingsBtn.getY());
-
-        exitBtn = new Sprite(texExit);
-        keyOutline = new Sprite(keyOutlineTexture);
-        exitBtn.setPosition(WIDTH - exitBtn.getWidth() - PADDING, HEIGHT - exitBtn.getHeight() - PADDING);
-        keyOutline.setPosition(exitBtn.getX() - 2, exitBtn.getY() - 2);
-
-        bestiaryBtn = new Sprite(texBook);
-        bestiaryOutline = new Sprite(bestiaryOutlineTexture);
-        bestiaryBtn.setPosition(PADDING, PADDING);
-        bestiaryOutline.setPosition(bestiaryBtn.getX() - 2, bestiaryBtn.getY() - 2);
-
-        labelSprite = new Sprite(labelTexture);
-        labelSprite.setSize(labelSprite.getWidth() * 0.4f, labelSprite.getHeight() * 0.4f);
-        labelSprite.setPosition(CENTRE_X - labelSprite.getWidth() / 2, HEIGHT - labelSprite.getHeight() * 2.3f);
-    }
-
-    private void initFonts() {
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/settings.ttf"));
-
-        FreeTypeFontGenerator.FreeTypeFontParameter paramCustom = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        paramCustom.size = 24;
-        customFont = generator.generateFont(paramCustom);
-
-        FreeTypeFontGenerator.FreeTypeFontParameter paramHover = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        paramHover.size = 20;
-        paramHover.characters = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ" +
-                                "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя" +
-                                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.,:;(){}[]«»–-";
-
-        hoverFont = generator.generateFont(paramHover);
-        hoverFont.getData().markupEnabled = true;
-
-        generator.dispose();
+        stage = new Stage(CameraManager.viewport);
     }
 
     private void initSettingWindow() {
@@ -247,7 +140,7 @@ public class MenuScreen implements Screen {
         skin = new Skin(Gdx.files.internal("uiskin.json"));
         style = new Window.WindowStyle(skin.get("default", Window.WindowStyle.class));
         style.background = skin.newDrawable("white", DARK_RED);
-        style.titleFont = customFont;
+        style.titleFont = MENU_mainFont;
 
         settingsWindow = new VisWindow("", style);
         settingsWindow.top().padTop(0);
@@ -255,7 +148,7 @@ public class MenuScreen implements Screen {
         settingsWindow.setSize(400, 300);
         settingsWindow.setPosition(CENTRE_X - settingsWindow.getWidth() / 2, CENTRE_Y - settingsWindow.getHeight() / 2);
 
-        VisLabel title = new VisLabel("Settings", new Label.LabelStyle(customFont, Color.WHITE));
+        VisLabel title = new VisLabel("Settings", new Label.LabelStyle(MENU_mainFont, Color.WHITE));
         title.setAlignment(Align.center);
         title.setFontScale(1.2f);
 
@@ -277,7 +170,7 @@ public class MenuScreen implements Screen {
         ArrayList<Settings> settingsList = new ArrayList<>();
 
         settingsList.add(new Settings("Гучнiсть", volumeSlider));
-        settingsList.add(new Settings("Страшнi звуки", new VisCheckBox("Йоу")));
+        settingsList.add(new Settings("Страшнi звуки", new VisCheckBox("Jooou")));
         settingsList.add(new Settings("Селект бокс", new VisSelectBox<>()));
 
         for (Settings settings : settingsList) {
@@ -290,7 +183,7 @@ public class MenuScreen implements Screen {
         functionalSettings();
     }
 
-    private void initBestiaryWindow(){
+    private void initBestiaryWindow() {
         Array<EnemyInfo> enemies = new Array<>();
 
         TextureAtlas watermelonAtlas = new TextureAtlas(Gdx.files.internal("animations/watermelon.atlas"));
@@ -310,7 +203,7 @@ public class MenuScreen implements Screen {
         enemies.add(new EnemyInfo("Диявол", "       Першим зустрiчае у пеклi... Очевидно, що не з теплими обiймами....", demonAtlas, 0.6f));
 
 
-         bestiaryWindow = new BestiaryWindow(enemies, style);
+        bestiaryWindow = new BestiaryWindow(enemies, style);
         bestiaryWindow.setVisible(false);
         stage.addActor(bestiaryWindow);
     }
@@ -322,7 +215,7 @@ public class MenuScreen implements Screen {
             @Override
             public void changed(ChangeListener.ChangeEvent event, Actor actor) {
                 float volume = volumeSlider.getValue();
-                AudioManager.getInstance().setVolume(volume);
+                AudioManager.instance.setVolume(volume);
             }
         });
 
@@ -334,14 +227,6 @@ public class MenuScreen implements Screen {
         });
     }
 
-    private void increaseSize(Sprite sprite) {
-        sprite.setSize(sprite.getWidth() * 1.8f, sprite.getHeight() * 1.8f);
-    }
-
-    private void decreaseSize(Sprite sprite) {
-        sprite.setSize(sprite.getWidth() * 0.7f, sprite.getHeight() * 0.7f);
-    }
-
     //##################### Методи для render #####################
 
     private void clearAndUpdate(float delta) {
@@ -350,7 +235,7 @@ public class MenuScreen implements Screen {
 
         time += delta;
 
-        if (initialized) camera.position.set(CENTRE_X, CENTRE_Y, 0);
+        if (isInitialized) camera.position.set(CENTRE_X, CENTRE_Y, 0);
         camera.update();
         batch.setProjectionMatrix(camera.combined);
     }
@@ -360,6 +245,7 @@ public class MenuScreen implements Screen {
         animateContinueButton(delta);
 
         batch.begin();
+
         batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         leftWing.draw(batch);
         rightWing.draw(batch);
@@ -416,7 +302,7 @@ public class MenuScreen implements Screen {
 
     private void hoveredHint() {
         if (hoveredHint != null) {
-            hoverFont.setColor(Color.BLACK);
+            MENU_hoverFont.setColor(Color.BLACK);
             switch (hoveredHint.length()) {
                 case 4:
                     drawButtonHint(exitBtn, 4);
@@ -436,14 +322,14 @@ public class MenuScreen implements Screen {
 
     private void drawButtonHint(Sprite button, float length) {
         float buttonCentreX = button.getX() + button.getWidth() / 2;
-        hoverFont.draw(batch, hoveredHint, buttonCentreX - length * 4, button.getY() - 10);
+        MENU_hoverFont.draw(batch, hoveredHint, buttonCentreX - length * 4, button.getY() - 10);
     }
 
     //##################### Обробка подій #####################
 
     private void handleInput() {
         Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-        CameraManager.getInstance().getCamera().unproject(mouse);
+        camera.unproject(mouse);
 
         if (exitBtn.getBoundingRectangle().contains(mouse.x, mouse.y))
             hoveredHint = "Exit";
@@ -458,13 +344,13 @@ public class MenuScreen implements Screen {
                 Gdx.app.exit();
             else if (settingsBtn.getBoundingRectangle().contains(mouse.x, mouse.y)) {
                 settingsWindow.setVisible(true);
-            }
-            else if(bestiaryBtn.getBoundingRectangle().contains(mouse.x, mouse.y)) {
+            } else if (bestiaryBtn.getBoundingRectangle().contains(mouse.x, mouse.y)) {
                 bestiaryWindow.setVisible(true);
             }
         }
+
         if (Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
-            ScreenManager.getInstance().setScreen(ScreenManager.ScreenType.GAME);
+            ScreenManager.instance.setScreen(ScreenManager.ScreenType.current);
         }
     }
 
@@ -498,7 +384,8 @@ public class MenuScreen implements Screen {
             settingsTable.add(actor).expandX().fillX().padRight(30).left();
         }
     }
-    public class EnemyInfo {
+
+    private static class EnemyInfo {
         public final String name;
         public final String description;
         public final Animation<TextureAtlas.AtlasRegion> animation;
@@ -517,20 +404,18 @@ public class MenuScreen implements Screen {
         }
     }
 
-    public class BestiaryWindow extends VisWindow {
+    private class BestiaryWindow extends VisWindow {
         private final VisList<EnemyInfo> enemyList;
         private final VisImage image;
         private final VisLabel descriptionLabel;
-        private final Array<EnemyInfo> enemyInfos;
         private float animTime = 0f;
 
         public BestiaryWindow(Array<EnemyInfo> enemies, WindowStyle style) {
             super("", style);
-            this.enemyInfos = enemies;
 
             this.setSize(600, 400);
             this.setPosition(Gdx.graphics.getWidth() / 2f - getWidth() / 2f,
-                    Gdx.graphics.getHeight() / 2f - getHeight() / 2f);
+                Gdx.graphics.getHeight() / 2f - getHeight() / 2f);
 
             // Список ворогів
             enemyList = new VisList<>();
@@ -558,7 +443,7 @@ public class MenuScreen implements Screen {
 //            header.add(new VisLabel(" ")).colspan(2).padBottom(5); // для відступу
 //            this.add(header).expandX().fillX().row();
 
-            VisLabel title = new VisLabel("Bestiary", new Label.LabelStyle(customFont, Color.WHITE));
+            VisLabel title = new VisLabel("Bestiary", new Label.LabelStyle(MENU_mainFont, Color.WHITE));
             title.setAlignment(Align.center);
             title.setFontScale(1.2f);
 
@@ -597,13 +482,12 @@ public class MenuScreen implements Screen {
             }
         }
 
-
         private void updatePreview(EnemyInfo info) {
             descriptionLabel.setText(info.description);
             animTime = 0f;
 
-            float scale_width=10f;
-            float scale_height=1.5f;
+//            float scale_width = 10f;
+//            float scale_height = 1.5f;
 
             // якщо потрібно малювати кастомно — треба буде віддати Animation або кадр
             TextureRegion frame = info.animation.getKeyFrame(0);

@@ -1,9 +1,8 @@
 package com.sillyrilly;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.sillyrilly.managers.*;
-import com.sillyrilly.util.d2.GameConfig;
+import com.sillyrilly.util.Const;
 
 /**
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
@@ -12,24 +11,24 @@ public class Main extends Game {
 
     @Override
     public void create() {
-        initialize();
+        AudioManager.initialize();
+        AssetsManager.initialize();
+        CameraManager.initialize(Const.VIRTUAL_WIDTH, Const.VIRTUAL_HEIGHT);
+        FontManager.initialize();
+        InputManager.initialize();
+        ScreenManager.initialize(this);
     }
 
     @Override
     public void resize(int width, int height) {
-        CameraManager.getInstance().resize(width, height);
+        CameraManager.instance.resize(width, height);
     }
 
     @Override
     public void dispose() {
-    //    AudioManager.getInstance().dispose();
-        ScreenManager.getInstance().dispose();
-        Gdx.app.log("DISPOSE", "Game disposed");
-        Gdx.app.exit();
-    }
-
-    private void initialize() {
-        CameraManager.getInstance().initialize(GameConfig.VIRTUAL_WIDTH, GameConfig.VIRTUAL_HEIGHT);
-        ScreenManager.getInstance().initialize(this, ScreenManager.ScreenType.MENU);
+        AudioManager.instance.dispose();
+        AssetsManager.instance.dispose();
+        FontManager.instance.dispose();
+        ScreenManager.instance.dispose();
     }
 }
