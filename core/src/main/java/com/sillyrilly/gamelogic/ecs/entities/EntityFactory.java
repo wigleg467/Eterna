@@ -19,10 +19,9 @@ import com.sillyrilly.gamelogic.ecs.utils.EnemyType;
 import com.sillyrilly.gamelogic.ecs.utils.EntityType;
 import com.sillyrilly.gamelogic.ecs.utils.NPCType;
 
-public class EntityFactory {
-    public final static float PPM = 32f;
-    public final static float TILE_SIZE = 32f;
+import static com.sillyrilly.util.Const.PPM;
 
+public class EntityFactory {
     private final Engine engine;
     private final World world;
 
@@ -55,21 +54,19 @@ public class EntityFactory {
 
         Entity entity = new Entity();
 
-
-        BodyComponent bc = new BodyComponent(body);
-        entity.add(bc);
+        entity.add(new BodyComponent(body));
         entity.add(new FacingComponent());
         entity.add(new CameraFollowableComponent());
         entity.add(new CameraTargetComponent());
+        entity.add(new PlayerComponent());
         entity.add(new LevelComponent(lvl));
-        entity.add(new PlayerComponent(bc));
-        entity.add(new AnimationButtomComponent(EntityType.PLAYER,  "bottom_idle", "bottom_walk_right"));
+        entity.add(new AnimationButtomComponent(EntityType.PLAYER, "bottom_idle", "bottom_walk_right"));
         entity.add(new AnimationTopComponent(EntityType.PLAYER));
         entity.add(new WeaponComponent(WeaponComponent.WeaponType.SWORD));
+
         engine.addEntity(entity);
 
         Gdx.app.log("Create", "Player");
-
     }
 
     public void createEnemy(float x, float y, EnemyType type, int lvl) {
@@ -97,7 +94,9 @@ public class EntityFactory {
         entity.add(new BodyComponent(body));
         entity.add(new EnemyComponent(type));
         entity.add(new FacingComponent());
+        entity.add(new PathComponent());
         entity.add(new LevelComponent(lvl));
+        entity.add(new EnemyComponent(type));
 
         AIComponent ai = new AIComponent();
         ai.stateMachine = new DefaultStateMachine<>(entity, EnemyState.IDLE);

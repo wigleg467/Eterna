@@ -1,9 +1,11 @@
 package com.sillyrilly.managers;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
-import com.sillyrilly.screens.ASCII3DScreen;
 import com.sillyrilly.screens.ASCIIScreen;
 import com.sillyrilly.screens.GameScreen;
 import com.sillyrilly.screens.MenuScreen;
@@ -11,66 +13,67 @@ import com.sillyrilly.screens.MenuScreen;
 import java.util.EnumMap;
 
 public class ScreenManager implements Disposable {
-    public enum ScreenType {
-        MENU, GAME, ASCII, ASCII3D;
+    public static ScreenManager instance;
+    public static SpriteBatch batch;
+    public static ShapeRenderer shapeRenderer;
 
-        private static ScreenType current;
+    public enum ScreenType {
+        MENU, GAME, ASCII;
+
+        public static ScreenType current = GAME;
 
         public static Screen createScreen(ScreenType type) {
             return switch (type) {
                 case MENU -> new MenuScreen();
                 case GAME -> new GameScreen();
                 case ASCII -> new ASCIIScreen();
-                case ASCII3D -> new ASCII3DScreen();
             };
         }
 
-        public static void setScreenType(ScreenType type) {
+        public static void setCurrentScreenType(ScreenType type) {
             current = type;
-        }
-
-        public static ScreenType getCurrentScreenType() {
-            return current;
         }
     }
 
-    private static ScreenManager instance;
-
-    private Game game;
     private final EnumMap<ScreenType, Screen> screenMap = new EnumMap<>(ScreenType.class);
+
+    private static Game game;
+
+    private static boolean isInitialized = false;
 
     private ScreenManager() {
     }
 
-    public static ScreenManager getInstance() {
-        if (instance == null) instance = new ScreenManager();
-        return instance;
-    }
+    public static void initialize(Game game) {
+        if (!isInitialized) {
+            batch = new SpriteBatch();
+            instance = new ScreenManager();
+            shapeRenderer = new ShapeRenderer();
 
-    public void initialize(Game game) {
-        this.game = game;
-        setScreen(ScreenType.MENU);
-    }
+            ScreenManager.game = game;
 
-    public void initialize(Game game, ScreenType type) {
-        this.game = game;
-        setScreen(type);
+            instance.setMenuScreen();
+
+            isInitialized = true;
+        }
     }
 
     public void setScreen(ScreenType type) {
-        if (!screenMap.containsKey(type)) {
-            screenMap.put(type, ScreenType.createScreen(type));
-        }
+        if (!screenMap.containsKey(type)) screenMap.put(type, ScreenType.createScreen(type));
         game.setScreen(screenMap.get(type));
-        ScreenType.setScreenType(type);
+        ScreenType.setCurrentScreenType(type);
     }
 
-    public Screen getCurrentScreen() {
-        return screenMap.get(ScreenManager.ScreenType.current);
+    public void setMenuScreen() {
+        if (!screenMap.containsKey(ScreenType.MENU)) screenMap.put(ScreenType.MENU, ScreenType.createScreen(ScreenType.MENU));
+
+        game.setScreen(screenMap.get(ScreenType.MENU));
     }
 
     public void dispose() {
         for (Screen screen : screenMap.values()) screen.dispose();
         screenMap.clear();
+        batch.dispose();
+        shapeRenderer.dispose();
     }
 }

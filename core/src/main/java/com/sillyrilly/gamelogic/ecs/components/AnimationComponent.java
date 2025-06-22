@@ -21,7 +21,7 @@ public class AnimationComponent implements Component {
 
     public Map<State, Animation<TextureAtlas.AtlasRegion>> animations = new EnumMap<>(State.class);
     public TextureAtlas.AtlasRegion currentFrame;
-    public State currentState = State.IDLE;
+    public State currentState = State.WALK;
     public float stateTime = 0f;
 
     public AnimationComponent(Animatable animatable, String... animationNames) {
@@ -29,7 +29,6 @@ public class AnimationComponent implements Component {
             for (int i = 0; i < animationNames.length; i++) {
                 if (!animationNames[i].isEmpty()) {
                     animations.put(State.get(i), createAnimation(animatable.getAnimationPath(), animationNames[i]));
-                    Gdx.app.log("AnimationComponent", animationNames[i]);
                 }
             }
         }

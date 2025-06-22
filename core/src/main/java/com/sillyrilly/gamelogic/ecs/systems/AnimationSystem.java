@@ -16,17 +16,15 @@ public class AnimationSystem extends EntitySystem {
     private final ComponentMapper<AnimationTopComponent> atc = ComponentMapper.getFor(AnimationTopComponent.class);
 
     private ImmutableArray<Entity> entities;
-    private InputManager inputManager;
+    private Entity player;
 
     public AnimationSystem() {
     }
 
     @Override
     public void addedToEngine(Engine engine) {
-        entities = engine.getEntitiesFor(Family.all(FacingComponent.class, BodyComponent.class)
-                .one(AnimationComponent.class, AnimationTopComponent.class, AnimationButtomComponent.class)
-                .get());
-        this.inputManager = InputManager.getInstance();
+        entities = engine.getEntitiesFor(Family.all(FacingComponent.class, BodyComponent.class).get());
+        player = engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
     }
 
     @Override
@@ -49,9 +47,9 @@ public class AnimationSystem extends EntitySystem {
                 AnimationTopComponent top = atc.get(entity);
 
 
-                AnimationTopComponent.TopState topInputState = InputManager.getInstance().getTopState();
-                AnimationButtomComponent.BottomState bottomInputState = InputManager.getInstance().getBottomState();
-                WeaponComponent.WeaponType weapon = InputManager.getInstance().getCurrentWeapon();
+                AnimationTopComponent.TopState topInputState = InputManager.instance.getTopState();
+                AnimationButtomComponent.BottomState bottomInputState = InputManager.instance.getBottomState();
+                WeaponComponent.WeaponType weapon = InputManager.instance.getCurrentWeapon();
 
                 // --- TOP STATE ---
 
@@ -63,7 +61,7 @@ public class AnimationSystem extends EntitySystem {
                     if (attackAnim != null && attackAnim.isAnimationFinished(top.stateTime)) {
                         top.currentState = topInputState;
                         top.stateTime = 0f;
-                        InputManager.getInstance().setCanAttack(true);
+                        InputManager.instance.setCanAttack(true);
                     }
                 } else {
                     if (top.currentState != topInputState) {

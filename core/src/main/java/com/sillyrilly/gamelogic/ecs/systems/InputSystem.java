@@ -8,7 +8,7 @@ public class InputSystem extends EntitySystem {
     private InputManager inputManager;
     @Override
     public void addedToEngine(Engine engine) {
-        inputManager = InputManager.getInstance();
+        inputManager = InputManager.instance;
     }
 
     @Override

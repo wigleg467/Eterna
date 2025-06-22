@@ -3,29 +3,24 @@ package com.sillyrilly.screens;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.sillyrilly.managers.AudioManager;
-import com.sillyrilly.util.d2.ASCIIConfig;
+import com.sillyrilly.managers.CameraManager;
+import com.sillyrilly.managers.InputManager;
+import com.sillyrilly.managers.ScreenManager;
+import com.sillyrilly.util.ASCIIConfig;
 
 import java.util.Random;
 
-import static com.sillyrilly.util.d2.ASCIIConfig.*;
-import static com.sillyrilly.util.d2.ASCIITexture.*;
+import static com.sillyrilly.managers.FontManager.*;
+import static com.sillyrilly.ui.hud.ASCIITexture.*;
+import static com.sillyrilly.util.ASCIIConfig.*;
 
 public class ASCIIScreen implements Screen {
-
     private SpriteBatch batch;
-    private BitmapFont renderFont;
-    private BitmapFont miniMapFont;
-    private BitmapFont.Glyph glyph;
-    private TextureRegion region;
-    private final Random rand = new Random();
-    private final AudioManager audioManager = AudioManager.getInstance();
-
-    private final InputHandler inputHandler = new InputHandler();
+    private AudioManager audioManager;
+    private InputHandler inputHandler;
+    private Random rand;
 
     private float playerX = 1.5f, playerY = 1.5f;
     private float angle = 0.0f;
@@ -44,30 +39,17 @@ public class ASCIIScreen implements Screen {
     @Override
     public void show() {
         if (!isInitialized) {
-            Gdx.input.setInputProcessor(inputHandler);
-            Gdx.input.setCursorCatched(isCursorCaught);
-
-            FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/CascadiaMono-Regular.ttf"));
-            FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-
-            parameter.characters = CHARACTER_LIST;
-            parameter.size = 14;
-            renderFont = generator.generateFont(parameter);
-            parameter.size = 16;
-            miniMapFont = generator.generateFont(parameter);
-
-            generator.dispose();
-
-            glyph = miniMapFont.getData().getGlyph('>');
-            region = new TextureRegion(miniMapFont.getRegion().getTexture(),
-                glyph.srcX, glyph.srcY, glyph.width, glyph.height);
-
-            batch = new SpriteBatch();
+            batch = ScreenManager.batch;
+            audioManager = AudioManager.instance;
+            inputHandler = new InputHandler();
+            rand = new Random();
 
             isInitialized = true;
         }
 
-        audioManager.playBasementMusic(true, 1f);
+        Gdx.input.setCursorCatched(isCursorCaught);
+        InputManager.multiplexer.addProcessor(inputHandler);
+        audioManager.playMusic(AudioManager.MusicType.BASEMENT);
     }
 
     /**
@@ -77,6 +59,47 @@ public class ASCIIScreen implements Screen {
      */
     @Override
     public void render(float delta) {
+        update(delta);
+
+        batch.begin();
+
+        draw();
+        drawHUD();
+        if (isMapOn) drawMiniMap();
+
+        batch.end();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        CameraManager.instance.resize(width, height);
+    }
+
+    @Override
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
+    public void hide() {
+        Gdx.input.setCursorCatched(false);
+        InputManager.multiplexer.removeProcessor(inputHandler);
+    }
+
+    /**
+     * Called when this screen should release all resources.
+     */
+    @Override
+    public void dispose() {
+        batch.dispose();
+        ASCII_mainFont.dispose();
+        ASCII_minimapFont.dispose();
+    }
+
+    private void update(float delta) {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -85,9 +108,9 @@ public class ASCIIScreen implements Screen {
         if (hud == 0) maxDepth = 1.3f;
         else if (hud == 1) maxDepth = 1.5f;
         else maxDepth = 4f;
+    }
 
-        batch.begin();
-
+    private void draw() {
         float distToUnderWorld = distanceToValue(playerX, playerY);
 
         float correctedDistanceToExit = (float) Math.exp((-distToUnderWorld + 2f) * 0.5f);
@@ -107,80 +130,50 @@ public class ASCIIScreen implements Screen {
                 char ch = y < wallStart ? ' ' : (y > wallEnd ? new Random().nextBoolean() ? '—' : '-' : getSymbol(hit));
 
                 boolean result = rand.nextDouble() < correctedDistanceToExit;
-                audioManager.setVolume(correctedDistanceToExit, 2);
-                audioManager.setVolume(1 - correctedDistanceToExit, 1);
-                if (result) renderFont.setColor(Color.RED);
+                audioManager.setVolume(correctedDistanceToExit, AudioManager.MusicType.BASEMENT);
+                audioManager.setVolume(1 - correctedDistanceToExit, AudioManager.MusicType.HELL);
+                if (result) ASCII_mainFont.setColor(Color.RED);
                 else if (hud == 2)
                     switch (ch) {
-                        case '—', '/', '⁄' -> renderFont.setColor(Color.BROWN);
-                        case '-' -> renderFont.setColor(new Color(0x8b3313ff));
-                        default -> renderFont.setColor(Color.GRAY);
+                        case '—', '/', '⁄' -> ASCII_mainFont.setColor(Color.BROWN);
+                        case '-' -> ASCII_mainFont.setColor(new Color(0x8b3313ff));
+                        default -> ASCII_mainFont.setColor(Color.GRAY);
                     }
-                else renderFont.setColor(Color.GRAY);
+                else ASCII_mainFont.setColor(Color.GRAY);
 
 
-                renderFont.draw(batch, String.valueOf(ch),
+                ASCII_mainFont.draw(batch, String.valueOf(ch),
                     x * CELL_W, (SCREEN_HEIGHT - y) * CELL_H);
             }
         }
+    }
 
-        renderFont.setColor(Color.WHITE);
+    private void drawHUD() {
+        ASCII_mainFont.setColor(Color.WHITE);
         switch (hud) {
-            case 1 -> renderFont.draw(batch, SWORD, 0, 1500);
-            case 2 -> renderFont.draw(batch, LAMP, 0, 800);
-            case 3 -> renderFont.draw(batch, SKULL, 0, 800);
-            case 4 -> renderFont.draw(batch, PISTOL, 400, 300);
-            case 5 -> renderFont.draw(batch, KNIFE, 0, 880);
+            case 1 -> ASCII_mainFont.draw(batch, SWORD, 0, 1500);
+            case 2 -> ASCII_mainFont.draw(batch, LAMP, 0, 800);
+            case 3 -> ASCII_mainFont.draw(batch, SKULL, 0, 800);
+            case 4 -> ASCII_mainFont.draw(batch, PISTOL, 400, 300);
+            case 5 -> ASCII_mainFont.draw(batch, KNIFE, 0, 880);
         }
-
-
-        if (isMapOn) drawMiniMap();
-
-        batch.end();
-    }
-
-    @Override
-    public void resize(int width, int height) {
-    }
-
-
-    @Override
-    public void pause() {
-    }
-
-    @Override
-    public void resume() {
-    }
-
-    @Override
-    public void hide() {
-    }
-
-    /**
-     * Called when this screen should release all resources.
-     */
-    @Override
-    public void dispose() {
-        batch.dispose();
-        renderFont.dispose();
-        miniMapFont.dispose();
     }
 
     private void drawMiniMap() {
         int sizeX = 8, sizeY = 10;
         int offsetX = 10, offsetY = 10;
 
-        miniMapFont.setColor(Color.BLACK);
+        ASCII_minimapFont.setColor(Color.BLACK);
         for (int y = 0; y < MAP_HEIGHT; y++) {
             for (int x = 0; x < MAP_WIDTH; x++) {
                 char ch = '█';
-                miniMapFont.draw(batch, String.valueOf(ch),
+                ASCII_minimapFont.draw(batch, String.valueOf(ch),
                     offsetX + x * sizeX,
                     SCREEN_HEIGHT * 16 - offsetY - y * sizeY
                 );
             }
         }
-        miniMapFont.setColor(Color.WHITE);
+        ASCII_minimapFont.setColor(Color.WHITE);
         for (int y = 0; y < MAP_HEIGHT; y++) {
             for (int x = 0; x < MAP_WIDTH; x++) {
                 char ch = switch (MAP[y][x]) {
@@ -188,17 +181,17 @@ public class ASCIIScreen implements Screen {
                     case DOOR -> 'D';
                     default -> ' ';
                 };
-                miniMapFont.draw(batch, String.valueOf(ch),
+                ASCII_minimapFont.draw(batch, String.valueOf(ch),
                     offsetX + x * sizeX,
                     SCREEN_HEIGHT * 16 - offsetY - y * sizeY
                 );
             }
         }
 
-        batch.draw(region, offsetX - 4 + (int) (playerX * sizeX),
+        batch.draw(ASCII_characterRegion, offsetX - 4 + (int) (playerX * sizeX),
             SCREEN_HEIGHT * 16 - (float) offsetY * 2 / 3 - (int) (playerY * sizeY) - 9,
-            glyph.width / 2f, glyph.height / 2f,
-            glyph.width, glyph.height, 1, 1, (float) -Math.toDegrees(angle));
+            ASCII_characterGlyph.width / 2f, ASCII_characterGlyph.height / 2f,
+            ASCII_characterGlyph.width, ASCII_characterGlyph.height, 1, 1, (float) -Math.toDegrees(angle));
 
         //        miniMapFont.draw(batch, "^",
 //            offsetX + (int) (playerX * sizeX),
@@ -331,7 +324,7 @@ public class ASCIIScreen implements Screen {
         }
 
         if (isMoving && footstepTimer <= 0f) {
-            AudioManager.getInstance().playStep(1f);  // 0.3 — гучність, можеш змінити
+            AudioManager.instance.playSound(AudioManager.SoundType.STEPS);
             footstepTimer = footstepCooldown;
         }
 
@@ -366,14 +359,18 @@ public class ASCIIScreen implements Screen {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) isMapOn = !isMapOn;
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
+            if (hud + 1 < 6) hud++;
+            else hud = 0;
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) {
             isCursorCaught = !isCursorCaught;
             Gdx.input.setCursorCatched(isCursorCaught);
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
-            if (hud + 1 < 6) hud++;
-            else hud = 0;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            ScreenManager.instance.setScreen(ScreenManager.ScreenType.MENU);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {

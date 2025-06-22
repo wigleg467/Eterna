@@ -11,10 +11,6 @@ public class BodyComponent implements Component {
         this.body = body;
     }
 
-    public Body getBody() {
-        return body;
-    }
-
     public Vector2 getPosition() {
         return body.getPosition();
     }

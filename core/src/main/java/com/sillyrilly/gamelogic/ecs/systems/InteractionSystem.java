@@ -11,7 +11,7 @@ import com.sillyrilly.gamelogic.ecs.utils.DialogueWindow;
 import com.sillyrilly.gamelogic.ecs.utils.GameState;
 import com.sillyrilly.gamelogic.ecs.utils.NPCType;
 
-import static com.sillyrilly.gamelogic.ecs.utils.DialogueStorage.getDialogue;
+import static com.sillyrilly.managers.DialogueManager.getDialogue;
 
 public class InteractionSystem extends EntitySystem {
     private final ComponentMapper<BodyComponent> bm = ComponentMapper.getFor(BodyComponent.class);

@@ -11,9 +11,8 @@ import com.sillyrilly.gamelogic.ecs.components.WeaponComponent;
 import com.sillyrilly.gamelogic.ecs.systems.CameraFollowSystem;
 
 public class InputManager extends InputAdapter {
-    private static InputManager instance;
-
-    private final InputMultiplexer multiplexer;
+    public static InputManager instance;
+    public static InputMultiplexer multiplexer;
 
     private final Vector2 movement = new Vector2();
     private AnimationButtomComponent.BottomState bottomState;
@@ -23,16 +22,18 @@ public class InputManager extends InputAdapter {
     private boolean debug = false;
     private WeaponComponent.WeaponType currentWeapon = WeaponComponent.WeaponType.SWORD;
 
-    private InputManager() {
-        this.multiplexer = new InputMultiplexer();
+    private static boolean isInitialized = false;
 
-        Gdx.input.setInputProcessor(multiplexer);
+    private InputManager() {
     }
 
-    public static InputManager getInstance() {
-        if (instance == null) instance = new InputManager();
+    public static void initialize() {
+        if (!isInitialized) {
+            instance = new InputManager();
+            multiplexer = new InputMultiplexer();
 
-        return instance;
+            Gdx.input.setInputProcessor(multiplexer);
+        }
     }
 
     public void update() {
@@ -41,14 +42,12 @@ public class InputManager extends InputAdapter {
         bottomState = AnimationButtomComponent.BottomState.IDLE;
 
 
-
-
         movement.set(0, 0);
 
         boolean isAttacking = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
         boolean isMoving = false;
 
-// Спочатку перевіряємо рух — незалежно від атаки
+        // Спочатку перевіряємо рух — незалежно від атаки
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             movement.y += 1;
             isMoving = true;
@@ -75,8 +74,8 @@ public class InputManager extends InputAdapter {
         }
 
         bottomState = isMoving
-                ? AnimationButtomComponent.BottomState.WALK
-                : AnimationButtomComponent.BottomState.IDLE;
+            ? AnimationButtomComponent.BottomState.WALK
+            : AnimationButtomComponent.BottomState.IDLE;
         if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) {
             debug = !debug;
         }
@@ -88,20 +87,20 @@ public class InputManager extends InputAdapter {
 
         if (Gdx.input.isKeyPressed(Input.Keys.EQUALS) && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
             // ### Zoom in ###
-            CameraManager.getInstance().setZoom(0.02f);
+            CameraManager.instance.setZoom(0.02f);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.MINUS) && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
             // ### Zoom out ###
-            CameraManager.getInstance().setZoom(-0.02f);
+            CameraManager.instance.setZoom(-0.02f);
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
-            changeCamera = true;
+            //   changeCamera = true;
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            ScreenManager.getInstance().setScreen(ScreenManager.ScreenType.MENU);
+            ScreenManager.instance.setMenuScreen();
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
             currentWeapon = WeaponComponent.WeaponType.SWORD;
@@ -114,7 +113,7 @@ public class InputManager extends InputAdapter {
         }
     }
 
-    public boolean isDebug() {
+    public boolean isDebugMode() {
         return debug;
     }
 
@@ -129,6 +128,7 @@ public class InputManager extends InputAdapter {
     public AnimationTopComponent.TopState getTopState() {
         return topState;
     }
+
     public AnimationButtomComponent.BottomState getBottomState() {
         return bottomState;
     }
@@ -138,10 +138,6 @@ public class InputManager extends InputAdapter {
         return movement;
     }
 
-    public boolean isChangeCamera() {
-        return changeCamera;
-    }
-
     public boolean canAttack() {
         return canAttack;
     }
@@ -149,11 +145,12 @@ public class InputManager extends InputAdapter {
     public void setCanAttack(boolean canAttack) {
         this.canAttack = canAttack;
     }
+
     public WeaponComponent.WeaponType getCurrentWeapon() {
         return currentWeapon;
     }
+
     public void setCurrentWeapon(WeaponComponent.WeaponType type) {
         this.currentWeapon = type;
     }
 }
-

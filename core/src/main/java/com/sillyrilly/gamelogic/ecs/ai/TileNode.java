@@ -19,8 +19,4 @@ public class TileNode {
     public int getIndex() {
         return index;
     }
-
-    public Array<Connection<TileNode>> getConnections() {
-        return connections;
-    }
 }
