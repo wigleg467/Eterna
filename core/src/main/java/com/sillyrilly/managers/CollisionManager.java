@@ -30,4 +30,6 @@ public class CollisionManager {
         TiledMapTile tile = cell.getTile();
         return tile != null && tile.getProperties().containsKey("blocked");
     }
+
+
 }

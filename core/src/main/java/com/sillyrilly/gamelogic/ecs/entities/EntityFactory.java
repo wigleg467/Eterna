@@ -5,8 +5,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
@@ -72,11 +72,10 @@ public class EntityFactory {
 
     }
 
-    public void createEnemy(float x, float y, EnemyType type, int lvl, float offsetX, float offsetY) {
-        offsetY*=1216;
+    public void createEnemy(float x, float y, EnemyType type, int lvl) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set((x + offsetX) / PPM, (y + offsetY) / PPM);
+        bodyDef.position.set((x) / PPM, (y) / PPM);
         bodyDef.fixedRotation = true;
 
         Body body = world.createBody(bodyDef);
@@ -107,11 +106,10 @@ public class EntityFactory {
         engine.addEntity(entity);
     }
 
-    public void createNPC(float x, float y, NPCType type, int lvl, float offsetX, float offsetY) {
-        offsetY*=1216;
+    public void createNPC(float x, float y, NPCType type, int lvl) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set((x + offsetX) / PPM, (y + offsetY) / PPM);
+        bodyDef.position.set((x) / PPM, (y) / PPM);
         bodyDef.fixedRotation = true;
 
         Body body = world.createBody(bodyDef);
@@ -140,23 +138,13 @@ public class EntityFactory {
     }
 
     public void createTileLayer(TiledMap map, String layerName, int lvl) {
-        createTileLayer(map, layerName, lvl, 0f, 0f, 0f, 0, 0);
+        createTileLayer(map, layerName, lvl, 0f, 0f, 0f);
     }
 
-    public void createTileLayer(TiledMap map, String layerName, int level, float offsetXTiles, float offsetYTiles) {
-        createTileLayer(map, layerName, level, 0f, 0f, 0f, offsetXTiles, offsetYTiles);
-    }
-
-    public void createTileLayer(TiledMap map, String layerName, int level,
-                                float density, float friction, float restitution,
-                                float offsetXTiles, float offsetYTiles) {
 
 
+    public void createTileLayer(TiledMap map, String layerName, int lvl, float density, float friction, float restitution) {
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(layerName);
-        if (layer == null) return;
-
-        float offsetX = offsetXTiles * layer.getTileWidth() / EntityFactory.PPM;
-        float offsetY = offsetYTiles * layer.getTileHeight() * layer.getHeight() / EntityFactory.PPM;
 
         for (int x = 0; x < layer.getWidth(); x++) {
             for (int y = 0; y < layer.getHeight(); y++) {
@@ -166,20 +154,16 @@ public class EntityFactory {
                 TiledMapTile tile = cell.getTile();
                 TextureRegion region = tile.getTextureRegion();
 
-                float tileWidth = region.getRegionWidth() / EntityFactory.PPM;
-                float tileHeight = region.getRegionHeight() / EntityFactory.PPM;
-
-                float posX = (x + 0.5f) * tileWidth + offsetX;
-                float posY = (y + 0.5f) * tileHeight + offsetY;
-
                 BodyDef bodyDef = new BodyDef();
                 bodyDef.type = BodyDef.BodyType.StaticBody;
-                bodyDef.position.set(posX, posY);
+                bodyDef.position.set((x), (y)); // Центр тайла
 
                 Body body = world.createBody(bodyDef);
 
-                if (density != 0 || friction != 0 || restitution != 0) {
+                if (density != 0 && friction != 0 && restitution != 0) {
                     PolygonShape shape = new PolygonShape();
+                    float tileWidth = region.getRegionWidth() / PPM;
+                    float tileHeight = region.getRegionHeight() / PPM;
                     shape.setAsBox(tileWidth / 2f, tileHeight / 2f);
 
                     FixtureDef fixtureDef = new FixtureDef();
@@ -193,58 +177,64 @@ public class EntityFactory {
                 }
 
                 Entity entity = new Entity();
-                entity.add(new BodyComponent(body));
-                entity.add(new LevelComponent(level));
-                entity.add(new TileComponent(tile));
+
+                BodyComponent bc = new BodyComponent(body);
+                LevelComponent lc = new LevelComponent(lvl);
+                TileComponent tc = new TileComponent(cell.getTile());
+
+                entity.add(bc);
+                entity.add(lc);
+                entity.add(tc);
                 engine.addEntity(entity);
             }
         }
     }
 
     public void createObjectLayer(TiledMap map, String layerName, int lvl) {
-        createObjectLayer(map, layerName, lvl, 0f, 0f, 0f, 0, 0);
+        createObjectLayer(map, layerName, lvl, 0f, 0f, 0f);
     }
 
-    public void createObjectLayer(TiledMap map, String layerName, int level,
-                                  float density, float friction, float restitution,
-                                  float offsetXTiles, float offsetYTiles) {
-        MapLayer layer = map.getLayers().get(layerName);
-        if (layer == null) return;
+    public void createObjectLayer(TiledMap map, String layerName, int lvl, float density, float friction, float restitution) {
+        MapObjects objects = map.getLayers().get(layerName).getObjects(); // шар з колізією
 
-        float offsetX = offsetXTiles * TILE_SIZE / PPM;
-        float offsetY = offsetYTiles * TILE_SIZE * map.getProperties().get("height", Integer.class) / PPM;
+        for (MapObject object : objects) {
+            if (object instanceof RectangleMapObject rectObject) {
+                Rectangle rect = rectObject.getRectangle();
 
-        for (MapObject object : layer.getObjects()) {
-            if (!(object instanceof RectangleMapObject rectObject)) continue;
+                // Створення BodyDef
+                BodyDef bodyDef = new BodyDef();
+                bodyDef.type = BodyDef.BodyType.StaticBody;
 
-            Rectangle rect = rectObject.getRectangle();
-            float x = (rect.x + rect.width / 2f) / PPM + offsetX;
-            float y = (rect.y + rect.height / 2f) / PPM + offsetY;
+                // Центр прямокутника
+                float x = (rect.x + rect.width / 2f) / PPM;
+                float y = (rect.y + rect.height / 2f) / PPM;
+                bodyDef.position.set(x, y);
 
-            BodyDef bodyDef = new BodyDef();
-            bodyDef.type = BodyDef.BodyType.StaticBody;
-            bodyDef.position.set(x, y);
+                // Створення тіла
+                Body body = world.createBody(bodyDef);
+                if (density != 0 && friction != 0 && restitution != 0) {
+                    PolygonShape shape = new PolygonShape();
+                    shape.setAsBox(rect.width / 2f / PPM, rect.height / 2f / PPM);
 
-            Body body = world.createBody(bodyDef);
+                    FixtureDef fixtureDef = new FixtureDef();
+                    fixtureDef.shape = shape;
+                    fixtureDef.density = density;
+                    fixtureDef.friction = friction;
+                    fixtureDef.restitution = restitution;
 
-            if (density != 0 || friction != 0 || restitution != 0) {
-                PolygonShape shape = new PolygonShape();
-                shape.setAsBox(rect.width / 2f / PPM, rect.height / 2f / PPM);
+                    body.createFixture(fixtureDef);
+                    shape.dispose();
+                }
+                // Додаємо в ECS
+                Entity entity = new Entity();
 
-                FixtureDef fixtureDef = new FixtureDef();
-                fixtureDef.shape = shape;
-                fixtureDef.density = density;
-                fixtureDef.friction = friction;
-                fixtureDef.restitution = restitution;
+                BodyComponent bc = new BodyComponent(body);
+                LevelComponent lc = new LevelComponent(lvl);
 
-                body.createFixture(fixtureDef);
-                shape.dispose();
+                entity.add(bc);
+                entity.add(lc);
+                engine.addEntity(entity);
             }
-
-            Entity entity = new Entity();
-            entity.add(new BodyComponent(body));
-            entity.add(new LevelComponent(level));
-            engine.addEntity(entity);
         }
     }
 }

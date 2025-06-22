@@ -1,18 +1,25 @@
 package com.sillyrilly.gamelogic.ecs.utils;
 
 public enum NPCType implements Animatable {
-    LUMBERJACK("animations/lumberjack.atlas", 1f, 1f, "Лісоруб", "portraits/lumberjack.png"),
-    DEMON("animations/demon.atlas", 1f, 1f, "Демон", "portraits/lumberjack.png"),
-    NUN("animations/nun.atlas", 1f, 1f, "Монахиня", "portraits/lumberjack.png");
+    LUMBERJACK("lumberjack", "animations/lumberjack.atlas", 1f, 1f, "Лісоруб", "portraits/lumberjack.png"),
+    DEMON("demon", "animations/demon.atlas", 1f, 1f, "Демон", "portraits/lumberjack.png"),
+    NUN("nun", "animations/nun.atlas", 1f, 1f, "Монахиня", "portraits/lumberjack.png");
+
+    private final String id;
     private final String path, ukrName, portrait;
     private final float w, h;
 
-    NPCType(String path, float w, float h, String ukrName, String portrait) {
+    NPCType(String id, String path, float w, float h, String ukrName, String portrait) {
+        this.id = id;
         this.path = path;
         this.w = w;
         this.h = h;
         this.ukrName = ukrName;
         this.portrait = portrait;
+    }
+
+    public String getId() {
+        return id;
     }
 
     @Override
@@ -28,10 +35,11 @@ public enum NPCType implements Animatable {
         return h;
     }
 
-    public String getName(){
+    public String getName() {
         return ukrName;
     }
-    public String getPortraitPath(){
+
+    public String getPortraitPath() {
         return portrait;
     }
 }

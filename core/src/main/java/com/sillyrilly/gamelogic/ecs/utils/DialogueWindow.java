@@ -15,6 +15,7 @@ public class DialogueWindow {
     private int currentLineIndex;
     private boolean visible = false;
     private String name;
+    public Runnable onDialogueEnd;
 
 
         public DialogueWindow(Texture background, BitmapFont font) {
@@ -35,14 +36,16 @@ public class DialogueWindow {
             portraitTexture = new Texture(portrait);
         }
 
-        public void nextLine() {
-            if (!visible) return;
-            if (currentLineIndex >= lines.size-1) {
-                visible = false; // діалог завершено
-                return;
-            }
+    public void nextLine() {
+        if (!visible) return;
+
+        if (currentLineIndex >= lines.size - 1) {
+            visible = false;
+            if (onDialogueEnd != null) onDialogueEnd.run();
+        } else {
             currentLineIndex++;
         }
+    }
 
         public boolean isVisible() {
             return visible;

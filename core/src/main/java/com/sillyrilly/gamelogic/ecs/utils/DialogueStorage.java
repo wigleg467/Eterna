@@ -3,10 +3,11 @@ package com.sillyrilly.gamelogic.ecs.utils;
 import com.badlogic.gdx.utils.ObjectMap;
 
 public class DialogueStorage {
-    private static final ObjectMap<NPCType, Dialogue> dialogues = new ObjectMap<>();
+
+    private static final ObjectMap<DialogueKey, Dialogue> dialogues = new ObjectMap<>();
 
     public static void init() {
-        dialogues.put(NPCType.LUMBERJACK, new Dialogue(
+        dialogues.put(new DialogueKey(NPCType.LUMBERJACK, 0), new Dialogue(
                 NPCType.LUMBERJACK.getName(),
                 NPCType.LUMBERJACK.getPortraitPath(),
                 "Привіт, друже!",
@@ -14,21 +15,54 @@ public class DialogueStorage {
                 "Можеш допомогти?"
         ));
 
-        dialogues.put(NPCType.DEMON, new Dialogue(
+        // Другий діалог для того самого NPC
+        dialogues.put(new DialogueKey(NPCType.LUMBERJACK, 1), new Dialogue(
+                NPCType.LUMBERJACK.getName(),
+                NPCType.LUMBERJACK.getPortraitPath(),
+                "Вони досі тут. Будь обачним"
+        ));
+
+        dialogues.put(new DialogueKey(NPCType.LUMBERJACK, 2), new Dialogue(
+                NPCType.LUMBERJACK.getName(),
+                NPCType.LUMBERJACK.getPortraitPath(),
+                "Дякую за допомогу.",
+                "За твою мужність я дарую тобі сокиру свого сина"
+        ));
+
+        dialogues.put(new DialogueKey(NPCType.DEMON, 0), new Dialogue(
                 NPCType.DEMON.getName(),
                 NPCType.DEMON.getPortraitPath(),
-                "Не наближайся!",
-                "Я з пекла."
+                "Привіт, друже!",
+                "Я рубаю дрова.",
+                "Можеш допомогти?"
         ));
-        dialogues.put(NPCType.NUN, new Dialogue(
+        dialogues.put(new DialogueKey(NPCType.NUN, 0), new Dialogue(
                 NPCType.NUN.getName(),
                 NPCType.NUN.getPortraitPath(),
                 "Слава Ісусу Христу",
-                "У мене пістолет святої води."
+                "У мене пістолет святої води.",
+                "Допоможи побороти цих монстрів."
+        ));
+        dialogues.put(new DialogueKey(NPCType.NUN, 1), new Dialogue(
+                NPCType.NUN.getName(),
+                NPCType.NUN.getPortraitPath(),
+                "Слава Ісусу Христу",
+                "Вороги досі там."
+        ));
+        dialogues.put(new DialogueKey(NPCType.NUN, 2), new Dialogue(
+                NPCType.NUN.getName(),
+                NPCType.NUN.getPortraitPath(),
+                "Ти отримуєш моє балословення",
+                "Іди перетни міст"
         ));
     }
 
-    public static Dialogue getDialogue(NPCType type) {
-        return dialogues.get(type);
+    public static Dialogue getDialogue(NPCType type, int stage) {
+        Dialogue d = dialogues.get(new DialogueKey(type, stage));
+        if (d == null) {
+            // fallback на перший діалог
+            return dialogues.get(new DialogueKey(type, 0));
+        }
+        return d;
     }
 }

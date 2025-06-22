@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -18,19 +19,19 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.sillyrilly.gamelogic.ecs.ai.NavigationMap;
 import com.sillyrilly.gamelogic.ecs.entities.EntityFactory;
 import com.sillyrilly.gamelogic.ecs.systems.*;
-import com.sillyrilly.gamelogic.ecs.utils.DialogueStorage;
-import com.sillyrilly.gamelogic.ecs.utils.DialogueWindow;
-import com.sillyrilly.gamelogic.ecs.utils.EnemyType;
-import com.sillyrilly.gamelogic.ecs.utils.NPCType;
+import com.sillyrilly.gamelogic.ecs.utils.*;
 import com.sillyrilly.managers.CameraManager;
 import com.sillyrilly.managers.InputManager;
 import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static squidpony.squidgrid.gui.gdx.SColor.DARK_RED;
 
@@ -46,16 +47,16 @@ public class GameScreen implements Screen {
     private EntityFactory factory;
     public static OrthogonalTiledMapRenderer renderer;
     private SpriteBatch batch;
-    private TiledMap realWorld;
-    private TiledMap hell;
-    private TiledMap heaven;
+    private TiledMap bigWorld;
     private World world;
     private Skin skin;
     private Window.WindowStyle style;
     public DialogueWindow dialogueWindow;
     private BitmapFont customFont;
     private float zoom = 0.6f;
+    public final static float PPM = 32f;
     private boolean initialized = false;
+    private final Map<String, Body> removableBodies = new HashMap<>();
 
     /**
      * Called when this screen becomes the current screen for a {@link Game}.
@@ -78,17 +79,13 @@ instance = this;
             skin = new Skin(Gdx.files.internal("uiskin.json"));
             style = new Window.WindowStyle(skin.get("default", Window.WindowStyle.class));
             style.background = skin.newDrawable("white", DARK_RED);
-            realWorld = new TmxMapLoader().load("maps/firstlevel.tmx");
-            hell = new TmxMapLoader().load("maps/secondlevel.tmx");
-            heaven = new TmxMapLoader().load("maps/third_level.tmx");
+            bigWorld = new TmxMapLoader().load("maps/bigmap.tmx");
             //   renderer = new OrthogonalTiledMapRenderer(heaven);
             //   renderer.setView(cameraManager.getCamera());
 
             world = new World(new Vector2(0, 0), true);
             parser = new Box2DMapObjectParser(tileScale);
-            parser.load(world, realWorld);
-            parser.load(world, heaven);
-            parser.load(world, hell);
+            parser.load(world, bigWorld);
 
             {
                 //     float mapWidth = heaven.getProperties().get("width", Integer.class);
@@ -107,9 +104,20 @@ instance = this;
                 engine.addSystem(new EnemyAISystem());
                 engine.addSystem(new CameraFollowSystem());
                 engine.addSystem(new AISystem());
-                engine.addSystem(new EnemyPathfindingSystem(new NavigationMap(realWorld).getGrid()));
+                engine.addSystem(new EnemyPathfindingSystem(new NavigationMap(bigWorld).getGrid()));
                 factory = new EntityFactory(engine, world);
-                factory.createPlayer(300f, 300f, 3);
+                MapLayer spawnLayer = bigWorld.getLayers().get("Spawns");
+
+                for (MapObject object : spawnLayer.getObjects()) {
+                    if ("PlayerSpawn".equals(object.getName()) && object instanceof RectangleMapObject rectObj) {
+                        Rectangle rect = rectObj.getRectangle();
+
+                        float spawnX = rect.x + rect.width / 2;
+                        float spawnY = rect.y + rect.height / 2;
+                        factory.createPlayer(spawnX, spawnY, 5);
+                        break;
+                    }
+                }
                 dialogueWindow = new DialogueWindow(new Texture("images/dialogue.png"), customFont);
                 engine.addSystem(new InteractionSystem(dialogueWindow));
                 engine.addSystem(new AnimationSystem());
@@ -121,83 +129,91 @@ instance = this;
             }
 
 
-            factory.createTileLayer(realWorld, "props", 3, 0, 0);
-            factory.createTileLayer(realWorld, "base", 0, 0, 0);
-            factory.createTileLayer(realWorld, "base2", 1, 0, 0);
-            factory.createTileLayer(realWorld, "landscape", 2, 0, 0);
-            factory.createTileLayer(realWorld, "house", 3, 0, 0);
-            factory.createObjectLayer(realWorld, "Collision_lvl_1", 1, 1, 0.01f, 0.01f, 0, 0);
+            factory.createTileLayer(bigWorld, "props", 5);
+            factory.createTileLayer(bigWorld, "base", 0);
+            factory.createTileLayer(bigWorld, "lava", 1);
+            factory.createTileLayer(bigWorld, "path", 2);
+            factory.createTileLayer(bigWorld, "base2", 1);
+            factory.createTileLayer(bigWorld, "base2", 2);
+            factory.createTileLayer(bigWorld, "base3", 3);
+            factory.createTileLayer(bigWorld, "base4", 4);
+            factory.createTileLayer(bigWorld, "landscape", 2);
+            factory.createObjectLayer(bigWorld, "Collisions", 1, 1, 0.01f, 0.01f);
 
 
-            factory.createTileLayer(hell, "props", 3, 0, -4);
-            factory.createTileLayer(hell, "base", 0, 0, -4);
-            factory.createTileLayer(hell, "lava", 1, 0, -4);
-            factory.createTileLayer(hell, "path", 2, 0, -4);
-            factory.createTileLayer(hell, "base2", 2, 0, -4);
-            factory.createTileLayer(hell, "web", 4, 0, -4);
-            factory.createObjectLayer(hell, "Collision_lvl_2", 1, 1, 0.01f, 0.01f, 0, -4);
-            factory.createObjectLayer(hell, "Enemies", 1, 1, 0.01f, 0.01f, 0, -4);
-
-            factory.createTileLayer(heaven, "props", 3, 0, 4);
-            factory.createTileLayer(heaven, "base", 0, 0, 4);
-            factory.createTileLayer(heaven, "base2", 1, 0, 4);
-            factory.createTileLayer(heaven, "base3", 2, 0, 4);
-            factory.createTileLayer(heaven, "base4", 2, 0, 4);
-            factory.createTileLayer(heaven, "castle", 5, 0, 4);
-            factory.createTileLayer(heaven, "clouds", 4, 0, 4);
-            factory.createObjectLayer(heaven, "Collision_lvl_3", 1, 1, 0.01f, 0.01f, 0, 4);
-            factory.createObjectLayer(heaven, "Enemies", 1, 1, 0.01f, 0.01f, 0, 4);
 
 
-            MapObjects objects = realWorld.getLayers().get("Enemies").getObjects();
+            MapObjects objects = bigWorld.getLayers().get("Enemies").getObjects();
             for (MapObject object : objects) {
                 Gdx.app.log("GameScreen", object.toString());
                 Rectangle rect = ((RectangleMapObject) object).getRectangle();
                 String typeStr = object.getProperties().get("type", String.class);
                 if (typeStr == null) continue;
                 EnemyType type = EnemyType.valueOf(typeStr.toUpperCase());
-                factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 3, 0, 0);
+                factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 5);
             }
 
 
-            objects = realWorld.getLayers().get("NPC").getObjects();
+            objects = bigWorld.getLayers().get("NPC").getObjects();
             for (MapObject object : objects) {
                 Gdx.app.log("GameScreen", object.toString());
                 Rectangle rect = ((RectangleMapObject) object).getRectangle();
                 String typeStr = object.getProperties().get("type", String.class);
                 if (typeStr == null) continue;
                 NPCType type = NPCType.valueOf(typeStr.toUpperCase());
-                factory.createNPC(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 3, 0, 0);
+                factory.createNPC(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 5);
             }
 
-
-            objects = heaven.getLayers().get("Enemies").getObjects();
-            for (MapObject object : objects) {
-                Gdx.app.log("GameScreen", object.toString());
-                Rectangle rect = ((RectangleMapObject) object).getRectangle();
-                String typeStr = object.getProperties().get("type", String.class);
-                if (typeStr == null) continue;
-                EnemyType type = EnemyType.valueOf(typeStr.toUpperCase());
-                factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 1, 0, 1);
-            }
-
-            objects = hell.getLayers().get("Enemies").getObjects();
-            for (MapObject object : objects) {
-                Gdx.app.log("GameScreen", object.toString());
-                Rectangle rect = ((RectangleMapObject) object).getRectangle();
-                String typeStr = object.getProperties().get("type", String.class);
-                if (typeStr == null) continue;
-                EnemyType type = EnemyType.valueOf(typeStr.toUpperCase());
-                factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 1, 0, -1);
-            }
-
+            initRemovableCollision( bigWorld.getLayers().get("RemovableCollision"));
 
             initialized = true;
         }
 
         cameraManager.getCamera().zoom = zoom;
         InputManager.getInstance().getMultiplexer().addProcessor(InputManager.getInstance());
+
     }
+
+
+    public void initRemovableCollision(MapLayer layer) {
+        for (MapObject object : layer.getObjects()) {
+            if (object instanceof RectangleMapObject rectObj) {
+                Rectangle rect = rectObj.getRectangle();
+
+                BodyDef bodyDef = new BodyDef();
+                bodyDef.type = BodyDef.BodyType.StaticBody;
+                bodyDef.position.set((rect.x + rect.width / 2) / PPM, (rect.y + rect.height / 2) / PPM);
+
+                Body body = world.createBody(bodyDef);
+
+                PolygonShape shape = new PolygonShape();
+                shape.setAsBox(rect.width / 2 / PPM, rect.height / 2 / PPM);
+
+                FixtureDef fixtureDef = new FixtureDef();
+                fixtureDef.shape = shape;
+                fixtureDef.isSensor = false;
+
+                body.createFixture(fixtureDef).setUserData("removable");
+
+                shape.dispose();
+
+                String id = object.getName();
+                if (id != null && !id.isEmpty()) {
+                    removableBodies.put(id, body);
+                } else {
+                    Gdx.app.error("CollisionManager", "Removable object has no name!");
+                }
+            }
+        }
+    }
+    public void removeBlock(String id) {
+        Body body = removableBodies.get(id);
+        if (body != null) {
+            world.destroyBody(body);
+            removableBodies.remove(id);
+        }
+    }
+
 
     /**
      * Called when the screen should render itself.
@@ -210,6 +226,14 @@ instance = this;
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         world.step(delta, 6, 2);
+
+        if (GameState.instance.talkedToNun) {
+            removeBlock("cemetery_block");
+        }
+
+        if (GameState.instance.gotBlessing) {
+            removeBlock("bridge_block");
+        }
 
         engine.update(delta);
     }
@@ -254,7 +278,7 @@ instance = this;
      */
     @Override
     public void dispose() {
-        heaven.dispose();
+        bigWorld.dispose();
         //   renderer.dispose();
         batch.dispose();
         world.dispose();

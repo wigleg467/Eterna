@@ -6,7 +6,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.*;
+import com.sillyrilly.gamelogic.ecs.utils.Dialogue;
 import com.sillyrilly.gamelogic.ecs.utils.DialogueWindow;
+import com.sillyrilly.gamelogic.ecs.utils.GameState;
+import com.sillyrilly.gamelogic.ecs.utils.NPCType;
 
 import static com.sillyrilly.gamelogic.ecs.utils.DialogueStorage.getDialogue;
 
@@ -59,8 +62,28 @@ public class InteractionSystem extends EntitySystem {
                     Gdx.app.error("InteractionSystem", "NPCComponent або npcType дорівнює null");
                     continue;
                 }
-                dialogueWindow.showDialogue(getDialogue(npcComp.npcType));
-                break;
+               npcComp = nm.get(npc);
+                Dialogue dialogue = getDialogue(npcComp.npcType, npcComp.dialogueStage);
+                NPCComponent finalNpcComp = npcComp;
+                dialogueWindow.onDialogueEnd = () -> {
+                    if (finalNpcComp.npcType == NPCType.NUN && finalNpcComp.dialogueStage == 2) {
+                        GameState.instance.gotBlessing = true;
+                    }
+                    else   if (finalNpcComp.npcType == NPCType.NUN && finalNpcComp.dialogueStage == 0) {
+                        GameState.instance.talkedToNun = true;
+                        finalNpcComp.dialogueStage++;
+                    }
+                    else   if (finalNpcComp.npcType == NPCType.NUN && finalNpcComp.dialogueStage == 1&&GameState.instance.defeatedCemeteryMonsters) {
+                        finalNpcComp.dialogueStage++;
+                    }
+                    else if (finalNpcComp.npcType == NPCType.LUMBERJACK&&finalNpcComp.dialogueStage == 0) {
+                        finalNpcComp.dialogueStage++;
+                    }
+                    else if (finalNpcComp.npcType == NPCType.LUMBERJACK&& GameState.instance.defeatedForestMonsters) {
+                        finalNpcComp.dialogueStage++;
+                    }
+                };
+                dialogueWindow.showDialogue(dialogue);
             }
         }
     }
