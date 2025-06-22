@@ -1,8 +1,7 @@
 package com.sillyrilly.gamelogic.ecs.utils;
 
 public enum EntityType implements Animatable {
-    PLAYER("animations/player.atlas"),
-    NPC("animations/npc.atlas");
+    PLAYER("animations/player.atlas");
 
 
     private final String path;

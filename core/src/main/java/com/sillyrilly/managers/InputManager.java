@@ -5,7 +5,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.math.Vector2;
-import com.sillyrilly.gamelogic.ecs.components.AnimationComponent;
+import com.sillyrilly.gamelogic.ecs.components.AnimationButtomComponent;
+import com.sillyrilly.gamelogic.ecs.components.AnimationTopComponent;
+import com.sillyrilly.gamelogic.ecs.components.WeaponComponent;
 import com.sillyrilly.gamelogic.ecs.systems.CameraFollowSystem;
 
 public class InputManager extends InputAdapter {
@@ -13,10 +15,12 @@ public class InputManager extends InputAdapter {
     public static InputMultiplexer multiplexer;
 
     private final Vector2 movement = new Vector2();
-    private AnimationComponent.State state;
-
+    private AnimationButtomComponent.BottomState bottomState;
+    private AnimationTopComponent.TopState topState;
+    private boolean changeCamera = false;
     private boolean canAttack = true;
     private boolean debug = false;
+    private WeaponComponent.WeaponType currentWeapon = WeaponComponent.WeaponType.SWORD;
 
     private static boolean isInitialized = false;
 
@@ -33,40 +37,45 @@ public class InputManager extends InputAdapter {
     }
 
     public void update() {
-        state = AnimationComponent.State.IDLE;
+
+        topState = AnimationTopComponent.TopState.IDLE;
+        bottomState = AnimationButtomComponent.BottomState.IDLE;
+
 
         movement.set(0, 0);
 
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            if (state != AnimationComponent.State.ATTACK) {
-                state = AnimationComponent.State.ATTACK;
-            }
-        } else {
-            // ### Рух ###
-            if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-                movement.y += 1;
-                state = AnimationComponent.State.WALK;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-                movement.y -= 1;
-                state = AnimationComponent.State.WALK;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-                movement.x -= 1;
-                state = AnimationComponent.State.WALK;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-                movement.x += 1;
-                state = AnimationComponent.State.WALK;
-            }
+        boolean isAttacking = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
+        boolean isMoving = false;
 
-            if (movement.len2() > 0) {
-                movement.nor();
-            } else {
-                state = AnimationComponent.State.IDLE;
-            }
+        // Спочатку перевіряємо рух — незалежно від атаки
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            movement.y += 1;
+            isMoving = true;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            movement.y -= 1;
+            isMoving = true;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            movement.x -= 1;
+            isMoving = true;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            movement.x += 1;
+            isMoving = true;
         }
 
+        if (movement.len2() > 0) {
+            movement.nor();
+        }
+
+        if (isAttacking) {
+            topState = AnimationTopComponent.TopState.ATTACK;
+        }
+
+        bottomState = isMoving
+            ? AnimationButtomComponent.BottomState.WALK
+            : AnimationButtomComponent.BottomState.IDLE;
         if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) {
             debug = !debug;
         }
@@ -93,15 +102,37 @@ public class InputManager extends InputAdapter {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             ScreenManager.instance.setMenuScreen();
         }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+            currentWeapon = WeaponComponent.WeaponType.SWORD;
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+            currentWeapon = WeaponComponent.WeaponType.AXE;
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
+            currentWeapon = WeaponComponent.WeaponType.FORK;
+        }
     }
 
     public boolean isDebugMode() {
         return debug;
     }
 
-    public AnimationComponent.State getState() {
-        return state;
+    public void setChangeCamera(boolean changeCamera) {
+        this.changeCamera = changeCamera;
     }
+
+    public InputMultiplexer getMultiplexer() {
+        return multiplexer;
+    }
+
+    public AnimationTopComponent.TopState getTopState() {
+        return topState;
+    }
+
+    public AnimationButtomComponent.BottomState getBottomState() {
+        return bottomState;
+    }
+
 
     public Vector2 getMovement() {
         return movement;
@@ -113,5 +144,13 @@ public class InputManager extends InputAdapter {
 
     public void setCanAttack(boolean canAttack) {
         this.canAttack = canAttack;
+    }
+
+    public WeaponComponent.WeaponType getCurrentWeapon() {
+        return currentWeapon;
+    }
+
+    public void setCurrentWeapon(WeaponComponent.WeaponType type) {
+        this.currentWeapon = type;
     }
 }

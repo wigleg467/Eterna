@@ -36,20 +36,13 @@ public class NavigationMap {
                 int endY = (int) ((rect.y + rect.height) / TILE_SIZE);
 
                 // Відмічаємо всі клітинки, які перетинає прямокутник
-                for (int x = startX; x <= endX && x < mapWidth; x++) {
-                    for (int y = startY; y <= endY && y < mapHeight; y++) {
+                for (int x = startX; x <= endX && x >= 0 && x < mapWidth; x++) {
+                    for (int y = startY; y <= endY && y >= 0 && y < mapHeight; y++) {
+                        Gdx.app.log("NavigationMap", x + ", " + y);
                         grid[x][y] = 1; // блокована клітинка
                     }
                 }
             }
         }
-    }
-
-    public boolean isWalkable(int x, int y) {
-        return grid[x][y] == 0;
-    }
-
-    public int[][] getGrid() {
-        return grid;
     }
 }

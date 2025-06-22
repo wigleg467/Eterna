@@ -1,11 +1,10 @@
 package com.sillyrilly.screens;
 
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -13,16 +12,17 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.sillyrilly.gamelogic.ecs.ai.NavigationMap;
 import com.sillyrilly.gamelogic.ecs.ai.TileGraph;
 import com.sillyrilly.gamelogic.ecs.entities.EntityFactory;
 import com.sillyrilly.gamelogic.ecs.systems.*;
+import com.sillyrilly.gamelogic.ecs.utils.DialogueWindow;
 import com.sillyrilly.gamelogic.ecs.utils.EnemyType;
-import com.sillyrilly.gamelogic.ecs.ai.NavigationMap;
 import com.sillyrilly.managers.CameraManager;
 import com.sillyrilly.managers.InputManager;
 import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
-
-import java.util.Arrays;
 
 import static com.sillyrilly.managers.AssetsManager.*;
 import static com.sillyrilly.util.Const.*;
@@ -32,7 +32,10 @@ public class GameScreen implements Screen {
 
     private Engine engine;
     private World world;
-
+//    private Skin skin;
+//    private Window.WindowStyle style;
+//    public DialogueWindow dialogueWindow;
+//    private BitmapFont customFont;
     private float zoom = 0.6f;
     private boolean initialized = false;
 

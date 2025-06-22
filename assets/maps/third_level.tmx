@@ -302,7 +302,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="10" name="Enemies">
+ <objectgroup id="10" name="Enemies" visible="0">
   <object id="168" name="ANGEL" x="2217.33" y="785">
    <properties>
     <property name="type" value="angel"/>

@@ -235,7 +235,7 @@ public class MenuScreen implements Screen {
 
         time += delta;
 
-        if (isInitialized) camera.position.set(CENTRE_X, CENTRE_Y, 0);
+        camera.position.set(CENTRE_X, CENTRE_Y, 0);
         camera.update();
         batch.setProjectionMatrix(camera.combined);
     }

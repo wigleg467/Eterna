@@ -10,20 +10,27 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.utils.Array;
 import com.sillyrilly.gamelogic.ecs.ai.NavigationMap;
 import com.sillyrilly.gamelogic.ecs.components.*;
 import com.sillyrilly.gamelogic.ecs.ai.TileGraph;
 import com.sillyrilly.gamelogic.ecs.ai.TileNode;
 import com.sillyrilly.managers.*;
+import com.sillyrilly.gamelogic.ecs.components.*;
+import com.sillyrilly.managers.CameraManager;
+import com.sillyrilly.managers.InputManager;
+import com.sillyrilly.screens.GameScreen;
 
 import static com.sillyrilly.util.Const.*;
 
 public class RenderSystem extends EntitySystem {
     private final ComponentMapper<AnimationComponent> ac = ComponentMapper.getFor(AnimationComponent.class);
+    private final ComponentMapper<AnimationButtomComponent> acb = ComponentMapper.getFor(AnimationButtomComponent.class);
+    private final ComponentMapper<AnimationTopComponent> act = ComponentMapper.getFor(AnimationTopComponent.class);
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<LevelComponent> lc = ComponentMapper.getFor(LevelComponent.class);
     private final ComponentMapper<TileComponent> tc = ComponentMapper.getFor(TileComponent.class);
@@ -58,6 +65,11 @@ public class RenderSystem extends EntitySystem {
         renderEntities();
         batch.end();
 
+        //    batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+        //    batch.begin();
+        //    GameScreen.instance.dialogueWindow.render(batch);
+        //    batch.end();
+
         debugMode();
     }
 
@@ -87,7 +99,33 @@ public class RenderSystem extends EntitySystem {
 
     private void renderEntities() {
         for (Entity entity : sortedEntities) {
-            if (ac.has(entity)) {
+            if (entity.getComponent(PlayerComponent.class) != null) {
+
+
+                BodyComponent body = bc.get(entity);
+                AnimationTopComponent topAnim = act.get(entity);
+                AnimationButtomComponent bottomAnim = acb.get(entity);
+
+                Vector2 pos = body.getPosition().scl(PPM);
+                float scale = 0.25f;
+
+                // нижня частина
+                TextureAtlas.AtlasRegion bottomFrame = bottomAnim.currentFrame;
+                //  if (bottomFrame != null) {
+                float width = bottomFrame.getRegionWidth() * scale;
+                float height = bottomFrame.getRegionHeight() * scale;
+                batch.draw(bottomFrame, pos.x - width / 2f, pos.y, width, height);
+                //  }
+
+                // верхня частина (малюємо вище)
+                TextureAtlas.AtlasRegion topFrame = topAnim.currentFrame;
+                // if (topFrame != null) {
+                width = topFrame.getRegionWidth() * scale;
+                height = topFrame.getRegionHeight() * scale;
+                batch.draw(topFrame, pos.x - width / 2f, pos.y, width, height);
+                //    }
+
+            } else if (ac.has(entity)) {
                 AnimationComponent anim = ac.get(entity);
                 BodyComponent body = bc.get(entity);
 

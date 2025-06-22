@@ -12,77 +12,117 @@ public class AnimationSystem extends EntitySystem {
     private final ComponentMapper<AnimationComponent> am = ComponentMapper.getFor(AnimationComponent.class);
     private final ComponentMapper<FacingComponent> fm = ComponentMapper.getFor(FacingComponent.class);
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<AnimationButtomComponent> abc = ComponentMapper.getFor(AnimationButtomComponent.class);
+    private final ComponentMapper<AnimationTopComponent> atc = ComponentMapper.getFor(AnimationTopComponent.class);
 
     private ImmutableArray<Entity> entities;
+    private Entity player;
 
     public AnimationSystem() {
     }
 
     @Override
     public void addedToEngine(Engine engine) {
-        entities = engine.getEntitiesFor(Family.all(AnimationComponent.class, FacingComponent.class).get());
+        entities = engine.getEntitiesFor(Family.all(FacingComponent.class, BodyComponent.class).get());
+        player = engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
     }
 
     @Override
     public void update(float deltaTime) {
         for (Entity entity : entities) {
-            AnimationComponent anim = am.get(entity);
             FacingComponent facing = fm.get(entity);
-
             BodyComponent body = bc.get(entity);
             Vector2 movement = body.body.getLinearVelocity();
 
-            if (movement.x > 0.1f)
+
+            if (movement.x > 0.1f) {
                 facing.facingRight = true;
-            else if (movement.x < -0.1f)
+            } else if (movement.x < -0.1f) {
                 facing.facingRight = false;
+            }
 
+            // --------- PLAYER ---------
             if (entity.getComponent(PlayerComponent.class) != null) {
-                AnimationComponent.State inputState = InputManager.instance.getState();
+                AnimationButtomComponent bottom = abc.get(entity);
+                AnimationTopComponent top = atc.get(entity);
 
-                // Якщо анімація атаки ще не завершена — не змінюємо стан
-                if (anim.currentState == AnimationComponent.State.ATTACK) {
-                    anim.stateTime += deltaTime;
 
-                    Animation<TextureAtlas.AtlasRegion> attackAnim = anim.animations.get(AnimationComponent.State.ATTACK);
-                    if (attackAnim.isAnimationFinished(anim.stateTime)) {
-                        // Атака завершена — повертаємось до поточного введеного стану (наприклад, WALK або IDLE)
-                        anim.currentState = inputState;
-                        anim.stateTime = 0f;
+                AnimationTopComponent.TopState topInputState = InputManager.instance.getTopState();
+                AnimationButtomComponent.BottomState bottomInputState = InputManager.instance.getBottomState();
+                WeaponComponent.WeaponType weapon = InputManager.instance.getCurrentWeapon();
+
+                // --- TOP STATE ---
+
+                if (top.currentState == AnimationTopComponent.TopState.ATTACK) {
+                    top.stateTime += deltaTime;
+                    bottom.stateTime += deltaTime;
+
+                    Animation<TextureAtlas.AtlasRegion> attackAnim = top.getAnimation(weapon, AnimationTopComponent.TopState.ATTACK);
+                    if (attackAnim != null && attackAnim.isAnimationFinished(top.stateTime)) {
+                        top.currentState = topInputState;
+                        top.stateTime = 0f;
                         InputManager.instance.setCanAttack(true);
                     }
                 } else {
-                    // Якщо не атака — просто оновлюємо стан і таймер
-                    if (anim.currentState != inputState) {
-                        anim.currentState = inputState;
-                        anim.stateTime = 0f;
+                    if (top.currentState != topInputState) {
+                        top.currentState = topInputState;
+                        top.stateTime = 0f;
                     } else {
-                        anim.stateTime += deltaTime;
+                        top.stateTime += deltaTime;
+                    }
+
+                    if (bottom.currentState != bottomInputState) {
+                        bottom.currentState = bottomInputState;
+                        bottom.stateTime = 0f;
+                    } else {
+                        bottom.stateTime += deltaTime;
                     }
                 }
 
-                Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
-                TextureAtlas.AtlasRegion frame = currentAnim.getKeyFrame(anim.stateTime, true);
+                // --- UPDATE FRAMES ---
 
-                if (facing != null && !facing.facingRight && !frame.isFlipX()) {
-                    frame.flip(true, false);
-                } else if (facing != null && facing.facingRight && frame.isFlipX()) {
-                    frame.flip(true, false);
+                Animation<TextureAtlas.AtlasRegion> currentTopAnim = top.getAnimation(weapon, top.currentState);
+                Animation<TextureAtlas.AtlasRegion> currentBottomAnim = bottom.animations.get(bottom.currentState);
+
+
+                TextureAtlas.AtlasRegion topCurrentFrame = currentTopAnim.getKeyFrame(top.stateTime, true);
+                TextureAtlas.AtlasRegion bottomCurrentFrame = currentBottomAnim.getKeyFrame(bottom.stateTime, true);
+
+                // --- FLIPPING ---
+                if (!facing.facingRight) {
+                    if (!topCurrentFrame.isFlipX()) topCurrentFrame.flip(true, false);
+                    if (!bottomCurrentFrame.isFlipX()) bottomCurrentFrame.flip(true, false);
+                } else {
+                    if (topCurrentFrame.isFlipX()) topCurrentFrame.flip(true, false);
+                    if (bottomCurrentFrame.isFlipX()) bottomCurrentFrame.flip(true, false);
                 }
-                anim.currentFrame = frame;
-            } else if (entity.getComponent(EnemyComponent.class) != null) {
+
+                top.currentFrame = topCurrentFrame;
+                bottom.currentFrame = bottomCurrentFrame;
+            }
+
+
+            // --------- ENEMY ---------
+            else if (entity.getComponent(EnemyComponent.class) != null) {
+                AnimationComponent anim = am.get(entity);
                 Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
                 if (currentAnim == null) continue;
+
                 TextureAtlas.AtlasRegion frame = currentAnim.getKeyFrame(anim.stateTime, true);
+                anim.stateTime += deltaTime;
 
+                if (!facing.facingRight && !frame.isFlipX()) frame.flip(true, false);
+                if (facing.facingRight && frame.isFlipX()) frame.flip(true, false);
 
-                if (facing != null && !facing.facingRight && !frame.isFlipX()) {
-                    frame.flip(true, false);
-                } else if (facing != null && facing.facingRight && frame.isFlipX()) {
-                    frame.flip(true, false);
-                }
                 anim.currentFrame = frame;
-                // Якщо це не гравець — просто оновлюємо таймер
+            }
+            // --------- NPC ---------
+            else if (entity.getComponent(NPCComponent.class) != null) {
+                AnimationComponent anim = am.get(entity);
+                Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
+                if (currentAnim == null) continue;
+
+                anim.currentFrame = currentAnim.getKeyFrame(anim.stateTime, true);
                 anim.stateTime += deltaTime;
             }
         }
