@@ -34,8 +34,8 @@ public class NavigationMap {
                 // Конвертуємо координати з пікселів у клітинки
                 int startX = (int) (rect.x / tileWidth);
                 int startY = (int) (rect.y / tileHeight);
-                int endX = (int) ((rect.x + rect.width) / tileWidth);
-                int endY = (int) ((rect.y + rect.height) / tileHeight);
+                int endX = (int) ((rect.x + rect.width) / tileWidth) - 1;
+                int endY = (int) ((rect.y + rect.height) / tileHeight) - 1;
 
                 // Відмічаємо всі клітинки, які перетинає прямокутник
                 for (int x = startX; x <= endX && x < mapWidth; x++) {

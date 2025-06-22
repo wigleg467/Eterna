@@ -129,24 +129,24 @@ instance = this;
             factory.createObjectLayer(realWorld, "Collision_lvl_1", 1, 1, 0.01f, 0.01f, 0, 0);
 
 
-            factory.createTileLayer(hell, "props", 3, 0, -1);
-            factory.createTileLayer(hell, "base", 0, 0, -1);
-            factory.createTileLayer(hell, "lava", 1, 0, -1);
-            factory.createTileLayer(hell, "path", 2, 0, -1);
-            factory.createTileLayer(hell, "base2", 2, 0, -1);
-            factory.createTileLayer(hell, "web", 4, 0, -1);
-            factory.createObjectLayer(hell, "Collision_lvl_2", 1, 1, 0.01f, 0.01f, 0, -1);
-            factory.createObjectLayer(hell, "Enemies", 1, 1, 0.01f, 0.01f, 0, -1);
+            factory.createTileLayer(hell, "props", 3, 0, -4);
+            factory.createTileLayer(hell, "base", 0, 0, -4);
+            factory.createTileLayer(hell, "lava", 1, 0, -4);
+            factory.createTileLayer(hell, "path", 2, 0, -4);
+            factory.createTileLayer(hell, "base2", 2, 0, -4);
+            factory.createTileLayer(hell, "web", 4, 0, -4);
+            factory.createObjectLayer(hell, "Collision_lvl_2", 1, 1, 0.01f, 0.01f, 0, -4);
+            factory.createObjectLayer(hell, "Enemies", 1, 1, 0.01f, 0.01f, 0, -4);
 
-            factory.createTileLayer(heaven, "props", 3, 0, 1);
-            factory.createTileLayer(heaven, "base", 0, 0, 1);
-            factory.createTileLayer(heaven, "base2", 1, 0, 1);
-            factory.createTileLayer(heaven, "base3", 2, 0, 1);
-            factory.createTileLayer(heaven, "base4", 2, 0, 1);
-            factory.createTileLayer(heaven, "castle", 5, 0, 1);
-            factory.createTileLayer(heaven, "clouds", 4, 0, 1);
-            factory.createObjectLayer(heaven, "Collision_lvl_3", 1, 1, 0.01f, 0.01f, 0, 1);
-            factory.createObjectLayer(heaven, "Enemies", 1, 1, 0.01f, 0.01f, 0, 1);
+            factory.createTileLayer(heaven, "props", 3, 0, 4);
+            factory.createTileLayer(heaven, "base", 0, 0, 4);
+            factory.createTileLayer(heaven, "base2", 1, 0, 4);
+            factory.createTileLayer(heaven, "base3", 2, 0, 4);
+            factory.createTileLayer(heaven, "base4", 2, 0, 4);
+            factory.createTileLayer(heaven, "castle", 5, 0, 4);
+            factory.createTileLayer(heaven, "clouds", 4, 0, 4);
+            factory.createObjectLayer(heaven, "Collision_lvl_3", 1, 1, 0.01f, 0.01f, 0, 4);
+            factory.createObjectLayer(heaven, "Enemies", 1, 1, 0.01f, 0.01f, 0, 4);
 
 
             MapObjects objects = realWorld.getLayers().get("Enemies").getObjects();

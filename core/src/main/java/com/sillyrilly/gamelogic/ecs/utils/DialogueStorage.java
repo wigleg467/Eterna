@@ -20,6 +20,12 @@ public class DialogueStorage {
                 "Не наближайся!",
                 "Я з пекла."
         ));
+        dialogues.put(NPCType.NUN, new Dialogue(
+                NPCType.NUN.getName(),
+                NPCType.NUN.getPortraitPath(),
+                "Слава Ісусу Христу",
+                "У мене пістолет святої води."
+        ));
     }
 
     public static Dialogue getDialogue(NPCType type) {

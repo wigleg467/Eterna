@@ -1,5 +1,5 @@
 player.png
-size: 1920, 700
+size: 1920, 1400
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
@@ -24,34 +24,87 @@ bottom_walk_right
   orig: 480, 350
   offset: 0, 0
   index: 1
-top_idle
+top_attack_sword
+  rotate: false
+  xy: 1440, 0
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 0
+top_attack_sword
+  rotate: false
+  xy: 0, 350
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 1
+top_attack_sword
+  rotate: false
+  xy: 480, 350
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 2
+top_attack_axe
   rotate: false
   xy: 960, 350
   size: 480, 350
   orig: 480, 350
   offset: 0, 0
   index: 0
-  top_attack
-    rotate: false
-    xy: 1440, 0
-    size: 480, 350
-    orig: 480, 350
-    offset: 0, 0
-    index: 0
-  top_attack
-    rotate: false
-    xy: 0, 350
-    size: 480, 350
-    orig: 480, 350
-    offset: 0, 0
-    index: 1
-  top_attack
-    rotate: false
-    xy: 480, 350
-    size: 480, 350
-    orig: 480, 350
-    offset: 0, 0
-    index: 2
-
-
-
+top_attack_axe
+  rotate: false
+  xy: 1440, 350
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 1
+top_attack_axe
+  rotate: false
+  xy: 0, 700
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 2
+top_attack_fork
+  rotate: false
+  xy: 480, 700
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 0
+top_attack_fork
+  rotate: false
+  xy: 960, 700
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 1
+top_attack_fork
+  rotate: false
+  xy: 1440, 700
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 2
+top_idle_sword
+  rotate: false
+  xy: 0, 1050
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 0
+top_idle_axe
+  rotate: false
+  xy: 480, 1050
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 0
+top_idle_fork
+  rotate: false
+  xy: 960, 1050
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 0

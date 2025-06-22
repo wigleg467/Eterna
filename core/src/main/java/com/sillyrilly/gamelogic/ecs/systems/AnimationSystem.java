@@ -2,7 +2,6 @@ package com.sillyrilly.gamelogic.ecs.systems;
 
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
@@ -37,40 +36,43 @@ public class AnimationSystem extends EntitySystem {
             BodyComponent body = bc.get(entity);
             Vector2 movement = body.body.getLinearVelocity();
 
-            if (movement.x > 0.1f)
+
+            if (movement.x > 0.1f) {
                 facing.facingRight = true;
-            else if (movement.x < -0.1f)
+            } else if (movement.x < -0.1f) {
                 facing.facingRight = false;
-
-
+            }
 
             // --------- PLAYER ---------
             if (entity.getComponent(PlayerComponent.class) != null) {
                 AnimationButtomComponent bottom = abc.get(entity);
                 AnimationTopComponent top = atc.get(entity);
+
+
                 AnimationTopComponent.TopState topInputState = InputManager.getInstance().getTopState();
                 AnimationButtomComponent.BottomState bottomInputState = InputManager.getInstance().getBottomState();
+                WeaponComponent.WeaponType weapon = InputManager.getInstance().getCurrentWeapon();
 
                 // --- TOP STATE ---
 
                 if (top.currentState == AnimationTopComponent.TopState.ATTACK) {
                     top.stateTime += deltaTime;
                     bottom.stateTime += deltaTime;
-                    Animation<TextureAtlas.AtlasRegion> attackAnim = top.animations.get(AnimationTopComponent.TopState.ATTACK);
-                    if (attackAnim.isAnimationFinished(top.stateTime)) {
-                        // Атака завершена — повертаємось до поточного введеного стану (наприклад, WALK або IDLE)
+
+                    Animation<TextureAtlas.AtlasRegion> attackAnim = top.getAnimation(weapon, AnimationTopComponent.TopState.ATTACK);
+                    if (attackAnim != null && attackAnim.isAnimationFinished(top.stateTime)) {
                         top.currentState = topInputState;
                         top.stateTime = 0f;
                         InputManager.getInstance().setCanAttack(true);
                     }
                 } else {
-                    // Якщо не атака — просто оновлюємо стан і таймер
                     if (top.currentState != topInputState) {
                         top.currentState = topInputState;
                         top.stateTime = 0f;
                     } else {
                         top.stateTime += deltaTime;
                     }
+
                     if (bottom.currentState != bottomInputState) {
                         bottom.currentState = bottomInputState;
                         bottom.stateTime = 0f;
@@ -81,12 +83,12 @@ public class AnimationSystem extends EntitySystem {
 
                 // --- UPDATE FRAMES ---
 
-                Animation<TextureAtlas.AtlasRegion> currentTopAnim = top.animations.get(top.currentState);
-                TextureAtlas.AtlasRegion topCurrentFrame = currentTopAnim.getKeyFrame(top.stateTime, true);
-
+                Animation<TextureAtlas.AtlasRegion> currentTopAnim = top.getAnimation(weapon, top.currentState);
                 Animation<TextureAtlas.AtlasRegion> currentBottomAnim = bottom.animations.get(bottom.currentState);
-                TextureAtlas.AtlasRegion bottomCurrentFrame = currentBottomAnim.getKeyFrame(bottom.stateTime, true);
 
+
+                TextureAtlas.AtlasRegion topCurrentFrame = currentTopAnim.getKeyFrame(top.stateTime, true);
+                TextureAtlas.AtlasRegion bottomCurrentFrame = currentBottomAnim.getKeyFrame(bottom.stateTime, true);
 
                 // --- FLIPPING ---
                 if (!facing.facingRight) {
@@ -96,10 +98,10 @@ public class AnimationSystem extends EntitySystem {
                     if (topCurrentFrame.isFlipX()) topCurrentFrame.flip(true, false);
                     if (bottomCurrentFrame.isFlipX()) bottomCurrentFrame.flip(true, false);
                 }
-                Gdx.app.log("ANIM", "Top state: " + top.currentState + ", frames: " + top.animations.get(top.currentState).getKeyFrames().length);
 
-                top.currentFrame = currentTopAnim.getKeyFrame(top.stateTime, true);
-                bottom.currentFrame = currentBottomAnim.getKeyFrame(bottom.stateTime, true);}
+                top.currentFrame = topCurrentFrame;
+                bottom.currentFrame = bottomCurrentFrame;
+            }
 
 
             // --------- ENEMY ---------

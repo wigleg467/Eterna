@@ -7,6 +7,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.AnimationButtomComponent;
 import com.sillyrilly.gamelogic.ecs.components.AnimationTopComponent;
+import com.sillyrilly.gamelogic.ecs.components.WeaponComponent;
 import com.sillyrilly.gamelogic.ecs.systems.CameraFollowSystem;
 
 public class InputManager extends InputAdapter {
@@ -20,6 +21,7 @@ public class InputManager extends InputAdapter {
     private boolean changeCamera = false;
     private boolean canAttack = true;
     private boolean debug = false;
+    private WeaponComponent.WeaponType currentWeapon = WeaponComponent.WeaponType.SWORD;
 
     private InputManager() {
         this.multiplexer = new InputMultiplexer();
@@ -37,6 +39,7 @@ public class InputManager extends InputAdapter {
 
         topState = AnimationTopComponent.TopState.IDLE;
         bottomState = AnimationButtomComponent.BottomState.IDLE;
+
 
 
 
@@ -100,6 +103,15 @@ public class InputManager extends InputAdapter {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             ScreenManager.getInstance().setScreen(ScreenManager.ScreenType.MENU);
         }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+            currentWeapon = WeaponComponent.WeaponType.SWORD;
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+            currentWeapon = WeaponComponent.WeaponType.AXE;
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
+            currentWeapon = WeaponComponent.WeaponType.FORK;
+        }
     }
 
     public boolean isDebug() {
@@ -136,6 +148,12 @@ public class InputManager extends InputAdapter {
 
     public void setCanAttack(boolean canAttack) {
         this.canAttack = canAttack;
+    }
+    public WeaponComponent.WeaponType getCurrentWeapon() {
+        return currentWeapon;
+    }
+    public void setCurrentWeapon(WeaponComponent.WeaponType type) {
+        this.currentWeapon = type;
     }
 }
 

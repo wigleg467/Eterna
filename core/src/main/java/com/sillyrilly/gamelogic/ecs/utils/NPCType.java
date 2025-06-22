@@ -2,7 +2,8 @@ package com.sillyrilly.gamelogic.ecs.utils;
 
 public enum NPCType implements Animatable {
     LUMBERJACK("animations/lumberjack.atlas", 1f, 1f, "Лісоруб", "portraits/lumberjack.png"),
-    DEMON("animations/demon.atlas", 1f, 1f, "Демон", "portraits/lumberjack.png"),;
+    DEMON("animations/demon.atlas", 1f, 1f, "Демон", "portraits/lumberjack.png"),
+    NUN("animations/nun.atlas", 1f, 1f, "Монахиня", "portraits/lumberjack.png");
     private final String path, ukrName, portrait;
     private final float w, h;
 

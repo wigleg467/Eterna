@@ -64,7 +64,8 @@ public class EntityFactory {
         entity.add(new LevelComponent(lvl));
         entity.add(new PlayerComponent(bc));
         entity.add(new AnimationButtomComponent(EntityType.PLAYER,  "bottom_idle", "bottom_walk_right"));
-        entity.add(new AnimationTopComponent(EntityType.PLAYER,  "top_idle", "top_attack"));
+        entity.add(new AnimationTopComponent(EntityType.PLAYER));
+        entity.add(new WeaponComponent(WeaponComponent.WeaponType.SWORD));
         engine.addEntity(entity);
 
         Gdx.app.log("Create", "Player");
