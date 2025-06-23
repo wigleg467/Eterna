@@ -1,7 +1,6 @@
 package com.sillyrilly;
 
 import com.badlogic.gdx.Game;
-import com.sillyrilly.managers.DialogueManager;
 import com.sillyrilly.managers.*;
 import com.sillyrilly.util.Const;
 

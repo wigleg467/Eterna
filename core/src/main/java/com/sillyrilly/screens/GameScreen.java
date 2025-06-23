@@ -19,8 +19,8 @@ import com.sillyrilly.gamelogic.ecs.entities.EntityFactory;
 import com.sillyrilly.gamelogic.ecs.systems.*;
 import com.sillyrilly.gamelogic.ecs.utils.DialogueWindow;
 import com.sillyrilly.gamelogic.ecs.utils.EnemyType;
-import com.sillyrilly.gamelogic.ecs.utils.GameState;
 import com.sillyrilly.gamelogic.ecs.utils.NPCType;
+import com.sillyrilly.managers.AudioManager;
 import com.sillyrilly.managers.CameraManager;
 import com.sillyrilly.managers.InputManager;
 import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
@@ -28,6 +28,7 @@ import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.sillyrilly.gamelogic.ecs.utils.GameState.*;
 import static com.sillyrilly.managers.AssetsManager.bigWorld;
 import static com.sillyrilly.managers.FontManager.MENU_hoverFont;
 import static com.sillyrilly.util.Const.PPM;
@@ -35,17 +36,13 @@ import static com.sillyrilly.util.Const.TILE_SCALE;
 
 public class GameScreen implements Screen {
     public static GameScreen instance;
-
-    private OrthographicCamera camera;
-
-    private Engine engine;
-    private World world;
-
-    private float zoom = 0.6f;
-    private boolean initialized = false;
-
     private final Map<String, Body> removableBodies = new HashMap<>();
     public DialogueWindow dialogueWindow;
+    private OrthographicCamera camera;
+    private Engine engine;
+    private World world;
+    private float zoom = 0.6f;
+    private boolean initialized = false;
 
     @Override
     public void show() {
@@ -68,6 +65,10 @@ public class GameScreen implements Screen {
 
         camera.zoom = zoom;
         Gdx.input.setCursorCatched(true);
+
+        if (!hell) AudioManager.instance.playMusic(AudioManager.MusicType.MAIN_THEME);
+        else AudioManager.instance.playMusic(AudioManager.MusicType.HELL);
+
         InputManager.multiplexer.addProcessor(InputManager.instance);
     }
 
@@ -78,13 +79,10 @@ public class GameScreen implements Screen {
 
         world.step(delta, 6, 2);
 
-        if (GameState.instance.talkedToNun) {
+        if (talkedToNun)
             removeBlock("cemetery_block");
-        }
-
-        if (GameState.instance.gotBlessing) {
+        if (gotBlessing)
             removeBlock("bridge_block");
-        }
 
         engine.update(delta);
     }
@@ -171,14 +169,15 @@ public class GameScreen implements Screen {
 
     private void addSystems() {
         engine.addSystem(new InputSystem());
+        engine.addSystem(new MovementSystem());
         engine.addSystem(new CameraFollowSystem());
         engine.addSystem(new AnimationSystem());
-        engine.addSystem(new MovementSystem());
         engine.addSystem(new AISystem());
         engine.addSystem(new EnemyPathfindingSystem());
-        dialogueWindow=new DialogueWindow(new Texture("images/dialogue.png"), MENU_hoverFont);
+        dialogueWindow = new DialogueWindow(new Texture("images/dialogue.png"), MENU_hoverFont);
         engine.addSystem(new InteractionSystem(dialogueWindow));
         engine.addSystem(new AttackSystem());
+        engine.addSystem(new EnemyAttackSystem());
 
         engine.addSystem(new RenderSystem());
     }
@@ -221,5 +220,14 @@ public class GameScreen implements Screen {
             world.destroyBody(body);
             removableBodies.remove(id);
         }
+    }
+
+    private boolean closeEnoughToHouse(Vector2 playerPos) {
+        int houseX = 350;
+        int houseY = 10100;
+        float dx = playerPos.x - houseX;
+        float dy = playerPos.y - houseY;
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
+        return distance < 2f * PPM; // наприклад 2 тайла
     }
 }

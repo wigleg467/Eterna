@@ -1,13 +1,17 @@
 package com.sillyrilly.gamelogic.ecs.systems;
 
 import com.badlogic.ashley.core.*;
-import com.badlogic.ashley.utils.ImmutableArray;import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
+import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.ai.DiagonalHeuristic;
 import com.sillyrilly.gamelogic.ecs.ai.EnemyState;
 import com.sillyrilly.gamelogic.ecs.ai.TileGraph;
 import com.sillyrilly.gamelogic.ecs.ai.TileNode;
 import com.sillyrilly.gamelogic.ecs.components.*;
+
+import static com.sillyrilly.util.Const.PPM;
+import static com.sillyrilly.util.GameConfig.ENEMY_SPEED;
 
 public class EnemyPathfindingSystem extends EntitySystem {
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
@@ -78,8 +82,7 @@ public class EnemyPathfindingSystem extends EntitySystem {
                     pathComp.currentIndex++;
                 } else {
                     direction.nor();
-                    float speed = 200f;
-                    Vector2 velocity = direction.scl(speed * deltaTime);
+                    Vector2 velocity = direction.scl(ENEMY_SPEED * PPM * deltaTime);
                     bce.body.setLinearVelocity(velocity);
                 }
             }

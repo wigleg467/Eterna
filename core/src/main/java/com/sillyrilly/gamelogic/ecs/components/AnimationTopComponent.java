@@ -11,15 +11,11 @@ import java.util.EnumMap;
 import java.util.Map;
 
 public class AnimationTopComponent implements Component {
-    public enum TopState {IDLE, ATTACK}
-
     public Map<WeaponComponent.WeaponType, Map<TopState, Animation<TextureAtlas.AtlasRegion>>> animations =
-            new EnumMap<>(WeaponComponent.WeaponType.class);
-
+        new EnumMap<>(WeaponComponent.WeaponType.class);
     public TextureAtlas.AtlasRegion currentFrame;
     public TopState currentState = TopState.IDLE;
     public float stateTime = 0f;
-
     public AnimationTopComponent(Animatable animatable) {
         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(animatable.getAnimationPath()));
 
@@ -47,4 +43,6 @@ public class AnimationTopComponent implements Component {
         if (stateMap == null) return null;
         return stateMap.get(state);
     }
+
+    public enum TopState {IDLE, ATTACK}
 }

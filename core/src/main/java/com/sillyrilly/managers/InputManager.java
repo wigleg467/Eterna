@@ -10,10 +10,12 @@ import com.sillyrilly.gamelogic.ecs.components.AnimationTopComponent;
 import com.sillyrilly.gamelogic.ecs.components.WeaponComponent;
 import com.sillyrilly.gamelogic.ecs.systems.CameraFollowSystem;
 
+import static com.sillyrilly.gamelogic.ecs.utils.GameState.defeatedHellGatesMonsters;
+
 public class InputManager extends InputAdapter {
     public static InputManager instance;
     public static InputMultiplexer multiplexer;
-
+    private static final boolean isInitialized = false;
     private final Vector2 movement = new Vector2();
     private AnimationButtomComponent.BottomState bottomState;
     private AnimationTopComponent.TopState topState;
@@ -21,8 +23,6 @@ public class InputManager extends InputAdapter {
     private boolean canAttack = true;
     private boolean debug = false;
     private WeaponComponent.WeaponType currentWeapon = WeaponComponent.WeaponType.SWORD;
-
-    private static boolean isInitialized = false;
 
     private InputManager() {
     }
@@ -37,17 +37,14 @@ public class InputManager extends InputAdapter {
     }
 
     public void update() {
-
         topState = AnimationTopComponent.TopState.IDLE;
         bottomState = AnimationButtomComponent.BottomState.IDLE;
-
 
         movement.set(0, 0);
 
         boolean isAttacking = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
         boolean isMoving = false;
 
-        // Спочатку перевіряємо рух — незалежно від атаки
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             movement.y += 1;
             isMoving = true;
@@ -65,6 +62,11 @@ public class InputManager extends InputAdapter {
             isMoving = true;
         }
 
+        bottomState = isMoving
+            ? AnimationButtomComponent.BottomState.WALK
+            : AnimationButtomComponent.BottomState.IDLE;
+
+
         if (movement.len2() > 0) {
             movement.nor();
         }
@@ -73,9 +75,14 @@ public class InputManager extends InputAdapter {
             topState = AnimationTopComponent.TopState.ATTACK;
         }
 
-        bottomState = isMoving
-            ? AnimationButtomComponent.BottomState.WALK
-            : AnimationButtomComponent.BottomState.IDLE;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E))
+            if (defeatedHellGatesMonsters) {
+
+                Gdx.app.log("Transform", "to ASCII");
+                ScreenManager.instance.setScreen(ScreenManager.ScreenType.ASCII);
+            }
+
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) {
             debug = !debug;
         }
@@ -85,12 +92,12 @@ public class InputManager extends InputAdapter {
             CameraFollowSystem.changeCameraSmoothing();
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.EQUALS) && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.EQUALS) && (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT))) {
             // ### Zoom in ###
             CameraManager.instance.setZoom(0.02f);
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.MINUS) && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.MINUS) && (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT))) {
             // ### Zoom out ###
             CameraManager.instance.setZoom(-0.02f);
         }

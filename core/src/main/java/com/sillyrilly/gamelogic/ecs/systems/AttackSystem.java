@@ -5,8 +5,10 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.*;
-import com.sillyrilly.gamelogic.ecs.utils.GameState;
 import com.sillyrilly.managers.InputManager;
+
+import static com.sillyrilly.gamelogic.ecs.utils.GameState.defeatedCemeteryMonsters;
+import static com.sillyrilly.gamelogic.ecs.utils.GameState.defeatedHellGatesMonsters;
 
 public class AttackSystem extends EntitySystem {
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
@@ -36,57 +38,61 @@ public class AttackSystem extends EntitySystem {
 
             boolean facingRight = fcp.facingRight;
 
+            boolean allCemeteryDead = true;
+            boolean allHellGatesDead = true;
+
             for (Entity enemy : enemies) {
                 BodyComponent bce = bc.get(enemy);
-                if (facingRight) {
-                    if (bcp.getPosition().x < bce.getPosition().x) {
-                        if (isEnemyNearPlayer(bcp.getPosition(), bce.getPosition())) {
-                            HealComponent hce = hc.get(enemy);
-                            if (hce.isAlive) {
-                                hce.hp = hce.hp - wcp.type.DAMAGE;
-                                Gdx.app.log("Удар", enemy.toString());
-                            }
-                        }
-                    }
-
-                } else {
-                    if (bcp.getPosition().x > bce.getPosition().x) {
-                        if (isEnemyNearPlayer(bcp.getPosition(), bce.getPosition())) {
-                            HealComponent hce = hc.get(enemy);
-                            if (hce.isAlive) {
-                                hce.hp = hce.hp - wcp.type.DAMAGE;
-                                Gdx.app.log("Удар", enemy.toString());
-                            }
-                        }
-                    }
-                }
                 HealComponent hce = hc.get(enemy);
-                if (!hce.isAlive && isLocationCleared("cemetery")) {
-                    // наприклад:
-                    Gdx.app.log("Location", "Всі вороги на cemetery знищені!");
-                    GameState.instance.defeatedCemeteryMonsters=true;
+                LocationComponent loc = enemy.getComponent(LocationComponent.class);
+
+
+                if (isEnemyNearPlayer(bcp.getPosition(), bce.getPosition(), facingRight)) {
+                    if (hce.isAlive) {
+                        hce.takeDamage(wcp.type.DAMAGE);
+                        hce.hitTimer = 0.15f;
+                        Gdx.app.log("Hit", hce.hp + " " + hce.isAlive);
+                    } else {
+                        bce.body.setActive(false);
+                    }
                 }
+
+
+                // Перевірка на alive
+                if (loc != null && loc.location.equals("cemetery") && hce.isAlive) {
+                    allCemeteryDead = false;
+                }
+                if (loc != null && loc.location.equals("hellGates") && hce.isAlive) {
+                    allHellGatesDead = false;
+                }
+            }
+
+            if (allCemeteryDead) {
+                defeatedCemeteryMonsters = true;
+                Gdx.app.log("Location", "All enemies in cemetery are dead cemetery");
+            }
+            if (allHellGatesDead) {
+                defeatedHellGatesMonsters = true;
+                Gdx.app.log("Location", "All enemies in hellGates are dead");
             }
 
         }
     }
 
-    public boolean isLocationCleared(String locationName) {
-        for (Entity enemy : enemies) {
-            LocationComponent loc = enemy.getComponent(LocationComponent.class);
-            HealComponent heal = hc.get(enemy);
+    private boolean isEnemyNearPlayer(Vector2 p, Vector2 e, boolean facingRight) {
+        float dx = e.x - p.x;
 
-            if (loc != null && loc.location.equals(locationName) && heal != null && heal.isAlive) {
+        if (facingRight) {
+            if (dx < 0) {
                 return false;
             }
+        } else if (dx > 0) {
+            return false;
+        } else {
+            dx = Math.abs(dx);
         }
-        return true;
-    }
 
-
-    private boolean isEnemyNearPlayer(Vector2 p, Vector2 e) {
-        float dx = p.x - e.x;
         float dy = Math.abs(p.y - e.y);
-        return dx <= 32f && dy <= 16f && !(dx == 0 && dy == 0);
+        return dx <= 5f && dy <= 3f;
     }
 }

@@ -3,7 +3,6 @@ package com.sillyrilly.managers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Disposable;
 
 import java.util.Random;
@@ -11,33 +10,21 @@ import java.util.Random;
 import static com.sillyrilly.util.Const.*;
 
 public class AudioManager implements Disposable {
-    public static AudioManager instance;
-
-    public enum MusicType {
-        MAIN_THEME, BASEMENT, HELL, HEAVEN, FORK
-    }
-
-    public enum SoundType {
-        STEPS
-    }
-
     private static final Music[] mainTheme = new Music[23];
+    private static final Sound[] steps = new Sound[5];
+    public static AudioManager instance;
     private static Music basementTheme;
     private static Music hellTheme;
     private static Music forkTheme;
-
-    private static final Sound[] steps = new Sound[5];
-
-    private float globalVolume = AUDIO_VOLUME;
-
     private static boolean isInitialized = false;
+    private float globalVolume = AUDIO_VOLUME;
 
     private AudioManager() {
     }
 
     public static AudioManager initialize() {
         if (!isInitialized) {
-           instance = new AudioManager();
+            instance = new AudioManager();
 
             // Musics init
             for (int i = 0; i < mainTheme.length; i++)
@@ -145,6 +132,14 @@ public class AudioManager implements Disposable {
         hellTheme.play();
         hellTheme.setLooping(true);
         setVolume(volume, MusicType.HELL);
+    }
+
+    public enum MusicType {
+        MAIN_THEME, BASEMENT, HELL, HEAVEN, FORK
+    }
+
+    public enum SoundType {
+        STEPS
     }
 }
 

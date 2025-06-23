@@ -10,52 +10,52 @@ public class DialogueManager {
 
     public static void initialize() {
         dialogues.put(new DialogueKey(NPCType.LUMBERJACK, 0), new Dialogue(
-                NPCType.LUMBERJACK.getName(),
-                NPCType.LUMBERJACK.getPortraitPath(),
-                "Привіт, друже!",
-                "Я рубаю дрова.",
-                "Можеш допомогти?"
+            NPCType.LUMBERJACK.getName(),
+            NPCType.LUMBERJACK.getPortraitPath(),
+            "Привіт, друже!",
+            "Я рубаю дрова.",
+            "Можеш допомогти?"
         ));
 
         // Другий діалог для того самого NPC
         dialogues.put(new DialogueKey(NPCType.LUMBERJACK, 1), new Dialogue(
-                NPCType.LUMBERJACK.getName(),
-                NPCType.LUMBERJACK.getPortraitPath(),
-                "Вони досі тут. Будь обачним"
+            NPCType.LUMBERJACK.getName(),
+            NPCType.LUMBERJACK.getPortraitPath(),
+            "Вони досі тут. Будь обачним"
         ));
 
         dialogues.put(new DialogueKey(NPCType.LUMBERJACK, 2), new Dialogue(
-                NPCType.LUMBERJACK.getName(),
-                NPCType.LUMBERJACK.getPortraitPath(),
-                "Дякую за допомогу.",
-                "За твою мужність я дарую тобі сокиру свого сина"
+            NPCType.LUMBERJACK.getName(),
+            NPCType.LUMBERJACK.getPortraitPath(),
+            "Дякую за допомогу.",
+            "За твою мужність я дарую тобі сокиру свого сина"
         ));
 
         dialogues.put(new DialogueKey(NPCType.DEMON, 0), new Dialogue(
-                NPCType.DEMON.getName(),
-                NPCType.DEMON.getPortraitPath(),
-                "Привіт, друже!",
-                "Я рубаю дрова.",
-                "Можеш допомогти?"
+            NPCType.DEMON.getName(),
+            NPCType.DEMON.getPortraitPath(),
+            "Привіт, друже!",
+            "Я рубаю дрова.",
+            "Можеш допомогти?"
         ));
         dialogues.put(new DialogueKey(NPCType.NUN, 0), new Dialogue(
-                NPCType.NUN.getName(),
-                NPCType.NUN.getPortraitPath(),
-                "Слава Ісусу Христу",
-                "У мене пістолет святої води.",
-                "Допоможи побороти цих монстрів."
+            NPCType.NUN.getName(),
+            NPCType.NUN.getPortraitPath(),
+            "Слава Ісусу Христу",
+            "У мене пістолет святої води.",
+            "Допоможи побороти цих монстрів."
         ));
         dialogues.put(new DialogueKey(NPCType.NUN, 1), new Dialogue(
-                NPCType.NUN.getName(),
-                NPCType.NUN.getPortraitPath(),
-                "Слава Ісусу Христу",
-                "Вороги досі там."
+            NPCType.NUN.getName(),
+            NPCType.NUN.getPortraitPath(),
+            "Слава Ісусу Христу",
+            "Вороги досі там."
         ));
         dialogues.put(new DialogueKey(NPCType.NUN, 2), new Dialogue(
-                NPCType.NUN.getName(),
-                NPCType.NUN.getPortraitPath(),
-                "Ти отримуєш моє балословення",
-                "Іди перетни міст"
+            NPCType.NUN.getName(),
+            NPCType.NUN.getPortraitPath(),
+            "Ти отримуєш моє балословення",
+            "Іди перетни міст"
         ));
     }
 

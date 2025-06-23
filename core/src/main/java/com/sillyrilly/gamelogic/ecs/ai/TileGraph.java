@@ -8,8 +8,8 @@ import com.badlogic.gdx.utils.Array;
 public class TileGraph implements IndexedGraph<TileNode> {
     public static TileGraph instance;
 
-    private Array<TileNode> nodeList;
-    private TileNode[][] nodes;
+    private final Array<TileNode> nodeList;
+    private final TileNode[][] nodes;
 
     public TileGraph(int[][] grid) {
         instance = this;
