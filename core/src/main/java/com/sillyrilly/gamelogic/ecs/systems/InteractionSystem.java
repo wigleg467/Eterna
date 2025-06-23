@@ -51,7 +51,7 @@ public class InteractionSystem extends EntitySystem {
             Vector2 npcPos = bm.get(npc).getPosition();
             float distance = playerPos.dst(npcPos);
 
-            if (distance < 1.5f) {
+            if (distance < 2f) {
                 AnimationComponent anim = am.get(npc);
                 anim.currentState = AnimationComponent.State.DEFAULT;
                 anim.stateTime = 0;
