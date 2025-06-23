@@ -106,6 +106,11 @@ public class EntityFactory {
         ai.stateMachine = new DefaultStateMachine<>(entity, EnemyState.IDLE);
         entity.add(ai);
 
+        AttackComponent ac = new AttackComponent();
+        ac.damage = 5;
+        ac.attackCooldown = 1.5f;
+        entity.add(ac);
+
         engine.addEntity(entity);
     }
 

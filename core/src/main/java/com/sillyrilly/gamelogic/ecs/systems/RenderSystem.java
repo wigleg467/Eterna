@@ -36,6 +36,7 @@ public class RenderSystem extends EntitySystem {
     private final ComponentMapper<LevelComponent> lc = ComponentMapper.getFor(LevelComponent.class);
     private final ComponentMapper<TileComponent> tc = ComponentMapper.getFor(TileComponent.class);
     private final ComponentMapper<PathComponent> pc = ComponentMapper.getFor(PathComponent.class);
+    private final ComponentMapper<HealComponent> hc = ComponentMapper.getFor(HealComponent.class);
 
     private ImmutableArray<Entity> entities;
     private ImmutableArray<Entity> enemies;
@@ -88,6 +89,14 @@ public class RenderSystem extends EntitySystem {
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
+        for (Entity entity : sortedEntities) {
+            if (hc.has(entity)) {
+                HealComponent heal = hc.get(entity);
+                if (heal.hitTimer > 0) {
+                    heal.hitTimer -= deltaTime;
+                }
+            }
+        }
         renderEntities();
         batch.end();
 
@@ -144,11 +153,20 @@ public class RenderSystem extends EntitySystem {
             return;
         }
 
+        if (hc.has(entity)) {
+            HealComponent heal=hc.get(entity);
+            if(!heal.isAlive) return;
+        }
+
         if (entity.getComponent(PlayerComponent.class) != null) {
             AnimationTopComponent topAnim = act.get(entity);
             AnimationButtomComponent bottomAnim = acb.get(entity);
 
             float scale = 0.25f;
+            HealComponent heal = hc.get(entity);
+            if (hc.has(entity) && hc.get(entity).hitTimer > 0) {
+                batch.setColor(Color.RED);
+            }
 
             TextureAtlas.AtlasRegion bottomFrame = bottomAnim.currentFrame;
             float width = bottomFrame.getRegionWidth() * scale;
@@ -160,6 +178,8 @@ public class RenderSystem extends EntitySystem {
             height = topFrame.getRegionHeight() * scale;
             batch.draw(topFrame, pos.x - width / 2f, pos.y, width, height);
 
+            batch.setColor(Color.WHITE);
+
         } else if (ac.has(entity)) {
             AnimationComponent anim = ac.get(entity);
             TextureAtlas.AtlasRegion frame = anim.currentFrame;
@@ -168,7 +188,15 @@ public class RenderSystem extends EntitySystem {
             float scale = 0.25f;
             float width = frame.getRegionWidth() * scale;
             float height = frame.getRegionHeight() * scale;
+            if (hc.has(entity) && hc.get(entity).hitTimer > 0) {
+                batch.setColor(Color.RED);
+            }
+
             batch.draw(frame, pos.x - width / 2f, pos.y, width, height);
+
+            if (hc.has(entity) && hc.get(entity).hitTimer > 0) {
+                batch.setColor(Color.WHITE); // повертаємо нормальний колір
+            }
 
         } else if (tc.has(entity)) {
             TileComponent tileC = tc.get(entity);

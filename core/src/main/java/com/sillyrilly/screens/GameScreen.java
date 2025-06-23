@@ -179,6 +179,7 @@ public class GameScreen implements Screen {
         dialogueWindow=new DialogueWindow(new Texture("images/dialogue.png"), MENU_hoverFont);
         engine.addSystem(new InteractionSystem(dialogueWindow));
         engine.addSystem(new AttackSystem());
+        engine.addSystem(new EnemyAttackSystem());
 
         engine.addSystem(new RenderSystem());
     }

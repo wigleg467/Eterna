@@ -3526,6 +3526,7 @@
   <object id="601" name="GUARD" type="GUARD" x="302.395" y="605.151" width="22" height="17">
    <properties>
     <property name="type" value="guard"/>
+     <property name="location" value="hellGates"/>
    </properties>
   </object>
   <object id="602" name="Skeleton" x="3635.73" y="2936.57">

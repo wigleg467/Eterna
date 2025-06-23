@@ -65,6 +65,11 @@ public class InteractionSystem extends EntitySystem {
                npcComp = nm.get(npc);
                 Dialogue dialogue = getDialogue(npcComp.npcType, npcComp.dialogueStage);
                 NPCComponent finalNpcComp = npcComp;
+                if(GameState.instance.defeatedCemeteryMonsters&&finalNpcComp.npcType == NPCType.NUN ||
+                   GameState.instance.defeatedForestMonsters&&finalNpcComp.npcType == NPCType.LUMBERJACK  ){
+                    finalNpcComp.dialogueStage=2;
+                }
+
                 dialogueWindow.onDialogueEnd = () -> {
                     if (finalNpcComp.npcType == NPCType.NUN && finalNpcComp.dialogueStage == 2) {
                         GameState.instance.gotBlessing = true;
@@ -73,13 +78,7 @@ public class InteractionSystem extends EntitySystem {
                         GameState.instance.talkedToNun = true;
                         finalNpcComp.dialogueStage++;
                     }
-                    else   if (finalNpcComp.npcType == NPCType.NUN && finalNpcComp.dialogueStage == 1&&GameState.instance.defeatedCemeteryMonsters) {
-                        finalNpcComp.dialogueStage++;
-                    }
                     else if (finalNpcComp.npcType == NPCType.LUMBERJACK&&finalNpcComp.dialogueStage == 0) {
-                        finalNpcComp.dialogueStage++;
-                    }
-                    else if (finalNpcComp.npcType == NPCType.LUMBERJACK&& GameState.instance.defeatedForestMonsters) {
                         finalNpcComp.dialogueStage++;
                     }
                 };

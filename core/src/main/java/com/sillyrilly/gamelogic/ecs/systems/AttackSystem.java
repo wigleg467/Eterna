@@ -49,7 +49,10 @@ public class AttackSystem extends EntitySystem {
                 if (isEnemyNearPlayer(bcp.getPosition(), bce.getPosition(), facingRight)) {
                     if (hce.isAlive) {
                         hce.takeDamage(wcp.type.DAMAGE);
+                        hce.hitTimer = 0.15f;
                         Gdx.app.log("Hit", hce.hp + " " + hce.isAlive);
+                    }else{
+                        bce.body.setActive(false);
                     }
                 }
 

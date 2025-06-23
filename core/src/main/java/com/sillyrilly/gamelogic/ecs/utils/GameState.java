@@ -4,7 +4,7 @@ public class GameState {
     public boolean talkedToLumberjack = false;
     public boolean defeatedForestMonsters = false;
 
-    public boolean talkedToNun = true;
+    public boolean talkedToNun = false;
     public boolean defeatedCemeteryMonsters = false;
 
     public boolean gotBlessing = false;
