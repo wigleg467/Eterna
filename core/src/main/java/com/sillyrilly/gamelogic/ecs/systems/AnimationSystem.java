@@ -16,7 +16,6 @@ public class AnimationSystem extends EntitySystem {
     private final ComponentMapper<AnimationTopComponent> atc = ComponentMapper.getFor(AnimationTopComponent.class);
 
     private ImmutableArray<Entity> entities;
-    private Entity player;
 
     public AnimationSystem() {
     }
@@ -24,7 +23,6 @@ public class AnimationSystem extends EntitySystem {
     @Override
     public void addedToEngine(Engine engine) {
         entities = engine.getEntitiesFor(Family.all(FacingComponent.class, BodyComponent.class).get());
-        player = engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
     }
 
     @Override
@@ -101,7 +99,6 @@ public class AnimationSystem extends EntitySystem {
                 bottom.currentFrame = bottomCurrentFrame;
             }
 
-
             // --------- ENEMY ---------
             else if (entity.getComponent(EnemyComponent.class) != null) {
                 AnimationComponent anim = am.get(entity);
@@ -116,9 +113,12 @@ public class AnimationSystem extends EntitySystem {
 
                 anim.currentFrame = frame;
             }
+
             // --------- NPC ---------
             else if (entity.getComponent(NPCComponent.class) != null) {
                 AnimationComponent anim = am.get(entity);
+                if (anim.currentState == AnimationComponent.State.WALK)
+                    anim.currentState = AnimationComponent.State.IDLE;
                 Animation<TextureAtlas.AtlasRegion> currentAnim = anim.animations.get(anim.currentState);
                 if (currentAnim == null) continue;
 

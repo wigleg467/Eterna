@@ -2,8 +2,10 @@ package com.sillyrilly.gamelogic.ecs.systems;
 
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.*;
+import com.sillyrilly.gamelogic.ecs.utils.GameState;
 import com.sillyrilly.managers.InputManager;
 
 public class AttackSystem extends EntitySystem {
@@ -56,10 +58,29 @@ public class AttackSystem extends EntitySystem {
                         }
                     }
                 }
+                HealComponent hce = hc.get(enemy);
+                if (!hce.isAlive && isLocationCleared("cemetery")) {
+                    // наприклад:
+                    Gdx.app.log("Location", "Всі вороги на cemetery знищені!");
+                    GameState.instance.defeatedCemeteryMonsters=true;
+                }
             }
 
         }
     }
+
+    public boolean isLocationCleared(String locationName) {
+        for (Entity enemy : enemies) {
+            LocationComponent loc = enemy.getComponent(LocationComponent.class);
+            HealComponent heal = hc.get(enemy);
+
+            if (loc != null && loc.location.equals(locationName) && heal != null && heal.isAlive) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     private boolean isEnemyNearPlayer(Vector2 p, Vector2 e) {
         float dx = p.x - e.x;

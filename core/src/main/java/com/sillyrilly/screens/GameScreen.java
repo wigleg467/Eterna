@@ -149,7 +149,9 @@ public class GameScreen implements Screen {
             String typeStr = object.getProperties().get("type", String.class);
             if (typeStr == null) continue;
             EnemyType type = EnemyType.valueOf(typeStr.toUpperCase());
-            factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 5);
+            String location = object.getProperties().get("location", String.class); // із Tiled
+            if (location == null) location = "default";
+            factory.createEnemy(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 5, location);
         }
 
 
@@ -171,6 +173,7 @@ public class GameScreen implements Screen {
         engine.addSystem(new AISystem());
         engine.addSystem(new EnemyPathfindingSystem());
         engine.addSystem(new InteractionSystem(new DialogueWindow(new Texture("images/dialogue.png"), MENU_hoverFont)));
+        engine.addSystem(new AttackSystem());
 
         engine.addSystem(new RenderSystem());
     }

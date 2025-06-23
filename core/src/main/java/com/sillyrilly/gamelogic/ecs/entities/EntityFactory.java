@@ -63,13 +63,14 @@ public class EntityFactory {
         entity.add(new AnimationButtomComponent(EntityType.PLAYER, "bottom_idle", "bottom_walk_right"));
         entity.add(new AnimationTopComponent(EntityType.PLAYER));
         entity.add(new WeaponComponent(WeaponComponent.WeaponType.SWORD));
+        entity.add(new HealComponent(100));
 
         engine.addEntity(entity);
 
         Gdx.app.log("Create", "Player");
     }
 
-    public void createEnemy(float x, float y, EnemyType type, int lvl) {
+    public void createEnemy(float x, float y, EnemyType type, int lvl, String location) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set((x) / PPM, (y) / PPM);
@@ -97,6 +98,9 @@ public class EntityFactory {
         entity.add(new PathComponent());
         entity.add(new LevelComponent(lvl));
         entity.add(new EnemyComponent(type));
+        entity.add(new HealComponent(100));
+
+        entity.add(new LocationComponent(location));
 
         AIComponent ai = new AIComponent();
         ai.stateMachine = new DefaultStateMachine<>(entity, EnemyState.IDLE);
