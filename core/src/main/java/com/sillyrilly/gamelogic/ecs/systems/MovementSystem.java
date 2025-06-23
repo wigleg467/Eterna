@@ -6,6 +6,7 @@ import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
 import com.sillyrilly.gamelogic.ecs.components.PlayerComponent;
 import com.sillyrilly.managers.InputManager;
 
+import static com.sillyrilly.gamelogic.ecs.utils.GameState.heaven;
 import static com.sillyrilly.gamelogic.ecs.utils.GameState.hell;
 import static com.sillyrilly.util.Const.PPM;
 import static com.sillyrilly.util.GameConfig.PLAYER_SPEED;
@@ -18,6 +19,7 @@ public class MovementSystem extends EntitySystem {
     private Entity player;
 
     private boolean initHell = false;
+    private boolean initHeaven = false;
 
     @Override
     public void addedToEngine(Engine engine) {
@@ -35,6 +37,10 @@ public class MovementSystem extends EntitySystem {
             body.body.setTransform(17100 / PPM, 72 / PPM, body.body.getAngle());
 
             initHell = true;
+        }else if (heaven && !initHeaven) {
+            body.body.setTransform(16880 / PPM, 9475 / PPM, body.body.getAngle());
+
+            initHeaven = true;
         }
 
         body.body.setLinearVelocity(movement);

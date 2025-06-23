@@ -165,6 +165,12 @@ public class GameScreen implements Screen {
             NPCType type = NPCType.valueOf(typeStr.toUpperCase());
             factory.createNPC(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 5);
         }
+
+      objects = bigWorld.getLayers().get("InteractiveObjects").getObjects();
+        for (MapObject obj : objects) {
+            Rectangle rect = ((RectangleMapObject) obj).getRectangle();
+            factory.createInteractiveObject(rect, obj.getProperties(), 5);
+        }
     }
 
     private void addSystems() {

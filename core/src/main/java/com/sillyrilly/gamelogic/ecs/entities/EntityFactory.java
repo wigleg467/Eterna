@@ -7,6 +7,7 @@ import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
@@ -18,6 +19,8 @@ import com.sillyrilly.gamelogic.ecs.components.*;
 import com.sillyrilly.gamelogic.ecs.utils.EnemyType;
 import com.sillyrilly.gamelogic.ecs.utils.EntityType;
 import com.sillyrilly.gamelogic.ecs.utils.NPCType;
+
+import java.util.Iterator;
 
 import static com.sillyrilly.util.Const.PPM;
 
@@ -136,6 +139,37 @@ public class EntityFactory {
         engine.addEntity(entity);
 
         Gdx.app.log("Create", "NPC");
+    }
+
+    public void createInteractiveObject(Rectangle rect, MapProperties props, int lvl) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+        bodyDef.position.set((rect.x + rect.width / 2f) / PPM, (rect.y + rect.height / 2f) / PPM);
+
+        Body body = world.createBody(bodyDef);
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(rect.width / 2f / PPM, rect.height / 2f / PPM);
+        body.createFixture(shape, 0);
+        shape.dispose();
+
+        Entity entity = new Entity();
+        entity.add(new BodyComponent(body));
+        entity.add(new InteractableComponent());
+        entity.add(new LevelComponent(lvl));
+
+        InteractiveObjectComponent ioc = new InteractiveObjectComponent();
+        ioc.type = props.get("type", String.class);
+
+        for (Iterator<String> it = props.getKeys(); it.hasNext(); ) {
+            String key = it.next();
+            if (!key.equals("type")) {
+                ioc.data.put(key, props.get(key).toString());
+            }
+        }
+
+        entity.add(ioc);
+        engine.addEntity(entity);
     }
 
     public void createTileLayer(TiledMap map, String layerName, int lvl) {

@@ -10,8 +10,6 @@ import com.sillyrilly.gamelogic.ecs.components.AnimationTopComponent;
 import com.sillyrilly.gamelogic.ecs.components.WeaponComponent;
 import com.sillyrilly.gamelogic.ecs.systems.CameraFollowSystem;
 
-import static com.sillyrilly.gamelogic.ecs.utils.GameState.defeatedHellGatesMonsters;
-
 public class InputManager extends InputAdapter {
     public static InputManager instance;
     public static InputMultiplexer multiplexer;
@@ -75,12 +73,8 @@ public class InputManager extends InputAdapter {
             topState = AnimationTopComponent.TopState.ATTACK;
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.E))
-            if (defeatedHellGatesMonsters) {
 
-                Gdx.app.log("Transform", "to ASCII");
-                ScreenManager.instance.setScreen(ScreenManager.ScreenType.ASCII);
-            }
+
 
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) {

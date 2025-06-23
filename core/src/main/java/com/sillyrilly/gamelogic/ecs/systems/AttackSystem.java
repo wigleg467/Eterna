@@ -53,7 +53,8 @@ public class AttackSystem extends EntitySystem {
                         hce.takeDamage(wcp.type.DAMAGE);
                         hce.hitTimer = 0.15f;
                         Gdx.app.log("Hit", hce.hp + " " + hce.isAlive);
-                    } else {
+                    }
+                    if(!hce.isAlive) {
                         bce.body.setActive(false);
                     }
                 }
