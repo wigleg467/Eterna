@@ -260,11 +260,11 @@ public class ASCIIScreen implements Screen {
                     return;
                 }
                 if (MAP[ty][tx] == DOOR_BACK) {
-                    //   audioManager.
-                    //  ScreenManager.getInstance().setScreen();
+                    ScreenManager.instance.setScreen(ScreenManager.ScreenType.GAME);
                 }
                 if (MAP[ty][tx] == DOOR_FORWARD) {
-                    //  ScreenManager.getInstance().setScreen();
+                    ScreenManager.instance.setScreen(ScreenManager.ScreenType.GAME);
+                    // GameState... HELL
                 }
             }
         }

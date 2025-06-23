@@ -7,6 +7,8 @@ import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
 import com.sillyrilly.gamelogic.ecs.components.PlayerComponent;
 import com.sillyrilly.managers.InputManager;
 
+import static com.sillyrilly.util.GameConfig.PLAYER_SPEED;
+
 public class MovementSystem extends EntitySystem {
     private final ComponentMapper<AnimationTopComponent> ac = ComponentMapper.getFor(AnimationTopComponent.class);
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
@@ -24,7 +26,7 @@ public class MovementSystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
         Vector2 movement = new Vector2(inputManager.getMovement());// робимо копію
-        movement.scl(7f);
+        movement.scl(PLAYER_SPEED);
 
         BodyComponent body = bc.get(player);
         if (ac.get(player).currentState != AnimationTopComponent.TopState.ATTACK)

@@ -12,6 +12,9 @@ import com.sillyrilly.gamelogic.ecs.ai.DiagonalHeuristic;
 import com.sillyrilly.gamelogic.ecs.ai.TileGraph;
 import com.sillyrilly.gamelogic.ecs.ai.TileNode;
 
+import static com.sillyrilly.util.Const.PPM;
+import static com.sillyrilly.util.GameConfig.ENEMY_SPEED;
+
 public class EnemyPathfindingSystem extends EntitySystem {
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<AIComponent> aic = ComponentMapper.getFor(AIComponent.class);
@@ -81,8 +84,7 @@ public class EnemyPathfindingSystem extends EntitySystem {
                     pathComp.currentIndex++;
                 } else {
                     direction.nor();
-                    float speed = 200f;
-                    Vector2 velocity = direction.scl(speed * deltaTime);
+                    Vector2 velocity = direction.scl(ENEMY_SPEED * PPM * deltaTime);
                     bce.body.setLinearVelocity(velocity);
                 }
             }

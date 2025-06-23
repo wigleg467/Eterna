@@ -84,8 +84,6 @@ public class RenderSystem extends EntitySystem {
     public void update(float deltaTime) {
         sortEntities();
 
-        Gdx.app.log("RenderSystem", "Rendering " + sortedEntities.size + " entities");
-
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
