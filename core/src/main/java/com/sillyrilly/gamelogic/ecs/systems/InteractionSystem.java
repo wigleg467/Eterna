@@ -8,9 +8,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.*;
 import com.sillyrilly.gamelogic.ecs.utils.Dialogue;
 import com.sillyrilly.gamelogic.ecs.utils.DialogueWindow;
-import com.sillyrilly.gamelogic.ecs.utils.GameState;
 import com.sillyrilly.gamelogic.ecs.utils.NPCType;
 
+import static com.sillyrilly.gamelogic.ecs.utils.GameState.*;
 import static com.sillyrilly.managers.DialogueManager.getDialogue;
 
 public class InteractionSystem extends EntitySystem {
@@ -22,7 +22,7 @@ public class InteractionSystem extends EntitySystem {
 
     private ImmutableArray<Entity> npcs;
     private Entity player;
-    private DialogueWindow dialogueWindow;
+    private final DialogueWindow dialogueWindow;
 
     public InteractionSystem(DialogueWindow dialogueWindow) {
         this.dialogueWindow = dialogueWindow;
@@ -62,23 +62,21 @@ public class InteractionSystem extends EntitySystem {
                     Gdx.app.error("InteractionSystem", "NPCComponent або npcType дорівнює null");
                     continue;
                 }
-               npcComp = nm.get(npc);
+                npcComp = nm.get(npc);
                 Dialogue dialogue = getDialogue(npcComp.npcType, npcComp.dialogueStage);
                 NPCComponent finalNpcComp = npcComp;
-                if(GameState.instance.defeatedCemeteryMonsters&&finalNpcComp.npcType == NPCType.NUN ||
-                   GameState.instance.defeatedForestMonsters&&finalNpcComp.npcType == NPCType.LUMBERJACK  ){
-                    finalNpcComp.dialogueStage=2;
+                if (defeatedCemeteryMonsters && finalNpcComp.npcType == NPCType.NUN ||
+                    defeatedForestMonsters && finalNpcComp.npcType == NPCType.LUMBERJACK) {
+                    finalNpcComp.dialogueStage = 2;
                 }
 
                 dialogueWindow.onDialogueEnd = () -> {
                     if (finalNpcComp.npcType == NPCType.NUN && finalNpcComp.dialogueStage == 2) {
-                        GameState.instance.gotBlessing = true;
-                    }
-                    else   if (finalNpcComp.npcType == NPCType.NUN && finalNpcComp.dialogueStage == 0) {
-                        GameState.instance.talkedToNun = true;
+                        gotBlessing = true;
+                    } else if (finalNpcComp.npcType == NPCType.NUN && finalNpcComp.dialogueStage == 0) {
+                        talkedToNun = true;
                         finalNpcComp.dialogueStage++;
-                    }
-                    else if (finalNpcComp.npcType == NPCType.LUMBERJACK&&finalNpcComp.dialogueStage == 0) {
+                    } else if (finalNpcComp.npcType == NPCType.LUMBERJACK && finalNpcComp.dialogueStage == 0) {
                         finalNpcComp.dialogueStage++;
                     }
                 };

@@ -13,14 +13,17 @@ import static com.sillyrilly.util.Const.PPM;
 import static com.sillyrilly.util.Const.TILE_SIZE;
 
 public class CameraFollowSystem extends EntitySystem {
+    private static boolean cameraSmoothing = false;
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<CameraFollowableComponent> cfc = ComponentMapper.getFor(CameraFollowableComponent.class);
     private final ComponentMapper<CameraTargetComponent> ctc = ComponentMapper.getFor(CameraTargetComponent.class);
     private CameraManager cameraManager;
-
     private ImmutableArray<Entity> targets;
 
-    private static boolean cameraSmoothing = false;
+    public static void changeCameraSmoothing() {
+        Gdx.app.log("Camera", "Changing CameraSmoothing");
+        cameraSmoothing = !cameraSmoothing;
+    }
 
     @Override
     public void addedToEngine(Engine engine) {
@@ -44,10 +47,5 @@ public class CameraFollowSystem extends EntitySystem {
                 break;
             }
         }
-    }
-
-    public static void changeCameraSmoothing() {
-        Gdx.app.log("Camera", "Changing CameraSmoothing");
-        cameraSmoothing = !cameraSmoothing;
     }
 }

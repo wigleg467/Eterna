@@ -6,6 +6,7 @@ import com.sillyrilly.managers.InputManager;
 
 public class InputSystem extends EntitySystem {
     private InputManager inputManager;
+
     @Override
     public void addedToEngine(Engine engine) {
         inputManager = InputManager.instance;

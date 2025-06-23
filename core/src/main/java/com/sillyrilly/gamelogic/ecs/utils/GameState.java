@@ -1,13 +1,15 @@
 package com.sillyrilly.gamelogic.ecs.utils;
 
 public class GameState {
-    public boolean talkedToLumberjack = false;
-    public boolean defeatedForestMonsters = false;
+    public static boolean talkedToLumberjack = false;
+    public static boolean defeatedForestMonsters = false;
 
-    public boolean talkedToNun = false;
-    public boolean defeatedCemeteryMonsters = false;
+    public static boolean talkedToNun = false;
+    public static boolean defeatedCemeteryMonsters = false;
 
-    public boolean gotBlessing = false;
+    public static boolean gotBlessing = false;
 
-    public static final GameState instance = new GameState();
+    public static boolean defeatedHellGatesMonsters = false;
+
+    public static boolean hell = false;
 }

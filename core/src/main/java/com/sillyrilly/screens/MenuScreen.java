@@ -20,12 +20,16 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.*;
-import com.sillyrilly.managers.*;
+import com.sillyrilly.managers.AudioManager;
+import com.sillyrilly.managers.CameraManager;
+import com.sillyrilly.managers.InputManager;
+import com.sillyrilly.managers.ScreenManager;
 
 import java.util.ArrayList;
 
 import static com.sillyrilly.managers.AssetsManager.*;
-import static com.sillyrilly.managers.FontManager.*;
+import static com.sillyrilly.managers.FontManager.MENU_hoverFont;
+import static com.sillyrilly.managers.FontManager.MENU_mainFont;
 import static com.sillyrilly.util.MenuConfig.*;
 
 public class MenuScreen implements Screen {
@@ -65,6 +69,7 @@ public class MenuScreen implements Screen {
         }
 
         camera.zoom = 1f;
+        AudioManager.instance.playMusic(AudioManager.MusicType.MAIN_THEME);
         InputManager.multiplexer.addProcessor(stage);
     }
 
@@ -165,13 +170,12 @@ public class MenuScreen implements Screen {
         settingsWindow.add(header).colspan(2).expandX().fillX().row();
 
         volumeSlider = new VisSlider(0, 1, 0.05f, false, skin.get("default-horizontal", VisSlider.SliderStyle.class));
-        volumeSlider.setValue(0.05f);
+        volumeSlider.setValue(0.4f);
 
         ArrayList<Settings> settingsList = new ArrayList<>();
 
         settingsList.add(new Settings("Гучнiсть", volumeSlider));
         settingsList.add(new Settings("Страшнi звуки", new VisCheckBox("Jooou")));
-        settingsList.add(new Settings("Селект бокс", new VisSelectBox<>()));
 
         for (Settings settings : settingsList) {
             settings.placeSettings();
@@ -356,6 +360,25 @@ public class MenuScreen implements Screen {
 
     //##################### Інше #####################
 
+    private static class EnemyInfo {
+        public final String name;
+        public final String description;
+        public final Animation<TextureAtlas.AtlasRegion> animation;
+        public final float frameDuration;
+
+        public EnemyInfo(String name, String description, TextureAtlas atlas, float frameDuration) {
+            this.name = name;
+            this.description = description;
+            this.frameDuration = frameDuration;
+            this.animation = new Animation<>(frameDuration, atlas.findRegions("walk_right"), Animation.PlayMode.LOOP);
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
     private class Settings {
         private static final float rowSpacing = 10f;
         private static final float labelColumnWidth = 120f;
@@ -382,25 +405,6 @@ public class MenuScreen implements Screen {
             settingsTable.row().padTop(rowSpacing);
             settingsTable.add(settingsLabel).width(labelColumnWidth).padLeft(30).left();
             settingsTable.add(actor).expandX().fillX().padRight(30).left();
-        }
-    }
-
-    private static class EnemyInfo {
-        public final String name;
-        public final String description;
-        public final Animation<TextureAtlas.AtlasRegion> animation;
-        public final float frameDuration;
-
-        public EnemyInfo(String name, String description, TextureAtlas atlas, float frameDuration) {
-            this.name = name;
-            this.description = description;
-            this.frameDuration = frameDuration;
-            this.animation = new Animation<>(frameDuration, atlas.findRegions("walk_right"), Animation.PlayMode.LOOP);
-        }
-
-        @Override
-        public String toString() {
-            return name;
         }
     }
 
@@ -434,14 +438,6 @@ public class MenuScreen implements Screen {
 
             VisSplitPane splitPane = new VisSplitPane(enemyList, rightPanel, false);
             splitPane.setSplitAmount(0.3f);
-
-
-//            VisTable header = new VisTable();
-//            header.add().expandX();
-//            header.add(close).top().right().pad(5);
-//            header.row();
-//            header.add(new VisLabel(" ")).colspan(2).padBottom(5); // для відступу
-//            this.add(header).expandX().fillX().row();
 
             VisLabel title = new VisLabel("Bestiary", new Label.LabelStyle(MENU_mainFont, Color.WHITE));
             title.setAlignment(Align.center);
@@ -486,13 +482,8 @@ public class MenuScreen implements Screen {
             descriptionLabel.setText(info.description);
             animTime = 0f;
 
-//            float scale_width = 10f;
-//            float scale_height = 1.5f;
-
-            // якщо потрібно малювати кастомно — треба буде віддати Animation або кадр
             TextureRegion frame = info.animation.getKeyFrame(0);
             image.setDrawable(new TextureRegionDrawable(frame));
-            //   image.setSize(frame.getRegionWidth() * 0.5f, frame.getRegionHeight() * 0.5f);
         }
 
         public void act(float delta) {

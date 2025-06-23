@@ -2,15 +2,13 @@ package com.sillyrilly.gamelogic.ecs.systems;
 
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
-import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
-import com.sillyrilly.gamelogic.ecs.components.*;
-import com.sillyrilly.gamelogic.ecs.ai.EnemyState;
 import com.sillyrilly.gamelogic.ecs.ai.DiagonalHeuristic;
+import com.sillyrilly.gamelogic.ecs.ai.EnemyState;
 import com.sillyrilly.gamelogic.ecs.ai.TileGraph;
 import com.sillyrilly.gamelogic.ecs.ai.TileNode;
+import com.sillyrilly.gamelogic.ecs.components.*;
 
 import static com.sillyrilly.util.Const.PPM;
 import static com.sillyrilly.util.GameConfig.ENEMY_SPEED;

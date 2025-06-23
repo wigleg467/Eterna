@@ -2,20 +2,22 @@ package com.sillyrilly.gamelogic.ecs.systems;
 
 import com.badlogic.ashley.core.*;
 import com.badlogic.gdx.math.Vector2;
-import com.sillyrilly.gamelogic.ecs.components.AnimationTopComponent;
 import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
 import com.sillyrilly.gamelogic.ecs.components.PlayerComponent;
 import com.sillyrilly.managers.InputManager;
 
+import static com.sillyrilly.gamelogic.ecs.utils.GameState.hell;
+import static com.sillyrilly.util.Const.PPM;
 import static com.sillyrilly.util.GameConfig.PLAYER_SPEED;
 
 public class MovementSystem extends EntitySystem {
-    private final ComponentMapper<AnimationTopComponent> ac = ComponentMapper.getFor(AnimationTopComponent.class);
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
 
     private InputManager inputManager;
 
     private Entity player;
+
+    private boolean initHell = false;
 
     @Override
     public void addedToEngine(Engine engine) {
@@ -29,7 +31,12 @@ public class MovementSystem extends EntitySystem {
         movement.scl(PLAYER_SPEED);
 
         BodyComponent body = bc.get(player);
-        if (ac.get(player).currentState != AnimationTopComponent.TopState.ATTACK)
-            body.body.setLinearVelocity(movement);
+        if (hell && !initHell) {
+            body.body.setTransform(17100 / PPM, 72 / PPM, body.body.getAngle());
+
+            initHell = true;
+        }
+
+        body.body.setLinearVelocity(movement);
     }
 }

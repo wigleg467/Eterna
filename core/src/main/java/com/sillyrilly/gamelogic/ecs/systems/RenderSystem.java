@@ -37,20 +37,16 @@ public class RenderSystem extends EntitySystem {
     private final ComponentMapper<TileComponent> tc = ComponentMapper.getFor(TileComponent.class);
     private final ComponentMapper<PathComponent> pc = ComponentMapper.getFor(PathComponent.class);
     private final ComponentMapper<HealComponent> hc = ComponentMapper.getFor(HealComponent.class);
-
-    private ImmutableArray<Entity> entities;
-    private ImmutableArray<Entity> enemies;
-
     private final OrthographicCamera camera = CameraManager.camera;
     private final SpriteBatch batch = ScreenManager.batch;
     private final ShapeRenderer shapeRenderer = ScreenManager.shapeRenderer;
-
     private final Array<Entity> backgroundEntities = new Array<>();
     private final Array<Entity> dynamicEntities = new Array<>();
     private final Array<Entity> sortedEntities = new Array<>();
-
     private final TileGraph graph = TileGraph.instance;
     private final int[][] grid = NavigationMap.instance.grid;
+    private ImmutableArray<Entity> entities;
+    private ImmutableArray<Entity> enemies;
 
     @Override
     public void addedToEngine(Engine engine) {
@@ -154,8 +150,8 @@ public class RenderSystem extends EntitySystem {
         }
 
         if (hc.has(entity)) {
-            HealComponent heal=hc.get(entity);
-            if(!heal.isAlive) return;
+            HealComponent heal = hc.get(entity);
+            if (!heal.isAlive) return;
         }
 
         if (entity.getComponent(PlayerComponent.class) != null) {

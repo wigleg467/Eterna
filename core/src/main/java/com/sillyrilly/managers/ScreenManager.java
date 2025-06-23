@@ -1,7 +1,6 @@
 package com.sillyrilly.managers;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -16,30 +15,9 @@ public class ScreenManager implements Disposable {
     public static ScreenManager instance;
     public static SpriteBatch batch;
     public static ShapeRenderer shapeRenderer;
-
-    public enum ScreenType {
-        MENU, GAME, ASCII;
-
-        public static ScreenType current = GAME;
-
-        public static Screen createScreen(ScreenType type) {
-            return switch (type) {
-                case MENU -> new MenuScreen();
-                case GAME -> new GameScreen();
-                case ASCII -> new ASCIIScreen();
-            };
-        }
-
-        public static void setCurrentScreenType(ScreenType type) {
-            current = type;
-        }
-    }
-
-    private final EnumMap<ScreenType, Screen> screenMap = new EnumMap<>(ScreenType.class);
-
     private static Game game;
-
     private static boolean isInitialized = false;
+    private final EnumMap<ScreenType, Screen> screenMap = new EnumMap<>(ScreenType.class);
 
     private ScreenManager() {
     }
@@ -65,7 +43,8 @@ public class ScreenManager implements Disposable {
     }
 
     public void setMenuScreen() {
-        if (!screenMap.containsKey(ScreenType.MENU)) screenMap.put(ScreenType.MENU, ScreenType.createScreen(ScreenType.MENU));
+        if (!screenMap.containsKey(ScreenType.MENU))
+            screenMap.put(ScreenType.MENU, ScreenType.createScreen(ScreenType.MENU));
 
         game.setScreen(screenMap.get(ScreenType.MENU));
     }
@@ -75,5 +54,23 @@ public class ScreenManager implements Disposable {
         screenMap.clear();
         batch.dispose();
         shapeRenderer.dispose();
+    }
+
+    public enum ScreenType {
+        MENU, GAME, ASCII;
+
+        public static ScreenType current = GAME;
+
+        public static Screen createScreen(ScreenType type) {
+            return switch (type) {
+                case MENU -> new MenuScreen();
+                case GAME -> new GameScreen();
+                case ASCII -> new ASCIIScreen();
+            };
+        }
+
+        public static void setCurrentScreenType(ScreenType type) {
+            current = type;
+        }
     }
 }

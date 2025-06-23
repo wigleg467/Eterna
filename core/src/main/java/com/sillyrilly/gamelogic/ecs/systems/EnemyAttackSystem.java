@@ -6,8 +6,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.*;
 
-import static com.sillyrilly.util.Const.PPM;
-
 public class EnemyAttackSystem extends EntitySystem {
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<HealComponent> hc = ComponentMapper.getFor(HealComponent.class);
@@ -31,12 +29,13 @@ public class EnemyAttackSystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
         for (Entity enemy : enemies) {
+            HealComponent hce = hc.get(enemy);
             AttackComponent attack = ac.get(enemy);
             BodyComponent body = bc.get(enemy);
 
             attack.timeSinceLastAttack += deltaTime;
 
-            if (isPlayerInRange(body.getPosition(), bcp.getPosition())) {
+            if (isPlayerInRange(body.getPosition(), bcp.getPosition()) && hce.isAlive) {
                 if (attack.timeSinceLastAttack >= attack.attackCooldown) {
                     attack.timeSinceLastAttack = 0f;
 
@@ -53,6 +52,6 @@ public class EnemyAttackSystem extends EntitySystem {
     private boolean isPlayerInRange(Vector2 enemyPos, Vector2 playerPos) {
         float dx = Math.abs(enemyPos.x - playerPos.x);
         float dy = Math.abs(enemyPos.y - playerPos.y);
-        return dx <= 32f && dy <= 32f;
+        return dx <= 1f && dy <= 1f;
     }
 }

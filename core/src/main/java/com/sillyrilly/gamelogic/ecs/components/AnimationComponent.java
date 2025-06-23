@@ -11,19 +11,10 @@ import java.util.EnumMap;
 import java.util.Map;
 
 public class AnimationComponent implements Component {
-    public enum State {
-        IDLE, WALK, ATTACK, DEFAULT;
-
-        private static State get(int i) {
-            return State.values()[i];
-        }
-    }
-
     public Map<State, Animation<TextureAtlas.AtlasRegion>> animations = new EnumMap<>(State.class);
     public TextureAtlas.AtlasRegion currentFrame;
     public State currentState = State.WALK;
     public float stateTime = 0f;
-
     public AnimationComponent(Animatable animatable, String... animationNames) {
         if (animationNames.length > 0) {
             for (int i = 0; i < animationNames.length; i++) {
@@ -38,5 +29,13 @@ public class AnimationComponent implements Component {
         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(atlasPath));
         Array<TextureAtlas.AtlasRegion> regions = atlas.findRegions(animationName);
         return new Animation<>(0.2f, regions, Animation.PlayMode.LOOP);
+    }
+
+    public enum State {
+        IDLE, WALK, ATTACK, DEFAULT;
+
+        private static State get(int i) {
+            return State.values()[i];
+        }
     }
 }

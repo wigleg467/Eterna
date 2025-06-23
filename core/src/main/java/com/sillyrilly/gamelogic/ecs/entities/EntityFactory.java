@@ -125,15 +125,6 @@ public class EntityFactory {
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(type.getWidth() / 2f, type.getHeight() / 2f);
 
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        //   fixtureDef.density = 1f;
-        //   fixtureDef.friction = 0.5f;
-        //   fixtureDef.restitution = 0f;
-
-        body.createFixture(fixtureDef);
-        shape.dispose();
-
         Entity entity = new Entity();
         entity.add(new AnimationComponent(type, "idle", "", "", "default"));
         entity.add(new BodyComponent(body));

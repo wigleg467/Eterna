@@ -6,7 +6,6 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
 import static com.sillyrilly.util.MenuConfig.*;
-import static com.sillyrilly.util.MenuConfig.HEIGHT;
 
 public class AssetsManager {
     public static AssetsManager instance;
@@ -59,7 +58,7 @@ public class AssetsManager {
         bigWorld.dispose();
     }
 
-    private void loadMaps(){
+    private void loadMaps() {
         bigWorld = new TmxMapLoader().load("maps/bigmap.tmx");
     }
 

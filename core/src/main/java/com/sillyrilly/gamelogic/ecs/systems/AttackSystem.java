@@ -5,10 +5,10 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.*;
-import com.sillyrilly.gamelogic.ecs.utils.GameState;
 import com.sillyrilly.managers.InputManager;
 
-import static com.sillyrilly.util.Const.TILE_SIZE;
+import static com.sillyrilly.gamelogic.ecs.utils.GameState.defeatedCemeteryMonsters;
+import static com.sillyrilly.gamelogic.ecs.utils.GameState.defeatedHellGatesMonsters;
 
 public class AttackSystem extends EntitySystem {
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
@@ -38,7 +38,8 @@ public class AttackSystem extends EntitySystem {
 
             boolean facingRight = fcp.facingRight;
 
-            boolean allDead = true;
+            boolean allCemeteryDead = true;
+            boolean allHellGatesDead = true;
 
             for (Entity enemy : enemies) {
                 BodyComponent bce = bc.get(enemy);
@@ -51,7 +52,7 @@ public class AttackSystem extends EntitySystem {
                         hce.takeDamage(wcp.type.DAMAGE);
                         hce.hitTimer = 0.15f;
                         Gdx.app.log("Hit", hce.hp + " " + hce.isAlive);
-                    }else{
+                    } else {
                         bce.body.setActive(false);
                     }
                 }
@@ -59,14 +60,22 @@ public class AttackSystem extends EntitySystem {
 
                 // Перевірка на alive
                 if (loc != null && loc.location.equals("cemetery") && hce.isAlive) {
-                    allDead = false;
+                    allCemeteryDead = false;
+                }
+                if (loc != null && loc.location.equals("hellGates") && hce.isAlive) {
+                    allHellGatesDead = false;
                 }
             }
 
-            if (allDead) {
-                GameState.instance.defeatedCemeteryMonsters = true;
+            if (allCemeteryDead) {
+                defeatedCemeteryMonsters = true;
                 Gdx.app.log("Location", "All enemies in cemetery are dead cemetery");
             }
+            if (allHellGatesDead) {
+                defeatedHellGatesMonsters = true;
+                Gdx.app.log("Location", "All enemies in hellGates are dead");
+            }
+
         }
     }
 
@@ -84,6 +93,6 @@ public class AttackSystem extends EntitySystem {
         }
 
         float dy = Math.abs(p.y - e.y);
-        return dx <= 128f && dy <= 128f;
+        return dx <= 5f && dy <= 3f;
     }
 }
