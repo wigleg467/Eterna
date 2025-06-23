@@ -11,18 +11,22 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.sillyrilly.gamelogic.ecs.ai.NavigationMap;
-import com.sillyrilly.gamelogic.ecs.components.*;
 import com.sillyrilly.gamelogic.ecs.ai.TileGraph;
 import com.sillyrilly.gamelogic.ecs.ai.TileNode;
-import com.sillyrilly.managers.*;
+import com.sillyrilly.gamelogic.ecs.components.*;
 import com.sillyrilly.managers.CameraManager;
+import com.sillyrilly.managers.FontManager;
 import com.sillyrilly.managers.InputManager;
+import com.sillyrilly.managers.ScreenManager;
+import com.sillyrilly.screens.GameScreen;
 
-import static com.sillyrilly.util.Const.*;
+import static com.sillyrilly.util.Const.PPM;
+import static com.sillyrilly.util.Const.TILE_SIZE;
 
 public class RenderSystem extends EntitySystem {
     private final ComponentMapper<AnimationComponent> ac = ComponentMapper.getFor(AnimationComponent.class);
@@ -89,6 +93,11 @@ public class RenderSystem extends EntitySystem {
         renderEntities();
         batch.end();
 
+        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+        batch.begin();
+        GameScreen.instance.dialogueWindow.render(batch);
+        batch.end();
+
         debugMode();
     }
 
@@ -99,7 +108,15 @@ public class RenderSystem extends EntitySystem {
         sortedEntities.sort((a, b) -> {
             float ya = bc.get(a).body.getPosition().y;
             float yb = bc.get(b).body.getPosition().y;
-            return Float.compare(yb, ya);
+
+            if (tc.has(a)) {
+                ya -= tc.get(a).renderOffsetY;
+            }
+            if (tc.has(b)) {
+                yb -= tc.get(b).renderOffsetY;
+            }
+
+            return Float.compare(yb, ya); // менше Y — вище на екрані, тому малюємо пізніше
         });
     }
 

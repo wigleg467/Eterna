@@ -44,6 +44,7 @@ public class AttackSystem extends EntitySystem {
                             HealComponent hce = hc.get(enemy);
                             if (hce.isAlive) {
                                 hce.hp = hce.hp - wcp.type.DAMAGE;
+                                Gdx.app.log("Удар", enemy.toString());
                             }
                         }
                     }
@@ -54,6 +55,7 @@ public class AttackSystem extends EntitySystem {
                             HealComponent hce = hc.get(enemy);
                             if (hce.isAlive) {
                                 hce.hp = hce.hp - wcp.type.DAMAGE;
+                                Gdx.app.log("Удар", enemy.toString());
                             }
                         }
                     }

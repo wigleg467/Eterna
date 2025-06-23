@@ -34,6 +34,8 @@ import static com.sillyrilly.util.Const.PPM;
 import static com.sillyrilly.util.Const.TILE_SCALE;
 
 public class GameScreen implements Screen {
+    public static GameScreen instance;
+
     private OrthographicCamera camera;
 
     private Engine engine;
@@ -43,10 +45,12 @@ public class GameScreen implements Screen {
     private boolean initialized = false;
 
     private final Map<String, Body> removableBodies = new HashMap<>();
+    public DialogueWindow dialogueWindow;
 
     @Override
     public void show() {
         if (!initialized) {
+            instance = this;
             camera = CameraManager.camera;
 
             new TileGraph(new NavigationMap(bigWorld).grid);
@@ -172,7 +176,8 @@ public class GameScreen implements Screen {
         engine.addSystem(new MovementSystem());
         engine.addSystem(new AISystem());
         engine.addSystem(new EnemyPathfindingSystem());
-        engine.addSystem(new InteractionSystem(new DialogueWindow(new Texture("images/dialogue.png"), MENU_hoverFont)));
+        dialogueWindow=new DialogueWindow(new Texture("images/dialogue.png"), MENU_hoverFont);
+        engine.addSystem(new InteractionSystem(dialogueWindow));
         engine.addSystem(new AttackSystem());
 
         engine.addSystem(new RenderSystem());
