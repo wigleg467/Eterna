@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="600" height="328" tilewidth="32" tileheight="32" infinite="0" nextlayerid="17" nextobjectid="836">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="600" height="328" tilewidth="32" tileheight="32" infinite="0" nextlayerid="17" nextobjectid="839">
  <tileset firstgid="1" source="tilesets/landscape.tsx"/>
  <tileset firstgid="65" source="tilesets/first_level_tiles.tsx"/>
  <tileset firstgid="129" source="tilesets/mainlevbuild.tsx"/>
@@ -3520,7 +3520,7 @@
   <object id="833" name="bridge_block" x="1766.5" y="1050" width="20.5" height="102.5"/>
  </objectgroup>
  <objectgroup id="16" name="Spawns">
-  <object id="834" name="PlayerSpawn" x="1096" y="196"/>
+  <object id="838" name="PlayerSpawn" x="17066.7" y="987.879"/>
  </objectgroup>
  <objectgroup id="6" name="Enemies">
   <object id="601" name="GUARD" type="GUARD" x="302.395" y="605.151" width="22" height="17">
