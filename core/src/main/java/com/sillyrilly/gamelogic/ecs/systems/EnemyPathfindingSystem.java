@@ -52,7 +52,7 @@ public class EnemyPathfindingSystem extends EntitySystem {
             pathComp.timeSinceLastUpdate += deltaTime;
             Vector2 playerPos = bcp.body.getPosition();
 
-            boolean needsUpdate = !pathComp.lastTargetPosition.epsilonEquals(playerPos, 0.1f) || pathComp.timeSinceLastUpdate > 1f;
+            boolean needsUpdate = !pathComp.lastTargetPosition.epsilonEquals(playerPos, 0.1f) || pathComp.timeSinceLastUpdate > 0.4f;
 
             if (needsUpdate) {
                 pathComp.timeSinceLastUpdate = 0f;
