@@ -127,11 +127,11 @@ public class GameScreen implements Screen {
         factory.createTileLayer(bigWorld, "base", 0);
         factory.createTileLayer(bigWorld, "lava", 1);
         factory.createTileLayer(bigWorld, "path", 2);
-        factory.createTileLayer(bigWorld, "base2", 1);
-        factory.createTileLayer(bigWorld, "base2", 2);
-        factory.createTileLayer(bigWorld, "base3", 3);
-        factory.createTileLayer(bigWorld, "base4", 4);
+        factory.createTileLayer(bigWorld, "base2", 3);
+        factory.createTileLayer(bigWorld, "base3", 4);
+        factory.createTileLayer(bigWorld, "base4", 5);
         factory.createTileLayer(bigWorld, "landscape", 2);
+        factory.createTileLayer(bigWorld, "clouds", 6);
         factory.createObjectLayer(bigWorld, "Collisions", 1, 1, 0.01f, 0.01f);
 
         MapLayer spawnLayer = bigWorld.getLayers().get("Spawns");
