@@ -21,7 +21,7 @@ public class AnimationComponent implements Component {
 
     public Map<State, Animation<TextureAtlas.AtlasRegion>> animations = new EnumMap<>(State.class);
     public TextureAtlas.AtlasRegion currentFrame;
-    public State currentState = State.WALK;
+    public State currentState = State.IDLE;
     public float stateTime = 0f;
 
     public AnimationComponent(Animatable animatable, String... animationNames) {

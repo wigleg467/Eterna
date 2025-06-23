@@ -134,13 +134,13 @@ public class EntityFactory {
         entity.add(new LevelComponent(lvl));
 
         engine.addEntity(entity);
+
+        Gdx.app.log("Create", "NPC");
     }
 
     public void createTileLayer(TiledMap map, String layerName, int lvl) {
         createTileLayer(map, layerName, lvl, 0f, 0f, 0f);
     }
-
-
 
     public void createTileLayer(TiledMap map, String layerName, int lvl, float density, float friction, float restitution) {
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(layerName);

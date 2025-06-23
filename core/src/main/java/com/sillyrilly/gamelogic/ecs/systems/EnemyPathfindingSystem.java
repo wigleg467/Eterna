@@ -42,22 +42,34 @@ public class EnemyPathfindingSystem extends EntitySystem {
         for (Entity enemy : enemies) {
             BodyComponent bce = bc.get(enemy);
             AIComponent ai = aic.get(enemy);
-            PathComponent pc = this.pc.get(enemy);
+            PathComponent pathComp = pc.get(enemy);
 
-            if (ai.stateMachine.getCurrentState() != EnemyState.CHASE)
+            if (ai.stateMachine.getCurrentState() != EnemyState.CHASE) {
+                bce.body.setLinearVelocity(0, 0);
                 continue;
-
-            TileNode start = graph.getNode((int) bce.getPosition().x, (int) bce.getPosition().y);
-            TileNode end = graph.getNode((int) bcp.getPosition().x, (int) bcp.getPosition().y);
-
-            pc.path.clear();
-
-            if (pathFinder.searchNodePath(start, end, diagonalHeuristic, pc.path)) {
-                pc.currentIndex = 1;
             }
 
-            if (pc.path.getCount() > pc.currentIndex) {
-                TileNode nextStep = pc.path.get(pc.currentIndex);
+            pathComp.timeSinceLastUpdate += deltaTime;
+            Vector2 playerPos = bcp.body.getPosition();
+
+            boolean needsUpdate = !pathComp.lastTargetPosition.epsilonEquals(playerPos, 0.1f) || pathComp.timeSinceLastUpdate > 1f;
+
+            if (needsUpdate) {
+                pathComp.timeSinceLastUpdate = 0f;
+                pathComp.lastTargetPosition.set(playerPos);
+
+                TileNode start = graph.getNode((int) bce.getPosition().x, (int) bce.getPosition().y);
+                TileNode end = graph.getNode((int) playerPos.x, (int) playerPos.y);
+
+                pathComp.path.clear();
+
+                if (pathFinder.searchNodePath(start, end, diagonalHeuristic, pathComp.path)) {
+                    pathComp.currentIndex = 1;
+                }
+            }
+
+            if (pathComp.path.getCount() > pathComp.currentIndex) {
+                TileNode nextStep = pathComp.path.get(pathComp.currentIndex);
                 float targetX = nextStep.x + 0.5f;
                 float targetY = nextStep.y + 0.5f;
 
@@ -66,7 +78,7 @@ public class EnemyPathfindingSystem extends EntitySystem {
                 float distance = direction.len();
 
                 if (distance < 0.1f) {
-                    pc.currentIndex++;
+                    pathComp.currentIndex++;
                 } else {
                     direction.nor();
                     float speed = 200f;

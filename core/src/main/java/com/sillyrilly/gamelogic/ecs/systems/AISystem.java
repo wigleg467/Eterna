@@ -47,6 +47,6 @@ public class AISystem extends EntitySystem {
     private boolean canSeePlayer(Entity enemy, Vector2 playerPos) {
         Vector2 enemyPos = enemy.getComponent(BodyComponent.class).getPosition();
         float dst = enemyPos.dst2(playerPos);
-        return dst < 30 * TILE_SIZE; // хз що це за число насправді (певно відстань по прямій)
+        return dst < 10 * TILE_SIZE; // хз що це за число насправді (певно відстань по прямій)
     }
 }

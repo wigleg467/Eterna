@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -20,10 +19,8 @@ import com.sillyrilly.gamelogic.ecs.components.*;
 import com.sillyrilly.gamelogic.ecs.ai.TileGraph;
 import com.sillyrilly.gamelogic.ecs.ai.TileNode;
 import com.sillyrilly.managers.*;
-import com.sillyrilly.gamelogic.ecs.components.*;
 import com.sillyrilly.managers.CameraManager;
 import com.sillyrilly.managers.InputManager;
-import com.sillyrilly.screens.GameScreen;
 
 import static com.sillyrilly.util.Const.*;
 
@@ -43,6 +40,8 @@ public class RenderSystem extends EntitySystem {
     private final SpriteBatch batch = ScreenManager.batch;
     private final ShapeRenderer shapeRenderer = ScreenManager.shapeRenderer;
 
+    private final Array<Entity> backgroundEntities = new Array<>();
+    private final Array<Entity> dynamicEntities = new Array<>();
     private final Array<Entity> sortedEntities = new Array<>();
 
     private final TileGraph graph = TileGraph.instance;
@@ -52,11 +51,36 @@ public class RenderSystem extends EntitySystem {
     public void addedToEngine(Engine engine) {
         entities = engine.getEntitiesFor(Family.all(BodyComponent.class, LevelComponent.class).get());
         enemies = engine.getEntitiesFor(Family.all(PathComponent.class).get());
+
+        for (int i = 0; i < entities.size(); i++) {
+            Entity e = entities.get(i);
+            LevelComponent level = lc.get(e);
+            if (level.level < 5) {
+                backgroundEntities.add(e); // фон (земля, плитки)
+            } else {
+                dynamicEntities.add(e);    // гравці, NPC, тощо
+            }
+        }
+        backgroundEntities.sort((a, b) -> {
+            LevelComponent la = lc.get(a);
+            LevelComponent lb = lc.get(b);
+
+            if (la.level != lb.level) return Integer.compare(la.level, lb.level);
+
+            float ya = bc.get(a).body.getPosition().y;
+            float yb = bc.get(b).body.getPosition().y;
+            if (tc.has(a)) ya -= tc.get(a).renderOffsetY;
+            if (tc.has(b)) yb -= tc.get(b).renderOffsetY;
+
+            return Float.compare(yb, ya);
+        });
     }
 
     @Override
     public void update(float deltaTime) {
         sortEntities();
+
+        Gdx.app.log("RenderSystem", "Rendering " + sortedEntities.size + " entities");
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);
@@ -65,93 +89,81 @@ public class RenderSystem extends EntitySystem {
         renderEntities();
         batch.end();
 
-        //    batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
-        //    batch.begin();
-        //    GameScreen.instance.dialogueWindow.render(batch);
-        //    batch.end();
-
         debugMode();
     }
 
     private void sortEntities() {
         sortedEntities.clear();
-        for (int i = 0; i < entities.size(); i++) {
-            sortedEntities.add(entities.get(i));
-        }
+        sortedEntities.addAll(dynamicEntities);
 
         sortedEntities.sort((a, b) -> {
-            LevelComponent la = lc.get(a);
-            LevelComponent lb = lc.get(b);
-
-            if (la.level != lb.level) {
-                return Integer.compare(la.level, lb.level);
-            }
-
             float ya = bc.get(a).body.getPosition().y;
             float yb = bc.get(b).body.getPosition().y;
-
-            if (tc.has(a)) ya -= tc.get(a).renderOffsetY;
-            if (tc.has(b)) yb -= tc.get(b).renderOffsetY;
-
             return Float.compare(yb, ya);
         });
     }
 
     private void renderEntities() {
+        float camLeft = (camera.position.x - camera.viewportWidth * camera.zoom / 2f);
+        float camRight = (camera.position.x + camera.viewportWidth * camera.zoom / 2f);
+        float camBottom = (camera.position.y - camera.viewportHeight * camera.zoom / 2f);
+        float camTop = (camera.position.y + camera.viewportHeight * camera.zoom / 2f);
+
+        // Render background level entities (e.g. ground tiles) — level == 0
+        for (Entity entity : backgroundEntities) {
+            renderEntity(entity, camLeft, camRight, camBottom, camTop);
+        }
+
+        // Render sorted dynamic entities (level > 0)
         for (Entity entity : sortedEntities) {
-            if (entity.getComponent(PlayerComponent.class) != null) {
-
-
-                BodyComponent body = bc.get(entity);
-                AnimationTopComponent topAnim = act.get(entity);
-                AnimationButtomComponent bottomAnim = acb.get(entity);
-
-                Vector2 pos = body.getPosition().scl(PPM);
-                float scale = 0.25f;
-
-                // нижня частина
-                TextureAtlas.AtlasRegion bottomFrame = bottomAnim.currentFrame;
-                //  if (bottomFrame != null) {
-                float width = bottomFrame.getRegionWidth() * scale;
-                float height = bottomFrame.getRegionHeight() * scale;
-                batch.draw(bottomFrame, pos.x - width / 2f, pos.y, width, height);
-                //  }
-
-                // верхня частина (малюємо вище)
-                TextureAtlas.AtlasRegion topFrame = topAnim.currentFrame;
-                // if (topFrame != null) {
-                width = topFrame.getRegionWidth() * scale;
-                height = topFrame.getRegionHeight() * scale;
-                batch.draw(topFrame, pos.x - width / 2f, pos.y, width, height);
-                //    }
-
-            } else if (ac.has(entity)) {
-                AnimationComponent anim = ac.get(entity);
-                BodyComponent body = bc.get(entity);
-
-                TextureAtlas.AtlasRegion frame = anim.currentFrame;
-                if (frame == null) continue;
-
-                float scale = 0.25f;
-                float width = frame.getRegionWidth() * scale;
-                float height = frame.getRegionHeight() * scale;
-
-                Vector2 pos = body.getPosition().scl(PPM);
-                batch.draw(frame, pos.x - width / 2f, pos.y, width, height);
-
-            } else if (tc.has(entity)) {
-                BodyComponent bodyC = bc.get(entity);
-                TileComponent tileC = tc.get(entity);
-
-                Vector2 pos = bodyC.body.getPosition().scl(PPM);
-                TiledMapTile tile = tileC.tile;
-                TextureRegion region = tile.getTextureRegion();
-
-                batch.draw(region, pos.x, pos.y,
-                    TILE_SIZE, tileC.renderOffsetY + TILE_SIZE);
-            }
+            renderEntity(entity, camLeft, camRight, camBottom, camTop);
         }
     }
+
+    private void renderEntity(Entity entity, float camLeft, float camRight, float camBottom, float camTop) {
+        BodyComponent body = bc.get(entity);
+        Vector2 pos = body.getPosition().scl(PPM);
+
+        if (pos.x < camLeft - TILE_SIZE || pos.x > camRight + TILE_SIZE ||
+            pos.y < camBottom - TILE_SIZE || pos.y > camTop + TILE_SIZE) {
+            return;
+        }
+
+        if (entity.getComponent(PlayerComponent.class) != null) {
+            AnimationTopComponent topAnim = act.get(entity);
+            AnimationButtomComponent bottomAnim = acb.get(entity);
+
+            float scale = 0.25f;
+
+            TextureAtlas.AtlasRegion bottomFrame = bottomAnim.currentFrame;
+            float width = bottomFrame.getRegionWidth() * scale;
+            float height = bottomFrame.getRegionHeight() * scale;
+            batch.draw(bottomFrame, pos.x - width / 2f, pos.y, width, height);
+
+            TextureAtlas.AtlasRegion topFrame = topAnim.currentFrame;
+            width = topFrame.getRegionWidth() * scale;
+            height = topFrame.getRegionHeight() * scale;
+            batch.draw(topFrame, pos.x - width / 2f, pos.y, width, height);
+
+        } else if (ac.has(entity)) {
+            AnimationComponent anim = ac.get(entity);
+            TextureAtlas.AtlasRegion frame = anim.currentFrame;
+            if (frame == null) return;
+
+            float scale = 0.25f;
+            float width = frame.getRegionWidth() * scale;
+            float height = frame.getRegionHeight() * scale;
+            batch.draw(frame, pos.x - width / 2f, pos.y, width, height);
+
+        } else if (tc.has(entity)) {
+            TileComponent tileC = tc.get(entity);
+            TiledMapTile tile = tileC.tile;
+            TextureRegion region = tile.getTextureRegion();
+            batch.draw(region, pos.x, pos.y,
+                TILE_SIZE, tileC.renderOffsetY + TILE_SIZE);
+        }
+    }
+
 
     private void debugMode() {
         if (InputManager.instance.isDebugMode()) {
@@ -164,8 +176,14 @@ public class RenderSystem extends EntitySystem {
 
     private void drawGrid() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for (int x = 0; x < grid.length; x++) {
-            for (int y = 0; y < grid[0].length; y++) {
+
+        int minX = Math.max(0, (int) ((camera.position.x - camera.viewportWidth * camera.zoom / 2) / TILE_SIZE));
+        int maxX = Math.min(grid.length, (int) ((camera.position.x + camera.viewportWidth * camera.zoom / 2) / TILE_SIZE) + 1);
+        int minY = Math.max(0, (int) ((camera.position.y - camera.viewportHeight * camera.zoom / 2) / TILE_SIZE));
+        int maxY = Math.min(grid[0].length, (int) ((camera.position.y + camera.viewportHeight * camera.zoom / 2) / TILE_SIZE) + 1);
+
+        for (int x = minX; x < maxX; x++) {
+            for (int y = minY; y < maxY; y++) {
                 TileNode node = graph.getNode(x, y);
                 shapeRenderer.setColor(node.walkable ? Color.GREEN : Color.RED);
                 shapeRenderer.rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -207,9 +225,18 @@ public class RenderSystem extends EntitySystem {
         Vector3 screenCoords = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
+
+        // Вивід координат курсора
         FontManager.defaultFont.draw(batch,
             String.format("(%.1f, %.1f)", screenCoords.x, screenCoords.y),
             screenCoords.x + 10, screenCoords.y + 20);
+
+        // Вивід FPS трохи нижче курсора
+        FontManager.defaultFont.draw(batch,
+            "FPS: " + Gdx.graphics.getFramesPerSecond(),
+            screenCoords.x + 10, screenCoords.y + 40);
+
         batch.end();
     }
 }
+

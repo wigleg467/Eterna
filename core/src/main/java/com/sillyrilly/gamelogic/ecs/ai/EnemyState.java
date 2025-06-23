@@ -4,8 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
-import com.badlogic.gdx.math.Vector2;
-import com.sillyrilly.gamelogic.ecs.components.BodyComponent;
+
 
 public enum EnemyState implements State<Entity> {
     IDLE {
@@ -16,13 +15,10 @@ public enum EnemyState implements State<Entity> {
 
         @Override
         public void update(Entity entity) {
-            Gdx.app.log("AI", "Update IDLE");
-            entity.getComponent(BodyComponent.class).body.setLinearVelocity(Vector2.Zero);
         }
 
         @Override
         public void exit(Entity entity) {
-            Gdx.app.log("AI", "Exit IDLE");
         }
 
         @Override
