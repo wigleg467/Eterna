@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="600" height="328" tilewidth="32" tileheight="32" infinite="0" nextlayerid="17" nextobjectid="839">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="600" height="328" tilewidth="32" tileheight="32" infinite="0" nextlayerid="17" nextobjectid="854">
  <tileset firstgid="1" source="tilesets/landscape.tsx"/>
  <tileset firstgid="65" source="tilesets/first_level_tiles.tsx"/>
  <tileset firstgid="129" source="tilesets/mainlevbuild.tsx"/>
@@ -3520,13 +3520,13 @@
   <object id="833" name="bridge_block" x="1766.5" y="1050" width="20.5" height="102.5"/>
  </objectgroup>
  <objectgroup id="16" name="Spawns">
-  <object id="838" name="PlayerSpawn" x="17066.7" y="987.879"/>
+  <object id="840" name="PlayerSpawn" x="1116" y="220"/>
  </objectgroup>
  <objectgroup id="6" name="Enemies">
   <object id="601" name="GUARD" type="GUARD" x="302.395" y="605.151" width="22" height="17">
    <properties>
+    <property name="location" value="hellGates"/>
     <property name="type" value="guard"/>
-     <property name="location" value="hellGates"/>
    </properties>
   </object>
   <object id="602" name="Skeleton" x="3635.73" y="2936.57">
@@ -3582,6 +3582,54 @@
     <property name="type" value="angel"/>
    </properties>
   </object>
+  <object id="841" x="2632" y="1672">
+   <properties>
+    <property name="location" value="forest"/>
+    <property name="type" value="watermelon"/>
+   </properties>
+  </object>
+  <object id="842" x="3408" y="1696">
+   <properties>
+    <property name="location" value="forest"/>
+    <property name="type" value="watermelon"/>
+   </properties>
+  </object>
+  <object id="843" x="2888" y="1160">
+   <properties>
+    <property name="location" value="forest"/>
+    <property name="type" value="watermelon"/>
+   </properties>
+  </object>
+  <object id="844" x="3328" y="1384">
+   <properties>
+    <property name="location" value="forest"/>
+    <property name="type" value="watermelon"/>
+   </properties>
+  </object>
+  <object id="849" x="4112" y="1912">
+   <properties>
+    <property name="location" value="forest"/>
+    <property name="type" value="mummy"/>
+   </properties>
+  </object>
+  <object id="850" x="4888" y="1936">
+   <properties>
+    <property name="location" value="forest"/>
+    <property name="type" value="mummy"/>
+   </properties>
+  </object>
+  <object id="851" x="4368" y="1400">
+   <properties>
+    <property name="location" value="forest"/>
+    <property name="type" value="mummy"/>
+   </properties>
+  </object>
+  <object id="852" x="4808" y="1624">
+   <properties>
+    <property name="location" value="forest"/>
+    <property name="type" value="mummy"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="7" name="NPC">
   <object id="611" name="Nun" x="5818.4" y="2798.15">
@@ -3592,6 +3640,11 @@
   <object id="610" name="Lumberjack" x="6134.4" y="656.818">
    <properties>
     <property name="type" value="lumberjack"/>
+   </properties>
+  </object>
+  <object id="853" x="1806.67" y="1101.33">
+   <properties>
+    <property name="type" value="guardcat"/>
    </properties>
   </object>
  </objectgroup>

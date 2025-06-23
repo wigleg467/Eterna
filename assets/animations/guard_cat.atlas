@@ -1,0 +1,40 @@
+guard_cat.png
+size: 480, 1750
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+default
+  rotate: false
+  xy: 0, 0
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 0
+idle
+  rotate: false
+  xy: 0, 350
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 0
+idle
+  rotate: false
+  xy: 0, 700
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 1
+idle
+  rotate: false
+  xy: 0, 1050
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 3
+idle
+  rotate: false
+  xy: 0, 1400
+  size: 480, 350
+  orig: 480, 350
+  offset: 0, 0
+  index: 4

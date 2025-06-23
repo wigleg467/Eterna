@@ -7,8 +7,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.*;
 import com.sillyrilly.managers.InputManager;
 
-import static com.sillyrilly.gamelogic.ecs.utils.GameState.defeatedCemeteryMonsters;
-import static com.sillyrilly.gamelogic.ecs.utils.GameState.defeatedHellGatesMonsters;
+import static com.sillyrilly.gamelogic.ecs.utils.GameState.*;
+
 
 public class AttackSystem extends EntitySystem {
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
@@ -40,6 +40,7 @@ public class AttackSystem extends EntitySystem {
 
             boolean allCemeteryDead = true;
             boolean allHellGatesDead = true;
+            boolean allForestDead = true;
 
             for (Entity enemy : enemies) {
                 BodyComponent bce = bc.get(enemy);
@@ -65,6 +66,9 @@ public class AttackSystem extends EntitySystem {
                 if (loc != null && loc.location.equals("hellGates") && hce.isAlive) {
                     allHellGatesDead = false;
                 }
+                if (loc != null && loc.location.equals("forest") && hce.isAlive) {
+                    allForestDead = false;
+                }
             }
 
             if (allCemeteryDead) {
@@ -74,6 +78,10 @@ public class AttackSystem extends EntitySystem {
             if (allHellGatesDead) {
                 defeatedHellGatesMonsters = true;
                 Gdx.app.log("Location", "All enemies in hellGates are dead");
+            }
+            if (allForestDead) {
+                defeatedForestMonsters = true;
+                Gdx.app.log("Location", "All enemies in forest are dead");
             }
 
         }

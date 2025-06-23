@@ -57,6 +57,20 @@ public class DialogueManager {
             "Ти отримуєш моє балословення",
             "Іди перетни міст"
         ));
+        dialogues.put(new DialogueKey(NPCType.GUARDCAT, 0), new Dialogue(
+                NPCType.GUARDCAT.getName(),
+                NPCType.GUARDCAT.getPortraitPath(),
+                "О нііі,так просто через міст ти не пройдеш",
+                "Спершу отрисай благословення монашки!",
+                "Вона біля монастиря, туди дорога через ліс"
+        ));
+        dialogues.put(new DialogueKey(NPCType.GUARDCAT, 1), new Dialogue(
+                NPCType.GUARDCAT.getName(),
+                NPCType.GUARDCAT.getPortraitPath(),
+                "Нічого собі",
+                "В тебе вийшло!.",
+                "Але чи на щастя це..."
+        ));
     }
 
     public static Dialogue getDialogue(NPCType type, int stage) {

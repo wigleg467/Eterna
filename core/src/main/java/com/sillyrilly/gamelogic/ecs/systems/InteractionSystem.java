@@ -69,6 +69,10 @@ public class InteractionSystem extends EntitySystem {
                     defeatedForestMonsters && finalNpcComp.npcType == NPCType.LUMBERJACK) {
                     finalNpcComp.dialogueStage = 2;
                 }
+                if(gotBlessing&&finalNpcComp.npcType == NPCType.GUARDCAT) {
+                    finalNpcComp.dialogueStage = 1;
+
+                }
 
                 dialogueWindow.onDialogueEnd = () -> {
                     if (finalNpcComp.npcType == NPCType.NUN && finalNpcComp.dialogueStage == 2) {
@@ -79,6 +83,7 @@ public class InteractionSystem extends EntitySystem {
                     } else if (finalNpcComp.npcType == NPCType.LUMBERJACK && finalNpcComp.dialogueStage == 0) {
                         finalNpcComp.dialogueStage++;
                     }
+                    anim.currentState = AnimationComponent.State.IDLE;
                 };
                 dialogueWindow.showDialogue(dialogue);
             }
