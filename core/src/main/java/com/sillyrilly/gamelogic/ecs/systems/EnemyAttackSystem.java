@@ -4,13 +4,9 @@ import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.sillyrilly.gamelogic.ecs.components.*;
-import com.sillyrilly.gamelogic.ecs.utils.GameOverWindow;
 import com.sillyrilly.gamelogic.ecs.utils.GameState;
-import com.sillyrilly.screens.GameScreen;
-
-import static com.sillyrilly.managers.FontManager.MENU_hoverFont;
+import com.sillyrilly.managers.ScreenManager;
 
 public class EnemyAttackSystem extends EntitySystem {
     private final ComponentMapper<BodyComponent> bc = ComponentMapper.getFor(BodyComponent.class);
@@ -52,9 +48,7 @@ public class EnemyAttackSystem extends EntitySystem {
                     }
                     if (!hcp.isAlive) {
                         String statsText = GameState.instance.stats.formatStats();
-                        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
-                        GameOverWindow gameOver = new GameOverWindow(skin, MENU_hoverFont, statsText);
-                        GameScreen.instance.stage.addActor(gameOver);
+                        ScreenManager.instance.setScreen(ScreenManager.ScreenType.GAMEOVER);
                        // GameScreen.instance.engine.setProcessing(false);
                     }
                 }

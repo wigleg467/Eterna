@@ -30,4 +30,6 @@ public class GameState {
         hell = false;
         heaven = false;
     }
+
+
 }

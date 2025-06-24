@@ -10,7 +10,7 @@ public class MenuConfig {
     public static final float FLOAT = 0.1f;
     public static final String MENU_CHARACTERS = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ" +
                                                  "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя" +
-                                                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.,:;(){}[]«»–-";
+                                                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.,:;(){}[]«»'–-";
 
 
 

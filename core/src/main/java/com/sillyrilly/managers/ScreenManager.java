@@ -5,7 +5,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
+import com.sillyrilly.gamelogic.ecs.utils.GameState;
 import com.sillyrilly.screens.ASCIIScreen;
+import com.sillyrilly.screens.GameOverScreen;
 import com.sillyrilly.screens.GameScreen;
 import com.sillyrilly.screens.MenuScreen;
 
@@ -57,7 +59,7 @@ public class ScreenManager implements Disposable {
     }
 
     public enum ScreenType {
-        MENU, GAME, ASCII;
+        MENU, GAME, ASCII, GAMEOVER;
 
         public static ScreenType current = GAME;
 
@@ -66,6 +68,7 @@ public class ScreenManager implements Disposable {
                 case MENU -> new MenuScreen();
                 case GAME -> new GameScreen();
                 case ASCII -> new ASCIIScreen();
+                case GAMEOVER -> new GameOverScreen(GameState.instance.stats.formatStats());
             };
         }
 

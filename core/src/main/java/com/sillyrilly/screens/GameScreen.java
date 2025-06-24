@@ -33,6 +33,7 @@ import java.util.Map;
 import static com.sillyrilly.gamelogic.ecs.utils.GameState.*;
 import static com.sillyrilly.managers.AssetsManager.bigWorld;
 import static com.sillyrilly.managers.CameraManager.viewport;
+import static com.sillyrilly.managers.FontManager.GAME_hoverFont;
 import static com.sillyrilly.managers.FontManager.MENU_hoverFont;
 import static com.sillyrilly.managers.ScreenManager.batch;
 import static com.sillyrilly.util.Const.PPM;
@@ -46,7 +47,7 @@ public class GameScreen implements Screen {
     public Engine engine;
     private World world;
     private float zoom = 0.6f;
-    private boolean initialized = false;
+    public boolean initialized = false;
     public HintRenderer hintRenderer;
     public Stage stage;
 
@@ -189,7 +190,7 @@ public class GameScreen implements Screen {
         engine.addSystem(new EnemyPathfindingSystem());
         dialogueWindow = new DialogueWindow(new Texture("images/dialogue.png"), MENU_hoverFont);
         engine.addSystem(new InteractionSystem(dialogueWindow));
-        hintRenderer = new HintRenderer(MENU_hoverFont);
+        hintRenderer = new HintRenderer(GAME_hoverFont);
         engine.addSystem(new AttackSystem());
         engine.addSystem(new EnemyAttackSystem());
         engine.addSystem(new RenderSystem());

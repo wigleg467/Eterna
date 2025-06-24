@@ -18,6 +18,8 @@ public class FontManager implements Disposable {
     // Menu
     public static BitmapFont MENU_mainFont;
     public static BitmapFont MENU_hoverFont;
+    public static BitmapFont GAME_hoverFont;
+
 
     // ASCII
     public static BitmapFont ASCII_mainFont;
@@ -52,6 +54,11 @@ public class FontManager implements Disposable {
             ASCII_mainFont = asciiGen.generateFont(param);
             param.size = 16;
             ASCII_minimapFont = asciiGen.generateFont(param);
+
+            param.characters = MENU_CHARACTERS;
+            param.size = 17;
+            GAME_hoverFont = menuGen.generateFont(param);
+            GAME_hoverFont.getData().markupEnabled = true;
 
             assert ASCII_minimapFont != null;
             ASCII_characterGlyph = ASCII_minimapFont.getData().getGlyph('>');
