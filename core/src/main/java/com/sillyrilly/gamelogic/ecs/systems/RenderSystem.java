@@ -46,11 +46,13 @@ public class RenderSystem extends EntitySystem {
     private final int[][] grid = NavigationMap.instance.grid;
     private ImmutableArray<Entity> entities;
     private ImmutableArray<Entity> enemies;
+    private Entity player;
 
     @Override
     public void addedToEngine(Engine engine) {
         entities = engine.getEntitiesFor(Family.all(BodyComponent.class, LevelComponent.class).get());
         enemies = engine.getEntitiesFor(Family.all(PathComponent.class).get());
+        player = engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
 
         for (int i = 0; i < entities.size(); i++) {
             Entity e = entities.get(i);
@@ -84,6 +86,12 @@ public class RenderSystem extends EntitySystem {
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
+        if (hc.has(player)) {
+            HealComponent heal = hc.get(player);
+            if (heal.hitTimer > 0) {
+                heal.hitTimer -= deltaTime;
+            }
+        }
         for (Entity entity : enemies) {
             if (hc.has(entity)) {
                 HealComponent heal = hc.get(entity);
