@@ -24,7 +24,6 @@ import com.sillyrilly.managers.FontManager;
 import com.sillyrilly.managers.InputManager;
 import com.sillyrilly.managers.ScreenManager;
 import com.sillyrilly.screens.GameScreen;
-
 import static com.sillyrilly.util.Const.PPM;
 import static com.sillyrilly.util.Const.TILE_SIZE;
 
@@ -47,11 +46,13 @@ public class RenderSystem extends EntitySystem {
     private final int[][] grid = NavigationMap.instance.grid;
     private ImmutableArray<Entity> entities;
     private ImmutableArray<Entity> enemies;
+    private Entity player;
 
     @Override
     public void addedToEngine(Engine engine) {
         entities = engine.getEntitiesFor(Family.all(BodyComponent.class, LevelComponent.class).get());
         enemies = engine.getEntitiesFor(Family.all(PathComponent.class).get());
+        player = engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
 
         for (int i = 0; i < entities.size(); i++) {
             Entity e = entities.get(i);
@@ -85,7 +86,13 @@ public class RenderSystem extends EntitySystem {
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
-        for (Entity entity : sortedEntities) {
+        if (hc.has(player)) {
+            HealComponent heal = hc.get(player);
+            if (heal.hitTimer > 0) {
+                heal.hitTimer -= deltaTime;
+            }
+        }
+        for (Entity entity : enemies) {
             if (hc.has(entity)) {
                 HealComponent heal = hc.get(entity);
                 if (heal.hitTimer > 0) {
@@ -134,12 +141,13 @@ public class RenderSystem extends EntitySystem {
         float camBottom = (camera.position.y - camera.viewportHeight * camera.zoom / 2f);
         float camTop = (camera.position.y + camera.viewportHeight * camera.zoom / 2f);
 
-        // Render background level entities (e.g. ground tiles) — level == 0
+        // Render background level entities (e.g. ground tiles) — level < 5
         for (Entity entity : backgroundEntities) {
             renderEntity(entity, camLeft, camRight, camBottom, camTop);
         }
 
-        // Render sorted dynamic entities (level > 0)
+
+        // Render sorted dynamic entities (level == 5)
         for (Entity entity : sortedEntities) {
             renderEntity(entity, camLeft, camRight, camBottom, camTop);
         }
@@ -164,7 +172,6 @@ public class RenderSystem extends EntitySystem {
             AnimationButtomComponent bottomAnim = acb.get(entity);
 
             float scale = 0.25f;
-            HealComponent heal = hc.get(entity);
             if (hc.has(entity) && hc.get(entity).hitTimer > 0) {
                 batch.setColor(Color.RED);
             }

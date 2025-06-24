@@ -18,7 +18,7 @@ public class InputManager extends InputAdapter {
     private AnimationButtomComponent.BottomState bottomState;
     private AnimationTopComponent.TopState topState;
     private boolean changeCamera = false;
-    private boolean canAttack = true;
+    private boolean attack = false;
     private boolean debug = false;
     private WeaponComponent.WeaponType currentWeapon = WeaponComponent.WeaponType.SWORD;
 
@@ -40,7 +40,6 @@ public class InputManager extends InputAdapter {
 
         movement.set(0, 0);
 
-        boolean isAttacking = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
         boolean isMoving = false;
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
@@ -69,8 +68,9 @@ public class InputManager extends InputAdapter {
             movement.nor();
         }
 
-        if (isAttacking) {
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             topState = AnimationTopComponent.TopState.ATTACK;
+            setAttack(true);
         }
 
 
@@ -139,12 +139,12 @@ public class InputManager extends InputAdapter {
         return movement;
     }
 
-    public boolean canAttack() {
-        return canAttack;
+    public boolean isAttacking() {
+        return attack;
     }
 
-    public void setCanAttack(boolean canAttack) {
-        this.canAttack = canAttack;
+    public void setAttack(boolean attack) {
+        this.attack = attack;
     }
 
     public WeaponComponent.WeaponType getCurrentWeapon() {

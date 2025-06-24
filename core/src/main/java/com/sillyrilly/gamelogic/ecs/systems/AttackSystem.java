@@ -31,9 +31,7 @@ public class AttackSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
-        if (inputManager.canAttack()) {
-            inputManager.setCanAttack(false);
-
+        if (inputManager.isAttacking()) {
             BodyComponent bcp = bc.get(player);
             FacingComponent fcp = fc.get(player);
             WeaponComponent wcp = wc.get(player);
@@ -54,10 +52,10 @@ public class AttackSystem extends EntitySystem {
                 if (isEnemyNearPlayer(bcp.getPosition(), bce.getPosition(), facingRight)) {
                     if (hce.isAlive) {
                         hce.takeDamage(wcp.type.DAMAGE);
-                        hce.hitTimer = 0.15f;
                         Gdx.app.log("Hit", hce.hp + " " + hce.isAlive);
+                        hce.hitTimer = 0.15f;
                     }
-                    if(!hce.isAlive) {
+                    if (!hce.isAlive) {
                         bce.body.setActive(false);
                         GameState.instance.stats.addKill(enc.enemyType.name());
                     }
@@ -88,7 +86,7 @@ public class AttackSystem extends EntitySystem {
                 defeatedForestMonsters = true;
                 Gdx.app.log("Location", "All enemies in forest are dead");
             }
-
+            inputManager.setAttack(false);
         }
     }
 

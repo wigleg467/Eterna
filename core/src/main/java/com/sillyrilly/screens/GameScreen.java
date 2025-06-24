@@ -41,6 +41,7 @@ import static com.sillyrilly.util.Const.TILE_SCALE;
 
 public class GameScreen implements Screen {
     public static GameScreen instance;
+
     private final Map<String, Body> removableBodies = new HashMap<>();
     public DialogueWindow dialogueWindow;
     private OrthographicCamera camera;
@@ -186,6 +187,8 @@ public class GameScreen implements Screen {
         engine.addSystem(new MovementSystem());
         engine.addSystem(new CameraFollowSystem());
         engine.addSystem(new AnimationSystem());
+        engine.addSystem(new AttackSystem());
+        engine.addSystem(new EnemyAttackSystem());
         engine.addSystem(new AISystem());
         engine.addSystem(new EnemyPathfindingSystem());
         dialogueWindow = new DialogueWindow(new Texture("images/dialogue.png"), MENU_hoverFont);

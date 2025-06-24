@@ -24,7 +24,7 @@ public class ASCIIScreen implements Screen {
     private Random rand;
 
     private float playerX = 1.5f, playerY = 1.5f;
-    private float angle = 0.0f;
+    private float angle = (float) 270;
 
     private float scale = 1f * ANTI_ALIASING;
 

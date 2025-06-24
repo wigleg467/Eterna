@@ -52,14 +52,14 @@ public class AnimationSystem extends EntitySystem {
                 // --- TOP STATE ---
 
                 if (top.currentState == AnimationTopComponent.TopState.ATTACK) {
+                    InputManager.instance.setAttack(false);
+
                     top.stateTime += deltaTime;
-                    bottom.stateTime += deltaTime;
 
                     Animation<TextureAtlas.AtlasRegion> attackAnim = top.getAnimation(weapon, AnimationTopComponent.TopState.ATTACK);
                     if (attackAnim != null && attackAnim.isAnimationFinished(top.stateTime)) {
                         top.currentState = topInputState;
                         top.stateTime = 0f;
-                        InputManager.instance.setCanAttack(true);
                     }
                 } else {
                     if (top.currentState != topInputState) {
@@ -68,13 +68,13 @@ public class AnimationSystem extends EntitySystem {
                     } else {
                         top.stateTime += deltaTime;
                     }
+                }
 
-                    if (bottom.currentState != bottomInputState) {
-                        bottom.currentState = bottomInputState;
-                        bottom.stateTime = 0f;
-                    } else {
-                        bottom.stateTime += deltaTime;
-                    }
+                if (bottom.currentState != bottomInputState) {
+                    bottom.currentState = bottomInputState;
+                    bottom.stateTime = 0f;
+                } else {
+                    bottom.stateTime += deltaTime;
                 }
 
                 // --- UPDATE FRAMES ---
