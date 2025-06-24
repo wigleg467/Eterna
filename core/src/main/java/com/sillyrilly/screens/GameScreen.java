@@ -14,12 +14,14 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.sillyrilly.gamelogic.ecs.ai.NavigationMap;
 import com.sillyrilly.gamelogic.ecs.ai.TileGraph;
 import com.sillyrilly.gamelogic.ecs.entities.EntityFactory;
 import com.sillyrilly.gamelogic.ecs.systems.*;
 import com.sillyrilly.gamelogic.ecs.utils.DialogueWindow;
 import com.sillyrilly.gamelogic.ecs.utils.EnemyType;
+import com.sillyrilly.gamelogic.ecs.utils.HintRenderer;
 import com.sillyrilly.gamelogic.ecs.utils.NPCType;
 import com.sillyrilly.managers.AudioManager;
 import com.sillyrilly.managers.CameraManager;
@@ -31,7 +33,9 @@ import java.util.Map;
 
 import static com.sillyrilly.gamelogic.ecs.utils.GameState.*;
 import static com.sillyrilly.managers.AssetsManager.bigWorld;
+import static com.sillyrilly.managers.CameraManager.viewport;
 import static com.sillyrilly.managers.FontManager.MENU_hoverFont;
+import static com.sillyrilly.managers.ScreenManager.batch;
 import static com.sillyrilly.managers.ScreenManager.mapRenderer;
 import static com.sillyrilly.util.Const.PPM;
 import static com.sillyrilly.util.Const.TILE_SCALE;
@@ -42,23 +46,23 @@ public class GameScreen implements Screen {
     private final Map<String, Body> removableBodies = new HashMap<>();
     public DialogueWindow dialogueWindow;
     private OrthographicCamera camera;
-    private Engine engine;
+    public Engine engine;
     private World world;
     private float zoom = 0.6f;
     private boolean initialized = false;
+    public HintRenderer hintRenderer;
+    public Stage stage;
 
     @Override
     public void show() {
         if (!initialized) {
             instance = this;
             camera = CameraManager.camera;
-
+            stage = new Stage(viewport, batch);
+            Gdx.input.setInputProcessor(stage);
             new TileGraph(new NavigationMap(bigWorld).grid);
             world = new World(new Vector2(0, 0), true);
-            mapRenderer = new OrthogonalTiledMapRenderer(bigWorld, 1 / PPM);
-            mapRenderer.setView(camera);
             engine = new Engine();
-
 
             parseMaps();
             initFactory();
@@ -191,6 +195,7 @@ public class GameScreen implements Screen {
         dialogueWindow = new DialogueWindow(new Texture("images/dialogue.png"), MENU_hoverFont);
         engine.addSystem(new InteractionSystem(dialogueWindow));
 
+        hintRenderer = new HintRenderer(MENU_hoverFont);
         engine.addSystem(new RenderSystem());
     }
 

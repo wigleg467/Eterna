@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="600" height="328" tilewidth="32" tileheight="32" infinite="0" nextlayerid="18" nextobjectid="962">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="600" height="328" tilewidth="32" tileheight="32" infinite="0" nextlayerid="18" nextobjectid="969">
  <tileset firstgid="1" source="tilesets/landscape.tsx"/>
  <tileset firstgid="65" source="tilesets/first_level_tiles.tsx"/>
  <tileset firstgid="129" source="tilesets/mainlevbuild.tsx"/>
@@ -3362,8 +3362,8 @@
   <object id="474" x="1128.66" y="1148.71" width="640.151" height="77.5455"/>
   <object id="475" x="665.986" y="844.378" width="16.1515" height="16.2122"/>
   <object id="476" x="806.653" y="1005.04" width="18.8182" height="16.2122"/>
-  <object id="477" x="1109.32" y="1037.04" width="682.818" height="11.5455"/>
-  <object id="478" x="1124.66" y="1019.04" width="667.485" height="18.2122"/>
+  <object id="477" x="1110.32" y="1048.04" width="682.818" height="11.5455"/>
+  <object id="478" x="1120.66" y="1031.04" width="667.485" height="18.2122"/>
   <object id="479" x="1570.66" y="859.712" width="254.151" height="158.212"/>
   <object id="480" x="1571.32" y="507.045" width="222.151" height="352.212"/>
   <object id="481" x="1594.66" y="495.712" width="205.485" height="13.5455"/>
@@ -3607,6 +3607,10 @@
   <object id="948" x="17286.8" y="748" width="221" height="9"/>
   <object id="950" x="16811" y="10342" width="122" height="15"/>
   <object id="951" x="16802.5" y="10355" width="130" height="27"/>
+  <object id="965" x="16642" y="9279" width="10" height="1215"/>
+  <object id="966" x="19174.5" y="9286.48" width="27.2727" height="1199.88"/>
+  <object id="967" x="16651.5" y="10466.7" width="2542.42" height="18.1818"/>
+  <object id="968" x="16648.1" y="9284.85" width="2553.42" height="18.1818"/>
  </objectgroup>
  <objectgroup id="15" name="RemovableCollision">
   <object id="832" name="cemetery_block" x="3688" y="3148" width="357.333" height="52">
@@ -3727,12 +3731,12 @@
     <property name="type" value="mummy"/>
    </properties>
   </object>
-  <object id="952" x="17124.2" y="10293.9">
+  <object id="952" x="18612.2" y="10029.9">
    <properties>
     <property name="type" value="demon"/>
    </properties>
   </object>
-  <object id="953" x="17442.4" y="10169.7">
+  <object id="953" x="17666.4" y="9521.7">
    <properties>
     <property name="type" value="demon"/>
    </properties>
@@ -3747,7 +3751,7 @@
     <property name="type" value="demon"/>
    </properties>
   </object>
-  <object id="956" x="17066.7" y="9948.48">
+  <object id="956" x="18338.7" y="9764.48">
    <properties>
     <property name="type" value="demon"/>
    </properties>
@@ -3757,11 +3761,12 @@
     <property name="type" value="demon"/>
    </properties>
   </object>
-  <object id="958" x="16775.8" y="9412.12">
+  <object id="958" x="18351.8" y="9460.12">
    <properties>
     <property name="type" value="demon"/>
    </properties>
   </object>
+  <object id="962" x="17912" y="10076"/>
  </objectgroup>
  <objectgroup id="17" name="InteractiveObjects">
   <object id="959" name="web" x="18982" y="9683" width="60" height="51">
@@ -3769,7 +3774,7 @@
     <property name="type" value="web"/>
    </properties>
   </object>
-  <object id="961" name="House" x="328" y="415.333" width="64" height="24">
+  <object id="961" name="House" x="289" y="415.333" width="143" height="24">
    <properties>
     <property name="type" value="house"/>
    </properties>
@@ -3789,6 +3794,11 @@
   <object id="853" x="1806.67" y="1101.33">
    <properties>
     <property name="type" value="guardcat"/>
+   </properties>
+  </object>
+  <object id="964" x="17045.3" y="10297.3">
+   <properties>
+    <property name="type" value="demon"/>
    </properties>
   </object>
  </objectgroup>

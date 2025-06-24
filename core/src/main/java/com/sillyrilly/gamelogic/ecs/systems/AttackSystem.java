@@ -5,6 +5,8 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.*;
+import com.sillyrilly.gamelogic.ecs.utils.GameState;
+import com.sillyrilly.gamelogic.ecs.utils.GameStats;
 import com.sillyrilly.managers.InputManager;
 
 import static com.sillyrilly.gamelogic.ecs.utils.GameState.*;
@@ -15,11 +17,11 @@ public class AttackSystem extends EntitySystem {
     private final ComponentMapper<FacingComponent> fc = ComponentMapper.getFor(FacingComponent.class);
     private final ComponentMapper<WeaponComponent> wc = ComponentMapper.getFor(WeaponComponent.class);
     private final ComponentMapper<HealComponent> hc = ComponentMapper.getFor(HealComponent.class);
-
+    private final ComponentMapper<EnemyComponent> ec = ComponentMapper.getFor(EnemyComponent.class);
     private InputManager inputManager;
     private ImmutableArray<Entity> enemies;
     private Entity player;
-
+    GameStats stats = GameState.instance.stats;
     @Override
     public void addedToEngine(Engine engine) {
         inputManager = InputManager.instance;
@@ -43,6 +45,7 @@ public class AttackSystem extends EntitySystem {
             for (Entity enemy : enemies) {
                 BodyComponent bce = bc.get(enemy);
                 HealComponent hce = hc.get(enemy);
+                EnemyComponent enc = ec.get(enemy);
                 LocationComponent loc = enemy.getComponent(LocationComponent.class);
 
 
@@ -54,6 +57,7 @@ public class AttackSystem extends EntitySystem {
                     }
                     if (!hce.isAlive) {
                         bce.body.setActive(false);
+                        GameState.instance.stats.addKill(enc.enemyType.name());
                     }
                 }
 
