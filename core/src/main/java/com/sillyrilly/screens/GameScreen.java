@@ -58,7 +58,7 @@ public class GameScreen implements Screen {
             instance = this;
             camera = CameraManager.camera;
             stage = new Stage(viewport, batch);
-            Gdx.input.setInputProcessor(stage);
+
             new TileGraph(new NavigationMap(bigWorld).grid);
             world = new World(new Vector2(0, 0), true);
             engine = new Engine();
@@ -79,6 +79,7 @@ public class GameScreen implements Screen {
         else AudioManager.instance.playMusic(AudioManager.MusicType.HELL);
 
         InputManager.multiplexer.addProcessor(InputManager.instance);
+        InputManager.multiplexer.addProcessor(stage);
     }
 
     @Override
