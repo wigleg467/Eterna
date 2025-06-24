@@ -94,12 +94,17 @@ public class RenderSystem extends EntitySystem {
             }
         }
         renderEntities();
+        GameScreen.instance.hintRenderer.render(batch);
         batch.end();
 
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
         batch.begin();
         GameScreen.instance.dialogueWindow.render(batch);
+
         batch.end();
+
+        GameScreen.instance.stage.act(deltaTime);
+        GameScreen.instance.stage.draw();
 
         debugMode();
     }

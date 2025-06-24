@@ -10,6 +10,7 @@ import com.sillyrilly.gamelogic.ecs.utils.Dialogue;
 import com.sillyrilly.gamelogic.ecs.utils.DialogueWindow;
 import com.sillyrilly.gamelogic.ecs.utils.NPCType;
 import com.sillyrilly.managers.ScreenManager;
+import com.sillyrilly.screens.GameScreen;
 
 import static com.sillyrilly.gamelogic.ecs.utils.GameState.*;
 import static com.sillyrilly.managers.DialogueManager.getDialogue;
@@ -38,6 +39,7 @@ public class InteractionSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
+        // Якщо відкрито діалогове вікно — обробляємо тільки ENTER
         if (dialogueWindow.isVisible()) {
             if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
                 dialogueWindow.nextLine();
@@ -45,73 +47,107 @@ public class InteractionSystem extends EntitySystem {
             return;
         }
 
-        if (!Gdx.input.isKeyJustPressed(Input.Keys.E)) return;
-
         Vector2 playerPos = bm.get(player).getPosition();
 
-        for (Entity npc : npcs) {
-            Vector2 npcPos = bm.get(npc).getPosition();
-            float distance = playerPos.dst(npcPos);
+        boolean hintShown = false;
+
+        for (Entity entity : npcs) {
+            Vector2 entityPos = bm.get(entity).getPosition();
+            float distance = playerPos.dst(entityPos);
 
             if (distance < 2.5f) {
-                if (nm.has(npc)) {
-                    AnimationComponent anim = am.get(npc);
-                    anim.currentState = AnimationComponent.State.DEFAULT;
-                    anim.stateTime = 0;
 
-                    NPCComponent npcComp = nm.get(npc);
-                    // Діалог для цього NPC
-                    if (npcComp == null || npcComp.npcType == null) {
-                        Gdx.app.error("InteractionSystem", "NPCComponent або npcType дорівнює null");
-                        continue;
-                    }
-                    npcComp = nm.get(npc);
-                    if (defeatedCemeteryMonsters && npcComp.npcType == NPCType.NUN ||
-                            defeatedForestMonsters && npcComp.npcType == NPCType.LUMBERJACK) {
-                        npcComp.dialogueStage = 2;
-                    }
-                    if (gotBlessing && npcComp.npcType == NPCType.GUARDCAT) {
-                        npcComp.dialogueStage = 1;
+                // ===== NPC ====
+                if (nm.has(entity)) {
+                    NPCComponent npcComp = nm.get(entity);
+                    AnimationComponent anim = am.get(entity);
 
-                    }
+                    // Показуємо підказку
+                    GameScreen.instance.hintRenderer.showHint(npcComp.npcType.getHint(), entityPos);
+                    hintShown = true;
 
 
-                    Dialogue dialogue = getDialogue(npcComp.npcType, npcComp.dialogueStage);
-                    NPCComponent finalNpcComp = npcComp;
+                    // Взаємодія при натисканні E
+                    if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+                        GameScreen.instance.hintRenderer.hideHint();
 
+                        // Переводимо анімацію в DEFAULT (наприклад, поворот обличчям)
+                        anim.currentState = AnimationComponent.State.DEFAULT;
+                        anim.stateTime = 0;
 
-                    dialogueWindow.onDialogueEnd = () -> {
-                        if (finalNpcComp.npcType == NPCType.NUN && finalNpcComp.dialogueStage == 2) {
-                            gotBlessing = true;
-                        } else if (finalNpcComp.npcType == NPCType.NUN && finalNpcComp.dialogueStage == 0) {
-                            talkedToNun = true;
-                            finalNpcComp.dialogueStage++;
-                        } else if (finalNpcComp.npcType == NPCType.LUMBERJACK && finalNpcComp.dialogueStage == 0) {
-                            finalNpcComp.dialogueStage++;
+                        // Оновлюємо stage діалогу
+                        if (defeatedCemeteryMonsters && npcComp.npcType == NPCType.NUN ||
+                                defeatedForestMonsters && npcComp.npcType == NPCType.LUMBERJACK) {
+                            npcComp.dialogueStage = 2;
+                            Gdx.app.log("Dialogue", "Dialogue Dialogue");
                         }
-                        anim.currentState = AnimationComponent.State.IDLE;
-                    };
-                    dialogueWindow.showDialogue(dialogue);
-                } else if (iom.has(npc)) {
-                    // це інтерактивний об’єкт
-                    InteractiveObjectComponent ioc = iom.get(npc);
-                    switch (ioc.type) {
-                        case "web":
-                            BodyComponent bc = bm.get(player);
-                            // bc.body.setTransform(newX / PPM, newY / PPM, 0);
-                            Gdx.app.log("Interaction", "Teleport to: heaven");
-                            heaven = true;
-                            break;
+                        if (gotBlessing && npcComp.npcType == NPCType.GUARDCAT) {
+                            npcComp.dialogueStage = 1;
+                        }
 
-                        case "house":
-                            if (defeatedHellGatesMonsters) {
-                                Gdx.app.log("Transform", "to ASCII");
-                                ScreenManager.instance.setScreen(ScreenManager.ScreenType.ASCII);
+                        Dialogue dialogue = getDialogue(npcComp.npcType, npcComp.dialogueStage);
+
+                        dialogueWindow.onDialogueEnd = () -> {
+                            if (npcComp.npcType == NPCType.NUN && npcComp.dialogueStage == 2) {
+                                gotBlessing = true;
+                            } else if (npcComp.npcType == NPCType.NUN && npcComp.dialogueStage == 0) {
+                                talkedToNun = true;
+                                npcComp.dialogueStage++;
+                            } else if (npcComp.npcType == NPCType.LUMBERJACK && npcComp.dialogueStage == 0) {
+                                talkedToLumberjack = true;
+                                npcComp.dialogueStage++;
                             }
-                            break;
+
+                            anim.currentState = AnimationComponent.State.IDLE;
+                        };
+
+                        dialogueWindow.showDialogue(dialogue);
+
+                        break;
+                    }
+
+                }
+
+                // ===== ІНТЕРАКТИВНИЙ ОБ'ЄКТ =====
+                else if (iom.has(entity)) {
+                    InteractiveObjectComponent ioc = iom.get(entity);
+
+                    // Показати підказку
+                    String hint = switch (ioc.type) {
+                        case "web" -> "Натисніть E щоб піднятися";
+                        case "house" -> "Натисніть E щоб увійти";
+                        default -> null;
+                    };
+
+
+                        GameScreen.instance.hintRenderer.showHint(hint, entityPos);
+                    hintShown = true;
+
+                    // Обробка взаємодії
+                    if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+                        GameScreen.instance.hintRenderer.hideHint();
+
+                        switch (ioc.type) {
+                            case "web" -> {
+                                Gdx.app.log("Interaction", "Teleport to: heaven");
+                                heaven = true;
+                            }
+                            case "house" -> {
+                                if (defeatedHellGatesMonsters) {
+                                    Gdx.app.log("Interaction", "Teleport to: ASCII screen");
+                                    ScreenManager.instance.setScreen(ScreenManager.ScreenType.ASCII);
+                                }
+                            }
+                        }
+
+                        break;
                     }
                 }
             }
+        }
+
+        if (!hintShown) {
+            GameScreen.instance.hintRenderer.hideHint();
         }
     }
 }

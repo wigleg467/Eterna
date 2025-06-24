@@ -133,6 +133,7 @@ public class EntityFactory {
         entity.add(new BodyComponent(body));
         entity.add(new NPCComponent(type));
         entity.add(new InteractableComponent());
+        entity.add(new HintComponent(type.getHint()));
         entity.add(new FacingComponent());
         entity.add(new LevelComponent(lvl));
 

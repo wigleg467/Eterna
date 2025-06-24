@@ -3,6 +3,13 @@ size: 774, 258
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
+idle
+  rotate: false
+  xy: 1, 1
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
 walk_right
   rotate: false
   xy: 1, 1
@@ -24,3 +31,10 @@ walk_right
   orig: 256, 256
   offset: 0, 0
   index: 3
+  default
+    rotate: false
+    xy: 1, 1
+    size: 256, 256
+    orig: 256, 256
+    offset: 0, 0
+    index: 1
