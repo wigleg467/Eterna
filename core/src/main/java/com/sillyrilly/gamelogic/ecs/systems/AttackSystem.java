@@ -5,9 +5,11 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.sillyrilly.gamelogic.ecs.components.*;
+import com.sillyrilly.gamelogic.ecs.utils.EnemyType;
 import com.sillyrilly.gamelogic.ecs.utils.GameState;
 import com.sillyrilly.gamelogic.ecs.utils.GameStats;
 import com.sillyrilly.managers.InputManager;
+import com.sillyrilly.managers.ScreenManager;
 
 import static com.sillyrilly.gamelogic.ecs.utils.GameState.*;
 
@@ -58,6 +60,9 @@ public class AttackSystem extends EntitySystem {
                     if (!hce.isAlive) {
                         bce.body.setActive(false);
                         GameState.instance.stats.addKill(enc.enemyType.name());
+                        if(enc.enemyType.equals(EnemyType.ANGEL)){
+                            ScreenManager.instance.setScreen(ScreenManager.ScreenType.WINSCREEN);
+                        }
                     }
                 }
 

@@ -110,9 +110,6 @@ public class RenderSystem extends EntitySystem {
 
         batch.end();
 
-        GameScreen.instance.stage.act(deltaTime);
-        GameScreen.instance.stage.draw();
-
         debugMode();
     }
 

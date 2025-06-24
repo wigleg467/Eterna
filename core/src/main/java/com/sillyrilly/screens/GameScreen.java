@@ -116,6 +116,7 @@ public class GameScreen implements Screen {
         zoom = camera.zoom;
         Gdx.input.setCursorCatched(false);
         InputManager.multiplexer.removeProcessor(InputManager.instance);
+        InputManager.multiplexer.removeProcessor(stage);
     }
 
     @Override
