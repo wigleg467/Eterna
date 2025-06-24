@@ -85,7 +85,7 @@ public class RenderSystem extends EntitySystem {
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
-        for (Entity entity : sortedEntities) {
+        for (Entity entity : enemies) {
             if (hc.has(entity)) {
                 HealComponent heal = hc.get(entity);
                 if (heal.hitTimer > 0) {
@@ -129,12 +129,13 @@ public class RenderSystem extends EntitySystem {
         float camBottom = (camera.position.y - camera.viewportHeight * camera.zoom / 2f);
         float camTop = (camera.position.y + camera.viewportHeight * camera.zoom / 2f);
 
-        // Render background level entities (e.g. ground tiles) — level == 0
+        // Render background level entities (e.g. ground tiles) — level < 5
         for (Entity entity : backgroundEntities) {
             renderEntity(entity, camLeft, camRight, camBottom, camTop);
         }
 
-        // Render sorted dynamic entities (level > 0)
+
+        // Render sorted dynamic entities (level == 5)
         for (Entity entity : sortedEntities) {
             renderEntity(entity, camLeft, camRight, camBottom, camTop);
         }
@@ -159,7 +160,6 @@ public class RenderSystem extends EntitySystem {
             AnimationButtomComponent bottomAnim = acb.get(entity);
 
             float scale = 0.25f;
-            HealComponent heal = hc.get(entity);
             if (hc.has(entity) && hc.get(entity).hitTimer > 0) {
                 batch.setColor(Color.RED);
             }

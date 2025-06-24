@@ -10,6 +10,7 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -31,11 +32,13 @@ import java.util.Map;
 import static com.sillyrilly.gamelogic.ecs.utils.GameState.*;
 import static com.sillyrilly.managers.AssetsManager.bigWorld;
 import static com.sillyrilly.managers.FontManager.MENU_hoverFont;
+import static com.sillyrilly.managers.ScreenManager.mapRenderer;
 import static com.sillyrilly.util.Const.PPM;
 import static com.sillyrilly.util.Const.TILE_SCALE;
 
 public class GameScreen implements Screen {
     public static GameScreen instance;
+
     private final Map<String, Body> removableBodies = new HashMap<>();
     public DialogueWindow dialogueWindow;
     private OrthographicCamera camera;
@@ -52,7 +55,10 @@ public class GameScreen implements Screen {
 
             new TileGraph(new NavigationMap(bigWorld).grid);
             world = new World(new Vector2(0, 0), true);
+            mapRenderer = new OrthogonalTiledMapRenderer(bigWorld, 1 / PPM);
+            mapRenderer.setView(camera);
             engine = new Engine();
+
 
             parseMaps();
             initFactory();
@@ -166,7 +172,7 @@ public class GameScreen implements Screen {
             factory.createNPC(rect.x + rect.width / 2, rect.y + rect.height / 2, type, 5);
         }
 
-      objects = bigWorld.getLayers().get("InteractiveObjects").getObjects();
+        objects = bigWorld.getLayers().get("InteractiveObjects").getObjects();
         for (MapObject obj : objects) {
             Rectangle rect = ((RectangleMapObject) obj).getRectangle();
             factory.createInteractiveObject(rect, obj.getProperties(), 5);
@@ -178,12 +184,12 @@ public class GameScreen implements Screen {
         engine.addSystem(new MovementSystem());
         engine.addSystem(new CameraFollowSystem());
         engine.addSystem(new AnimationSystem());
+        engine.addSystem(new AttackSystem());
+        engine.addSystem(new EnemyAttackSystem());
         engine.addSystem(new AISystem());
         engine.addSystem(new EnemyPathfindingSystem());
         dialogueWindow = new DialogueWindow(new Texture("images/dialogue.png"), MENU_hoverFont);
         engine.addSystem(new InteractionSystem(dialogueWindow));
-        engine.addSystem(new AttackSystem());
-        engine.addSystem(new EnemyAttackSystem());
 
         engine.addSystem(new RenderSystem());
     }

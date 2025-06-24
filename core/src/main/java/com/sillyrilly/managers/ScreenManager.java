@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import com.sillyrilly.screens.ASCIIScreen;
 import com.sillyrilly.screens.GameScreen;
@@ -14,6 +15,7 @@ import java.util.EnumMap;
 public class ScreenManager implements Disposable {
     public static ScreenManager instance;
     public static SpriteBatch batch;
+    public static OrthogonalTiledMapRenderer mapRenderer;
     public static ShapeRenderer shapeRenderer;
     private static Game game;
     private static boolean isInitialized = false;
