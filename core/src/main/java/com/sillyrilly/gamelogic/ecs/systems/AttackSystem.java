@@ -24,6 +24,7 @@ public class AttackSystem extends EntitySystem {
     private ImmutableArray<Entity> enemies;
     private Entity player;
     GameStats stats = GameState.instance.stats;
+
     @Override
     public void addedToEngine(Engine engine) {
         inputManager = InputManager.instance;
@@ -60,7 +61,7 @@ public class AttackSystem extends EntitySystem {
                     if (!hce.isAlive) {
                         bce.body.setActive(false);
                         GameState.instance.stats.addKill(enc.enemyType.name());
-                        if(enc.enemyType.equals(EnemyType.ANGEL)){
+                        if (enc.enemyType.equals(EnemyType.ANGEL)) {
                             ScreenManager.instance.setScreen(ScreenManager.ScreenType.WINSCREEN);
                         }
                     }

@@ -24,6 +24,7 @@ import com.sillyrilly.managers.FontManager;
 import com.sillyrilly.managers.InputManager;
 import com.sillyrilly.managers.ScreenManager;
 import com.sillyrilly.screens.GameScreen;
+
 import static com.sillyrilly.util.Const.PPM;
 import static com.sillyrilly.util.Const.TILE_SIZE;
 
@@ -102,12 +103,9 @@ public class RenderSystem extends EntitySystem {
         }
         renderEntities();
         GameScreen.instance.hintRenderer.render(batch);
-        batch.end();
-
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
-        batch.begin();
-        GameScreen.instance.dialogueWindow.render(batch);
 
+        GameScreen.instance.dialogueWindow.render(batch);
         batch.end();
 
         debugMode();
@@ -155,7 +153,7 @@ public class RenderSystem extends EntitySystem {
         Vector2 pos = body.getPosition().scl(PPM);
 
         if (pos.x < camLeft - TILE_SIZE || pos.x > camRight + TILE_SIZE ||
-            pos.y < camBottom - TILE_SIZE || pos.y > camTop + TILE_SIZE) {
+                pos.y < camBottom - TILE_SIZE || pos.y > camTop + TILE_SIZE) {
             return;
         }
 
@@ -208,7 +206,7 @@ public class RenderSystem extends EntitySystem {
             TiledMapTile tile = tileC.tile;
             TextureRegion region = tile.getTextureRegion();
             batch.draw(region, pos.x, pos.y,
-                TILE_SIZE, tileC.renderOffsetY + TILE_SIZE);
+                    TILE_SIZE, tileC.renderOffsetY + TILE_SIZE);
         }
     }
 
@@ -252,7 +250,7 @@ public class RenderSystem extends EntitySystem {
                 TileNode from = path.get(i);
                 TileNode to = path.get(i + 1);
                 shapeRenderer.line((from.x + 0.5f) * TILE_SIZE, (from.y + 0.5f) * TILE_SIZE,
-                    (to.x + 0.5f) * TILE_SIZE, (to.y + 0.5f) * TILE_SIZE);
+                        (to.x + 0.5f) * TILE_SIZE, (to.y + 0.5f) * TILE_SIZE);
             }
         }
         shapeRenderer.end();
@@ -276,13 +274,13 @@ public class RenderSystem extends EntitySystem {
 
         // Вивід координат курсора
         FontManager.defaultFont.draw(batch,
-            String.format("(%.1f, %.1f)", screenCoords.x, screenCoords.y),
-            screenCoords.x + 10, screenCoords.y + 20);
+                String.format("(%.1f, %.1f)", screenCoords.x, screenCoords.y),
+                screenCoords.x + 10, screenCoords.y + 20);
 
         // Вивід FPS трохи нижче курсора
         FontManager.defaultFont.draw(batch,
-            "FPS: " + Gdx.graphics.getFramesPerSecond(),
-            screenCoords.x + 10, screenCoords.y + 40);
+                "FPS: " + Gdx.graphics.getFramesPerSecond(),
+                screenCoords.x + 10, screenCoords.y + 40);
 
         batch.end();
     }

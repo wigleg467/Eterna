@@ -12,10 +12,11 @@ import java.util.Map;
 
 public class AnimationTopComponent implements Component {
     public Map<WeaponComponent.WeaponType, Map<TopState, Animation<TextureAtlas.AtlasRegion>>> animations =
-        new EnumMap<>(WeaponComponent.WeaponType.class);
+            new EnumMap<>(WeaponComponent.WeaponType.class);
     public TextureAtlas.AtlasRegion currentFrame;
     public TopState currentState = TopState.IDLE;
     public float stateTime = 0f;
+
     public AnimationTopComponent(Animatable animatable) {
         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(animatable.getAnimationPath()));
 

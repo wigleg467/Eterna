@@ -12,15 +12,15 @@ public class AssetsManager {
 
     // Menu texture
     public static Texture texHead, texSettings, texExit, texWings, texBook,
-        keyOutlineTexture, settingOutlineTexture,
-        bestiaryOutlineTexture, labelTexture,
-        backgroundTexture, continueTexture;
+            keyOutlineTexture, settingOutlineTexture,
+            bestiaryOutlineTexture, labelTexture,
+            backgroundTexture, continueTexture;
 
     // Menu Sprites
     public static Sprite head, leftWing,
-        rightWing, keyOutline, settingOutline,
-        bestiaryOutline, labelSprite,
-        settingsBtn, exitBtn, bestiaryBtn;
+            rightWing, keyOutline, settingOutline,
+            bestiaryOutline, labelSprite,
+            settingsBtn, exitBtn, bestiaryBtn;
 
     public static TiledMap bigWorld;
 

@@ -37,7 +37,7 @@ public class MovementSystem extends EntitySystem {
             body.body.setTransform(17100 / PPM, 72 / PPM, body.body.getAngle());
 
             initHell = true;
-        }else if (heaven && !initHeaven) {
+        } else if (heaven && !initHeaven) {
             body.body.setTransform(16880 / PPM, 9475 / PPM, body.body.getAngle());
 
             initHeaven = true;

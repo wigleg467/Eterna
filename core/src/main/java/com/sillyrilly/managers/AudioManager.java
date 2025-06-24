@@ -29,18 +29,18 @@ public class AudioManager implements Disposable {
             // Musics init
             for (int i = 0; i < mainTheme.length; i++)
                 mainTheme[i] = Gdx.audio.newMusic(Gdx.files.internal
-                    (MUSIC_FOLDER_PATH + "main-" + (i + 1) + AUDIO_FORMAT));
+                        (MUSIC_FOLDER_PATH + "main-" + (i + 1) + AUDIO_FORMAT));
             basementTheme = Gdx.audio.newMusic(Gdx.files.internal
-                (MUSIC_FOLDER_PATH + "basement" + AUDIO_FORMAT));
+                    (MUSIC_FOLDER_PATH + "basement" + AUDIO_FORMAT));
             hellTheme = Gdx.audio.newMusic(Gdx.files.internal
-                ("audio/music/hell.wav"));
+                    ("audio/music/hell.wav"));
             forkTheme = Gdx.audio.newMusic(Gdx.files.internal
-                (MUSIC_FOLDER_PATH + "fork" + AUDIO_FORMAT));
+                    (MUSIC_FOLDER_PATH + "fork" + AUDIO_FORMAT));
 
             // Sounds init
             for (int i = 0; i < steps.length; i++)
                 steps[i] = Gdx.audio.newSound(Gdx.files.internal
-                    (SOUND_FOLDER_PATH + "footstep-" + (i + 1) + AUDIO_FORMAT));
+                        (SOUND_FOLDER_PATH + "footstep-" + (i + 1) + AUDIO_FORMAT));
 
             isInitialized = true;
         }
@@ -109,7 +109,7 @@ public class AudioManager implements Disposable {
             setVolume(volume, MusicType.MAIN_THEME);
 
             mainTheme[num].setOnCompletionListener(m ->
-                playMainMusic(mainTheme[num].getVolume())
+                    playMainMusic(mainTheme[num].getVolume())
             );
         }
     }

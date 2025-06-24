@@ -60,8 +60,8 @@ public class InputManager extends InputAdapter {
         }
 
         bottomState = isMoving
-            ? AnimationButtomComponent.BottomState.WALK
-            : AnimationButtomComponent.BottomState.IDLE;
+                ? AnimationButtomComponent.BottomState.WALK
+                : AnimationButtomComponent.BottomState.IDLE;
 
 
         if (movement.len2() > 0) {
@@ -72,9 +72,6 @@ public class InputManager extends InputAdapter {
             topState = AnimationTopComponent.TopState.ATTACK;
             setAttack(true);
         }
-
-
-
 
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) {

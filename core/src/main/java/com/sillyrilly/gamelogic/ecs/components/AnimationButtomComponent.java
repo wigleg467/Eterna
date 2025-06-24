@@ -15,6 +15,7 @@ public class AnimationButtomComponent implements Component {
     public TextureAtlas.AtlasRegion currentFrame;
     public BottomState currentState = BottomState.IDLE;
     public float stateTime = 0f;
+
     public AnimationButtomComponent(Animatable animatable, String... animationNames) {
         if (animationNames.length > 0) {
             for (int i = 0; i < animationNames.length; i++) {

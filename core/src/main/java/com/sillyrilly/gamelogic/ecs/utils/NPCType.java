@@ -2,7 +2,7 @@ package com.sillyrilly.gamelogic.ecs.utils;
 
 public enum NPCType implements Animatable {
     LUMBERJACK("lumberjack", "animations/lumberjack.atlas", 1f, 1f, "Лісоруб", "portraits/lumberjack.png", "Натисніть Е, щоб поговорити з лісорубом"),
-    DEMON("demon", "animations/demon.atlas", 1f, 1f, "Демон", "portraits/lumberjack.png", "Натисніть Е, щоб поговорити з демоном"),
+    DEMON("demon", "animations/demon.atlas", 1f, 1f, "Демон", "animations/demon/walk_right_01.png", "Натисніть Е, щоб поговорити з демоном"),
     NUN("nun", "animations/nun.atlas", 1f, 1f, "Монахиня", "portraits/nun.png", "Натисніть Е, щоб поговорити з монашкою"),
     GUARDCAT("guardcat", "animations/guard_cat.atlas", 0.5f, 0.5f, "Кіт охоронець", "portraits/guard_cat.png", "Натисніть Е, щоб пробувати перейти через мостикк");
 

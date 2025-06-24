@@ -141,7 +141,7 @@ public class ASCIIScreen implements Screen {
 
 
                 ASCII_mainFont.draw(batch, String.valueOf(ch),
-                    x * CELL_W, (SCREEN_HEIGHT - y) * CELL_H);
+                        x * CELL_W, (SCREEN_HEIGHT - y) * CELL_H);
             }
         }
     }
@@ -166,8 +166,8 @@ public class ASCIIScreen implements Screen {
             for (int x = 0; x < MAP_WIDTH; x++) {
                 char ch = '█';
                 ASCII_minimapFont.draw(batch, String.valueOf(ch),
-                    offsetX + x * sizeX,
-                    SCREEN_HEIGHT * 16 - offsetY - y * sizeY
+                        offsetX + x * sizeX,
+                        SCREEN_HEIGHT * 16 - offsetY - y * sizeY
                 );
             }
         }
@@ -180,16 +180,16 @@ public class ASCIIScreen implements Screen {
                     default -> ' ';
                 };
                 ASCII_minimapFont.draw(batch, String.valueOf(ch),
-                    offsetX + x * sizeX,
-                    SCREEN_HEIGHT * 16 - offsetY - y * sizeY
+                        offsetX + x * sizeX,
+                        SCREEN_HEIGHT * 16 - offsetY - y * sizeY
                 );
             }
         }
 
         batch.draw(ASCII_characterRegion, offsetX - 4 + (int) (playerX * sizeX),
-            SCREEN_HEIGHT * 16 - (float) offsetY * 2 / 3 - (int) (playerY * sizeY) - 9,
-            ASCII_characterGlyph.width / 2f, ASCII_characterGlyph.height / 2f,
-            ASCII_characterGlyph.width, ASCII_characterGlyph.height, 1, 1, (float) -Math.toDegrees(angle));
+                SCREEN_HEIGHT * 16 - (float) offsetY * 2 / 3 - (int) (playerY * sizeY) - 9,
+                ASCII_characterGlyph.width / 2f, ASCII_characterGlyph.height / 2f,
+                ASCII_characterGlyph.width, ASCII_characterGlyph.height, 1, 1, (float) -Math.toDegrees(angle));
     }
 
     private Hit castRay(float rayAngle) {
@@ -224,14 +224,14 @@ public class ASCIIScreen implements Screen {
         if (hud == 2) {
             result = rand.nextFloat() < 0.95f;
             return
-                cell == DOOR ? result ? '/' : '⁄' :
-                    d < 0.9f ? result ? '|' : '!' :
-                        d < 1.05f ? rand.nextBoolean() ? '|' : '!' :
-                            d < 1.9f ? result ? '!' : ':' :
-                                d < 2.05f ? rand.nextBoolean() ? '!' : ':' :
-                                    d < 2.9f ? result ? ':' : '.' :
-                                        d < 3.05f ? rand.nextBoolean() ? ':' : '.' :
-                                            d < 4f ? result ? '.' : '·' : ' ';
+                    cell == DOOR ? result ? '/' : '⁄' :
+                            d < 0.9f ? result ? '|' : '!' :
+                                    d < 1.05f ? rand.nextBoolean() ? '|' : '!' :
+                                            d < 1.9f ? result ? '!' : ':' :
+                                                    d < 2.05f ? rand.nextBoolean() ? '!' : ':' :
+                                                            d < 2.9f ? result ? ':' : '.' :
+                                                                    d < 3.05f ? rand.nextBoolean() ? ':' : '.' :
+                                                                            d < 4f ? result ? '.' : '·' : ' ';
         } else if (hud == 1) {
             return d < 1.5f ? cell == DOOR ? result ? '/' : '⁄' : result ? '.' : '·' : ' ';
         } else {

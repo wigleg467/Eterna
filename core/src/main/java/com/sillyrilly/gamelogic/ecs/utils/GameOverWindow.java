@@ -33,16 +33,16 @@ public class GameOverWindow extends Window {
 
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) {
-                GameState.instance.reset(); // ← очищає статику
-                ScreenManager.instance.setScreen(ScreenManager.ScreenType.GAME);
-            }
-
-
-            // Додай усе до таблиці
-            padTop(30);
-            add(statsLabel).width(400).padBottom(20).row();
-
+            GameState.instance.reset(); // ← очищає статику
+            ScreenManager.instance.setScreen(ScreenManager.ScreenType.GAME);
         }
+
+
+        // Додай усе до таблиці
+        padTop(30);
+        add(statsLabel).width(400).padBottom(20).row();
+
     }
+}
 
 

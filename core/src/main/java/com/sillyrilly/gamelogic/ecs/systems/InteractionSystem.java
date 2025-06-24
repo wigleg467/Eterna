@@ -120,7 +120,7 @@ public class InteractionSystem extends EntitySystem {
                     };
 
 
-                        GameScreen.instance.hintRenderer.showHint(hint, entityPos);
+                    GameScreen.instance.hintRenderer.showHint(hint, entityPos);
                     hintShown = true;
 
                     // Обробка взаємодії

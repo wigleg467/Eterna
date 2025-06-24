@@ -15,6 +15,7 @@ public class AnimationComponent implements Component {
     public TextureAtlas.AtlasRegion currentFrame;
     public State currentState = State.WALK;
     public float stateTime = 0f;
+
     public AnimationComponent(Animatable animatable, String... animationNames) {
         if (animationNames.length > 0) {
             for (int i = 0; i < animationNames.length; i++) {

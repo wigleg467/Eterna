@@ -14,8 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.sillyrilly.gamelogic.ecs.utils.GameState;
-import com.sillyrilly.managers.ScreenManager;
 
 import static com.sillyrilly.managers.FontManager.MENU_hoverFont;
 
@@ -43,9 +41,8 @@ public class GameOverScreen implements Screen {
         stage.addActor(root);
 
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle(skin.get("default", TextButton.TextButtonStyle.class));
-       style.font = font;
-       style.fontColor = Color.WHITE;
-
+        style.font = font;
+        style.fontColor = Color.WHITE;
 
 
         Label title = new Label("Ви все ж воз'єдналися але в іншому світі", new Label.LabelStyle(font, Color.WHITE));
@@ -58,19 +55,20 @@ public class GameOverScreen implements Screen {
         statsLabel.setAlignment(Align.center);
         root.add(statsLabel).colspan(2).padBottom(20).width(400).row();
 
-        TextButton restart = new TextButton("Грати знову", style);;
+        TextButton restart = new TextButton("Вийти", style);
+        ;
         restart.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                GameState.instance.reset();
-                ScreenManager.instance.setScreen(ScreenManager.ScreenType.MENU);
+                Gdx.app.exit();
             }
         });
         root.add(restart).colspan(2).center();
     }
 
     @Override
-    public void show() {}
+    public void show() {
+    }
 
     @Override
     public void render(float delta) {
@@ -81,13 +79,25 @@ public class GameOverScreen implements Screen {
         stage.draw();
     }
 
-    @Override public void resize(int width, int height) {
+    @Override
+    public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
     }
-    @Override public void pause() {}
-    @Override public void resume() {}
-    @Override public void hide() {}
-    @Override public void dispose() {
+
+    @Override
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
+    public void hide() {
+    }
+
+    @Override
+    public void dispose() {
         stage.dispose();
     }
 }

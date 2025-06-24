@@ -13,7 +13,7 @@ public class HintRenderer {
     private boolean visible = false;
     private float npcWidth;
 
-    public HintRenderer( BitmapFont font) {
+    public HintRenderer(BitmapFont font) {
         this.font = font;
         font.getData().setScale(0.6f);
     }
@@ -32,6 +32,6 @@ public class HintRenderer {
     public void render(SpriteBatch batch) {
         if (!visible || hintText == null) return;
 
-        font.draw(batch, hintText, screenPos.x-160, screenPos.y + 100);
+        font.draw(batch, hintText, screenPos.x - 160, screenPos.y + 100);
     }
 }

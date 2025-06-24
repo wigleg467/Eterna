@@ -419,7 +419,7 @@ public class MenuScreen implements Screen {
 
             this.setSize(600, 400);
             this.setPosition(Gdx.graphics.getWidth() / 2f - getWidth() / 2f,
-                Gdx.graphics.getHeight() / 2f - getHeight() / 2f);
+                    Gdx.graphics.getHeight() / 2f - getHeight() / 2f);
 
             // Список ворогів
             enemyList = new VisList<>();

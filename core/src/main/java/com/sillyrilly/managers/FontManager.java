@@ -64,7 +64,7 @@ public class FontManager implements Disposable {
             ASCII_characterGlyph = ASCII_minimapFont.getData().getGlyph('>');
             assert ASCII_characterGlyph != null;
             ASCII_characterRegion = new TextureRegion(ASCII_minimapFont.getRegion().getTexture(),
-                ASCII_characterGlyph.srcX, ASCII_characterGlyph.srcY, ASCII_characterGlyph.width, ASCII_characterGlyph.height);
+                    ASCII_characterGlyph.srcX, ASCII_characterGlyph.srcY, ASCII_characterGlyph.width, ASCII_characterGlyph.height);
 
             menuGen.dispose();
             asciiGen.dispose();

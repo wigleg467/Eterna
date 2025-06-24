@@ -14,8 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.sillyrilly.gamelogic.ecs.utils.GameState;
-import com.sillyrilly.managers.ScreenManager;
 
 import static com.sillyrilly.managers.FontManager.MENU_hoverFont;
 
@@ -50,13 +48,12 @@ public class WinScreen implements Screen {
         root.add(title).colspan(2).padBottom(20).row();
 
 
-        TextButton restart = new TextButton("Грати знову", style);
+        TextButton restart = new TextButton("Вийти", style);
         ;
         restart.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                GameState.instance.reset();
-                ScreenManager.instance.setScreen(ScreenManager.ScreenType.MENU);
+                Gdx.app.exit();
             }
         });
         root.add(restart).colspan(2).center();

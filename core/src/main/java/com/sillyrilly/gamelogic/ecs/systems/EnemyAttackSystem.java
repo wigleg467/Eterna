@@ -49,7 +49,7 @@ public class EnemyAttackSystem extends EntitySystem {
                     if (!hcp.isAlive) {
                         String statsText = GameState.instance.stats.formatStats();
                         ScreenManager.instance.setScreen(ScreenManager.ScreenType.GAMEOVER);
-                       // GameScreen.instance.engine.setProcessing(false);
+                        // GameScreen.instance.engine.setProcessing(false);
                     }
                 }
             }
